@@ -1,0 +1,21 @@
+## This file is part of Whonix.
+## Copyright (C) 2012 - 2014 Patrick Schleizer <adrelanos@riseup.net>
+## See the file COPYING for copying conditions.
+
+Source: msgcollector
+Section: misc
+Priority: important
+Maintainer: Patrick Schleizer <adrelanos@riseup.net>
+Build-Depends: debhelper (>= 8), faketime, config-package-dev
+Homepage: https://www.whonix.org
+Vcs-Browser: https://github.com/Whonix/msgcollector
+Vcs-Git: https://github.com/Whonix/msgcollector.git
+Standards-Version: 3.9.4
+
+Package: msgcollector
+Architecture: all
+Pre-Depends: tor
+Depends: ${misc:Depends}
+Description: Notification System for X and Terminal
+ Collects messages by applications using this system and dispatches them in X
+ and in Terminal.
