@@ -15,7 +15,8 @@ Standards-Version: 3.9.4
 Package: msgcollector
 Architecture: all
 Pre-Depends: tor
-Depends: ${misc:Depends}
+Depends: zenity, ${misc:Depends}
+Recommends: libnotify-bin | kde-baseapps-bin
 Description: Notification System for X and Terminal
  Collects messages by applications using this system and dispatches them in X
  and in Terminal.
