@@ -4,7 +4,7 @@
 
 Source: msgcollector
 Section: misc
-Priority: important
+Priority: optional
 Maintainer: Patrick Schleizer <adrelanos@riseup.net>
 Build-Depends: debhelper (>= 8), faketime, config-package-dev
 Homepage: https://www.whonix.org
