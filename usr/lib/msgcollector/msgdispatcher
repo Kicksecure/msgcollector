@@ -168,7 +168,7 @@ dispatch_x_active() {
    else
       ## Fallback.
       local icon
-      icon="/usr/share/icons/whonix/whonix.ico"
+      icon="/usr/share/icons/anon-icon-pack/whonix.ico"
    fi
 
    ## "sudo -u user" is required, because /etc/init.d/sdwdate runs
