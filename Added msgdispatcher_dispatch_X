@@ -1,0 +1,6 @@
+Added the python script 'msgdispatcher_dispatch_X'
+to replace the zenity popup at the completion of
+timesync and whonixcheck.
+Will have to rename '/var/run/msgcollector/${identifier}.lefttop'
+as the the window move to bootomright in case whonixcheck and 
+timesync popups might overlap. 
