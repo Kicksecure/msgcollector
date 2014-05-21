@@ -16,7 +16,7 @@ class dispatch(QtGui.QMessageBox):
     def initUI(self):
 
         ## Cannot move to topleft safely, because of variable window size.
-        ## The window moves back to center if outside screen boubaries.
+        ## The window moves back to center if outside screen boundaries.
         if str(sys.argv[4]) == "1":
 	    self.bottomright()
         else:
