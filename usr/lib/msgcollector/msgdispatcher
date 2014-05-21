@@ -190,6 +190,7 @@ main_function() {
    local identifier
 
    while true; do
+      ## TODO: make generic
       for identifier in "whonixcheck" "timesync" "torbrowser"; do
          if [ "$x" = "1" ]; then
 
