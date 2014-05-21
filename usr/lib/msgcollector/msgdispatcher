@@ -26,7 +26,7 @@ error_handler() {
 "
    ############################################################
    ## Popup window with the message above.
-   /usr/lib/msgcollector/msgdispatcher_dispatch_X.py "warning" "$scriptname" "$msg" "0"
+   /usr/lib/msgcollector/msgdispatcher_dispatch_X "warning" "$scriptname" "$msg" "0"
    ############################################################
    echo "$msg"
    mkdir --parents ~/".msgcollector"
