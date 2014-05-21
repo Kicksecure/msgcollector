@@ -17,7 +17,6 @@ error_handler() {
 ## $scriptname script bug.
 ## No panic. Nothing is broken. Just some rare condition has been hit.
 ## Try again later. There is likely a solution for this problem.
-## Please see Whonix News, Whonix Blog and Whonix User Help Forum.
 ## Please report this bug!
 ##
 ## BASH_COMMAND: $BASH_COMMAND
@@ -148,8 +147,9 @@ dispatch_cli() {
       local parenttty
       parenttty="$(cat "/var/run/msgcollector/${identifier}.parenttty")"
       if [ "$parenttty" = "/dev/tty1" ]; then
-         ## When for example whonixcheck was run in tty1, then messages were
-         ## already echoed by msgcollector. No need to dispatch them again.
+         ## When an application (for example whonixcheck) was run in tty1,
+         ## then messages were already echoed by msgcollector. No need to
+         ## dispatch them again.
          true "Skipping, because parenttty is /dev/tty1."
          return 0
       fi
