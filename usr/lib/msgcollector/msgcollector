@@ -11,7 +11,8 @@
 ## /usr/lib/msgcollector/msgcollector --identifier whonixcheck --icon /usr/share/icons/anon-icon-pack/whonix.ico --parentpid "$$" --typex "warning" --titlex "test title" --passivepopupqueuex --message "test"
 ## /usr/lib/msgcollector/msgcollector --identifier whonixcheck --icon /usr/share/icons/anon-icon-pack/whonix.ico --parentpid "$$" --typex "warning" --titlex "test title" --progressbarx --message "test" --done
 ## /usr/lib/msgcollector/msgcollector --identifier whonixcheck --icon /usr/share/icons/anon-icon-pack/whonix.ico --parentpid "$$" --progressx "50"
-## /usr/lib/msgcollector/msgdispatcher
+## /usr/lib/msgcollector/msgdispatcher --x
+## /usr/lib/msgcollector/msgdispatcher --cli
 
 ## Tests:
 ## /usr/lib/msgcollector/msgcollector --identifier whonixcheck --icon /usr/share/icons/anon-icon-pack/whonix.ico --parentpid "$$" --typex "warning" --titlex "test title" --progressbaridx "test" --progressbarx --message "test" --done
