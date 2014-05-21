@@ -29,8 +29,8 @@ error_handler() {
    /usr/lib/whonix/msgdispatcher_dispatch_X.py "warning" "$scriptname" "$msg" "0"
    ############################################################
    echo "$msg"
-   mkdir --parents ~/".whonix"
-   echo "$scriptname: BASH_COMMAND: $BASH_COMMAND | exit_code: $exit_code" > ~/".whonix/msgdispatcher-error.log"
+   mkdir --parents ~/".msgcollector"
+   echo "$scriptname: BASH_COMMAND: $BASH_COMMAND | exit_code: $exit_code" > ~/".msgcollector/msgdispatcher-error.log"
 
    echo "qwerfffsdrt"
       

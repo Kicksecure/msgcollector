@@ -48,7 +48,7 @@ error_handler() {
 ###############################################################################\
 "
    echo "$msg"
-   mkdir --parents ~/".whonix"
+   mkdir --parents ~/".msgcollector"
    echo "\
 scriptname: $scriptname
 my_command_line_parameters: $my_command_line_parameters
@@ -57,7 +57,7 @@ ps_p_parentpid: $ps_p_parentpid
 my_pstree: $my_pstree
 BASH_COMMAND: $BASH_COMMAND
 exit_code: $exit_code
-" > ~/".whonix/msgdispatcher-error.log"
+" > ~/".msgcollector/msgdispatcher-error.log"
    exit 1
 }
 
