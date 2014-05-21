@@ -14,8 +14,10 @@ Standards-Version: 3.9.4
 
 Package: msgcollector
 Architecture: all
-Depends: zenity, ${misc:Depends}
-Recommends: libnotify-bin | kde-baseapps-bin
+Depends: python, zenity, libnotify-bin | kde-baseapps-bin, ${misc:Depends}
 Description: Notification System for X and Terminal
  Collects messages by applications using this system and dispatches them in X
  and in Terminal.
+ .
+ Without having either notify-send (package libnotify-bin) or having kdialog
+ (package kde-baseapps-bin) installed, passive popups will not be supported.
