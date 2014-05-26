@@ -129,7 +129,7 @@ passive_popup_tool() {
    ## - that is not the case for CLI Custom-Workstation users
    ## - that may not be the case for Gnome users
    if [ ! "$(command -v "kdialog")" = "" ] ; then
-      #/usr/lib/whonix/dispatch_X.py "$identifier" "$1" "$2"   
+      #/usr/lib/whonix/dispatch_X.py "$identifier" "$1" "$2"
       kdialog --title "$identifier" --passivepopup "$2" "$1"
       #true
     elif [ ! "$(command -v "notify-send")" = "" ] ; then
@@ -165,7 +165,7 @@ dispatch_x_active() {
       local lefttop
       lefttop="1"
    fi
-   
+
    if [ -f "/var/run/msgcollector/${identifier}.icon" ]; then
       local icon
       icon="$(cat "/var/run/msgcollector/${identifier}.icon")"
@@ -174,7 +174,7 @@ dispatch_x_active() {
       local icon
       icon="/usr/share/icons/anon-icon-pack/whonix.ico"
    fi
-   
+
    ## Pyhton script replacing the zenity call below.
    /usr/lib/whonix/msgdispatcher_dispatch_x "$type" "$title" "$msg" "$lefttop" "$icon"
 
@@ -183,7 +183,7 @@ dispatch_x_active() {
    #   display=":0"
    #fi
    #fi
-   
+
 
    ## "sudo -u user" is required, because /etc/init.d/sdwdate runs
    ## as root. When making changes, test this using:
@@ -200,7 +200,7 @@ dispatch_x_active() {
    #   "--$type" \
    #     --text "$msg" \
    #   >/dev/null 2>/dev/null &
-      
+
    #echo "$msg"
 
    #if [ "$lefttop" = "1" ]; then
