@@ -7,14 +7,14 @@ import os
 
 
 class dispatch(QtGui.QMessageBox):
-    
+
     def __init__(self):
         super(dispatch, self).__init__()
-        
+
         self.initUI()
-        
-    def initUI(self):               
-        
+
+    def initUI(self):
+
         icon = str(sys.argv[5])
         self.setWindowIcon(QtGui.QIcon(icon))
 
@@ -25,23 +25,23 @@ class dispatch(QtGui.QMessageBox):
 	    self.show()
 
         if str(sys.argv[1]) == "info":
-	    self.reply = QtGui.QMessageBox.information(self, str(sys.argv[2]) , str(sys.argv[3]),    
+	    self.reply = QtGui.QMessageBox.information(self, str(sys.argv[2]) , str(sys.argv[3]),
 	    QtGui.QMessageBox.Ok, QtGui.QMessageBox.Ok)
 	    sys.exit(0)
         elif str(sys.argv[1]) == "warning":
-            self.reply = QtGui.QMessageBox.warning(self, str(sys.argv[2]), str(sys.argv[3]),  
+            self.reply = QtGui.QMessageBox.warning(self, str(sys.argv[2]), str(sys.argv[3]),
             QtGui.QMessageBox.Ok, QtGui.QMessageBox.Ok)
             sys.exit(0)
-        elif str(sys.argv[1]) == "critcal":    
-            self.reply = QtGui.QMessageBox.critical(self, str(sys.argv[2]), str(sys.argv[3]),   
+        elif str(sys.argv[1]) == "critcal":
+            self.reply = QtGui.QMessageBox.critical(self, str(sys.argv[2]), str(sys.argv[3]),
             QtGui.QMessageBox.Ok, QtGui.QMessageBox.Ok)
             sys.exit(0)
         else:
             sys.exit(1)
 
-        
+
 def main():
-    
+
     app = QtGui.QApplication(sys.argv)
     ex = dispatch()
     sys.exit(app.exec_())
