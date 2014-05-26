@@ -17,6 +17,7 @@ error_handler() {
 ## $scriptname script bug.
 ## No panic. Nothing is broken. Just some rare condition has been hit.
 ## Try again later. There is likely a solution for this problem.
+## Please see Whonix News, Whonix Blog and Whonix User Help Forum.
 ## Please report this bug!
 ##
 ## BASH_COMMAND: $BASH_COMMAND
@@ -25,13 +26,11 @@ error_handler() {
 "
    ############################################################
    ## Popup window with the message above.
-   /usr/lib/msgcollector/msgdispatcher_dispatch_X "warning" "$scriptname" "$msg" "0"
+   /usr/lib/whonix/msgdispatcher_dispatch_x "warning" "$scriptname" "$msg" "0"
    ############################################################
    echo "$msg"
-   mkdir --parents ~/".msgcollector"
-   echo "$scriptname: BASH_COMMAND: $BASH_COMMAND | exit_code: $exit_code" > ~/".msgcollector/msgdispatcher-error.log"
-
-   echo "qwerfffsdrt"
+   mkdir --parents ~/".whonix"
+   echo "$scriptname: BASH_COMMAND: $BASH_COMMAND | exit_code: $exit_code" > ~/".whonix/msgdispatcher-error.log"
 
    true
 }
@@ -130,9 +129,10 @@ passive_popup_tool() {
    ## - that is not the case for CLI Custom-Workstation users
    ## - that may not be the case for Gnome users
    if [ ! "$(command -v "kdialog")" = "" ] ; then
-      #/usr/lib/msgcollector/dispatch_X.py "$identifier" "$1" "$2"
+      #/usr/lib/whonix/dispatch_X.py "$identifier" "$1" "$2"   
       kdialog --title "$identifier" --passivepopup "$2" "$1"
-   elif [ ! "$(command -v "notify-send")" = "" ] ; then
+      #true
+    elif [ ! "$(command -v "notify-send")" = "" ] ; then
       notify-send --expire-time "$1" "$identifier" "$2"
    else
       true
@@ -147,9 +147,8 @@ dispatch_cli() {
       local parenttty
       parenttty="$(cat "/var/run/msgcollector/${identifier}.parenttty")"
       if [ "$parenttty" = "/dev/tty1" ]; then
-         ## When an application (for example whonixcheck) was run in tty1,
-         ## then messages were already echoed by msgcollector. No need to
-         ## dispatch them again.
+         ## When for example whonixcheck was run in tty1, then messages were
+         ## already echoed by msgcollector. No need to dispatch them again.
          true "Skipping, because parenttty is /dev/tty1."
          return 0
       fi
@@ -162,10 +161,11 @@ dispatch_x_active() {
    trap "error_handler" ERR
 
    if [ -f "/var/run/msgcollector/${identifier}.lefttop" ]; then
+   #if [ -f "/usr/lib/whonix/msgdispatcher" ]; then
       local lefttop
       lefttop="1"
    fi
-
+   
    if [ -f "/var/run/msgcollector/${identifier}.icon" ]; then
       local icon
       icon="$(cat "/var/run/msgcollector/${identifier}.icon")"
@@ -174,8 +174,42 @@ dispatch_x_active() {
       local icon
       icon="/usr/share/icons/anon-icon-pack/whonix.ico"
    fi
+   
+   ## Pyhton script replacing the zenity call below.
+   /usr/lib/whonix/msgdispatcher_dispatch_x "$type" "$title" "$msg" "$lefttop" "$icon"
 
-   /usr/lib/msgcollector/msgdispatcher_dispatch_X "$type" "$title" "$msg" "$lefttop"
+
+   #if [ "$display" = "" ]; then
+   #   display=":0"
+   #fi
+   #fi
+   
+
+   ## "sudo -u user" is required, because /etc/init.d/sdwdate runs
+   ## as root. When making changes, test this using:
+   ## sudo touch /var/lib/whonix/sdw_error
+   ## sudo service sdwdate restart
+   #sudo -u user zenity \
+   #   --display="$display" \
+   #   --height=600 \
+   #   --width=800 \
+   #   --timeout 86400 \
+   #   --no-markup \
+   #   --window-icon "$icon" \
+   #   --title="$title" \
+   #   "--$type" \
+   #     --text "$msg" \
+   #   >/dev/null 2>/dev/null &
+      
+   #echo "$msg"
+
+   #if [ "$lefttop" = "1" ]; then
+      ## provided by /usr/lib/whonix/msgwmctrl
+   #   output_wmctrl_move_window_to_left_top "$title"
+      ## Not in Debian Wheezy, due to a bug in zenity resulting in no visible
+      ## text. Can be re-enabled in Debian Jessie.
+      #output_wmctrl_maximize_window "$title"
+   #fi
 }
 
 dispatch_x_passive() {
@@ -190,7 +224,6 @@ main_function() {
    local identifier
 
    while true; do
-      ## TODO: make generic
       for identifier in "whonixcheck" "timesync" "torbrowser"; do
          if [ "$x" = "1" ]; then
 
@@ -208,9 +241,9 @@ main_function() {
                         unset animate
                      fi
                      if [ "$verbose" = "1" ]; then
-                        bash -x /usr/lib/msgcollector/msgprogressbar --identifier "$identifier" --progressbaridx "${progressbaridx}" --verbose $animate
+                        bash -x /usr/lib/whonix/msgprogressbar --identifier "$identifier" --progressbaridx "${progressbaridx}" --verbose $animate
                      else
-                        /usr/lib/msgcollector/msgprogressbar --identifier "$identifier" --progressbaridx "${progressbaridx}" $animate &
+                        /usr/lib/whonix/msgprogressbar --identifier "$identifier" --progressbaridx "${progressbaridx}" $animate &
                      fi
                      unset animate
                      rm --force "/var/run/msgcollector/${identifier}.${progressbaridx}.progressbarx.done"
@@ -300,6 +333,6 @@ main_function() {
 
 parse_cmd_options ${1+"$@"}
 write_own_pid
-source /usr/lib/msgcollector/msgwmctrl
-fallbacks ## provided by /usr/lib/msgcollector/msgwmctrl
+source /usr/lib/whonix/msgwmctrl
+fallbacks ## provided by /usr/lib/whonix/msgwmctrl
 main_function
