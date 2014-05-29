@@ -26,11 +26,11 @@ error_handler() {
 "
    ############################################################
    ## Popup window with the message above.
-   /usr/lib/whonix/msgdispatcher_dispatch_x "warning" "$scriptname" "$msg" "0"
+   /usr/lib/msgcollector/msgdispatcher_dispatch_x "warning" "$scriptname" "$msg" "0"
    ############################################################
    echo "$msg"
-   mkdir --parents ~/".whonix"
-   echo "$scriptname: BASH_COMMAND: $BASH_COMMAND | exit_code: $exit_code" > ~/".whonix/msgdispatcher-error.log"
+   mkdir --parents ~/".msgcollector"
+   echo "$scriptname: BASH_COMMAND: $BASH_COMMAND | exit_code: $exit_code" > ~/".msgcollector/msgdispatcher-error.log"
 
    true
 }
@@ -129,7 +129,7 @@ passive_popup_tool() {
    ## - that is not the case for CLI Custom-Workstation users
    ## - that may not be the case for Gnome users
    if [ ! "$(command -v "kdialog")" = "" ] ; then
-      #/usr/lib/whonix/dispatch_X.py "$identifier" "$1" "$2"
+      #/usr/lib/msgcollector/dispatch_X.py "$identifier" "$1" "$2"
       kdialog --title "$identifier" --passivepopup "$2" "$1"
       #true
     elif [ ! "$(command -v "notify-send")" = "" ] ; then
@@ -161,7 +161,6 @@ dispatch_x_active() {
    trap "error_handler" ERR
 
    if [ -f "/var/run/msgcollector/${identifier}.lefttop" ]; then
-   #if [ -f "/usr/lib/whonix/msgdispatcher" ]; then
       local lefttop
       lefttop="1"
    fi
@@ -176,7 +175,7 @@ dispatch_x_active() {
    fi
 
    ## Pyhton script replacing the zenity call below.
-   /usr/lib/whonix/msgdispatcher_dispatch_x "$type" "$title" "$msg" "$lefttop" "$icon"
+   /usr/lib/msgcollector/msgdispatcher_dispatch_x "$type" "$title" "$msg" "$lefttop" "$icon"
 
 
    #if [ "$display" = "" ]; then
@@ -204,7 +203,7 @@ dispatch_x_active() {
    #echo "$msg"
 
    #if [ "$lefttop" = "1" ]; then
-      ## provided by /usr/lib/whonix/msgwmctrl
+      ## provided by /usr/lib/msgcollector/msgwmctrl
    #   output_wmctrl_move_window_to_left_top "$title"
       ## Not in Debian Wheezy, due to a bug in zenity resulting in no visible
       ## text. Can be re-enabled in Debian Jessie.
@@ -221,10 +220,25 @@ dispatch_x_passive() {
 main_function() {
    trap "error_handler" ERR
 
-   local identifier
+   shopt -s nullglob
+
+   local identifier_list identifier temp_list temp_item
 
    while true; do
-      for identifier in "whonixcheck" "timesync" "torbrowser"; do
+      unset identifier_list identifier temp_list temp_item
+      temp_list="/var/run/msgcollector/"*".done"
+      for temp_item in $temp_list; do
+         ## Remove ".done".
+         temp_item="${temp_item%%.*}"
+         ## Remove "/var/run/msgcollector/".
+         temp_item="${temp_item##*/}"
+         if [ "$identifier_list" = "" ]; then
+            identifier_list="$temp_item"
+         else
+            identifier_list="$identifier_list $temp_item"
+         fi
+      done
+      for identifier in $identifier_list; do
          if [ "$x" = "1" ]; then
 
             local progressbaridx_file
@@ -241,9 +255,9 @@ main_function() {
                         unset animate
                      fi
                      if [ "$verbose" = "1" ]; then
-                        bash -x /usr/lib/whonix/msgprogressbar --identifier "$identifier" --progressbaridx "${progressbaridx}" --verbose $animate
+                        bash -x /usr/lib/msgcollector/msgprogressbar --identifier "$identifier" --progressbaridx "${progressbaridx}" --verbose $animate
                      else
-                        /usr/lib/whonix/msgprogressbar --identifier "$identifier" --progressbaridx "${progressbaridx}" $animate &
+                        /usr/lib/msgcollector/msgprogressbar --identifier "$identifier" --progressbaridx "${progressbaridx}" $animate &
                      fi
                      unset animate
                      rm --force "/var/run/msgcollector/${identifier}.${progressbaridx}.progressbarx.done"
@@ -333,6 +347,6 @@ main_function() {
 
 parse_cmd_options ${1+"$@"}
 write_own_pid
-source /usr/lib/whonix/msgwmctrl
-fallbacks ## provided by /usr/lib/whonix/msgwmctrl
+source /usr/lib/msgcollector/msgwmctrl
+fallbacks ## provided by /usr/lib/msgcollector/msgwmctrl
 main_function
