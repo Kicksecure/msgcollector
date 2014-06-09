@@ -116,6 +116,11 @@ parse_cmd_options() {
                   exit 1
                fi
                ;;
+           --typexstatus)
+               ## for --status
+               shift
+               typex_chosen="1"
+               ;;
            --message)
                message="$2"
                shift 2
@@ -239,6 +244,8 @@ preparation() {
    if [ "$who_ami" = "" ]; then
       who_ami="$(whoami)"
    fi
+
+   mkdir --parents "/var/run/msgcollector/$who_ami"
 }
 
 colors() {
@@ -628,6 +635,18 @@ return_status() {
       fi
       write_to_file="/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbarx"
       return_status_file
+   fi
+   ## }}
+
+   ## {{ --typexstatus
+   if [ "$typex_chosen" = "1" ]; then
+      write_to_file="/var/run/msgcollector/$who_ami/${identifier}.typex"
+      if [ -f "$write_to_file" ]; then
+         local TYPE
+         TYPE="$(cat "$write_to_file")"
+         echo "$TYPE"
+      fi
+      exit 0
    fi
    ## }}
 
