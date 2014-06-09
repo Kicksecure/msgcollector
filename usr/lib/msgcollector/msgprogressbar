@@ -52,6 +52,10 @@ parse_cmd_options() {
                identifier="$2"
                shift 2
                ;;
+           --whoami)
+               whoami="$2"
+               shift 2
+               ;;
            --progressbaridx)
                progressbaridx="$2"
                shift 2
@@ -84,8 +88,8 @@ cleanup_self() {
    kill -sigterm "$zenity_progress_pid" >/dev/null 2>/dev/null || true
    rm --force "$fifo"
    rm --force "$progress_txt_file"
-   rm --force "/var/run/msgcollector/${identifier}.${progressbaridx}.zenityprogresspid"
-   rm --force "/var/run/msgcollector/${identifier}.${progressbaridx}.parentpid"
+   rm --force "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.zenityprogresspid"
+   rm --force "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.parentpid"
 }
 
 output_ex() {
@@ -97,11 +101,11 @@ output_ex() {
    ## Debugging.
    #echo "progress: $progress | caller: $PPID | $caller | killing $zenity_progress_pid" >> /home/user/progresslog
 
-   if [ -f "/var/run/msgcollector/${identifier}.${progressbaridx}.parentpid" ]; then
-      parentpid="$(cat "/var/run/msgcollector/${identifier}.${progressbaridx}.parentpid")"
+   if [ -f "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.parentpid" ]; then
+      parentpid="$(cat "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.parentpid")"
    else
       true "$output_signal_caught caught. Not killing parentpid $parentpid, \
-because /var/run/msgcollector/${identifier}.${progressbaridx}.parentpid does not exist."
+because /var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.parentpid does not exist."
       cleanup_self
       exit 0
    fi
@@ -142,28 +146,28 @@ trap "output_sigterm" SIGTERM
 start_progress_bar() {
    trap "error_handler" ERR
 
-   if [ -f "/var/run/msgcollector/${identifier}.${progressbaridx}.progressbarx" ]; then
+   if [ -f "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbarx" ]; then
       local msg
-      msg="$(cat "/var/run/msgcollector/${identifier}.${progressbaridx}.progressbarx")"
-      rm --force "/var/run/msgcollector/${identifier}.${progressbaridx}.progressbarx"
+      msg="$(cat "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbarx")"
+      rm --force "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbarx"
    fi
 
    if [ "$msg" = "" ]; then
       local msg="Progress bar message is empty, please report this Whonix bug!"
    fi
 
-   if [ -f "/var/run/msgcollector/${identifier}.titlex" ]; then
+   if [ -f "/var/run/msgcollector/$who_ami/${identifier}.titlex" ]; then
       local title
-      title="$(cat "/var/run/msgcollector/${identifier}.titlex")"
+      title="$(cat "/var/run/msgcollector/$who_ami/${identifier}.titlex")"
    fi
 
    if [ "$title" = "" ]; then
       local title="Variable title does not exist. Please report this bug!"
    fi
 
-   if [ -f "/var/run/msgcollector/${identifier}.icon" ]; then
+   if [ -f "/var/run/msgcollector/$who_ami/${identifier}.icon" ]; then
       local icon
-      icon="$(cat "/var/run/msgcollector/${identifier}.icon")"
+      icon="$(cat "/var/run/msgcollector/$who_ami/${identifier}.icon")"
    fi
 
    if [ "$icon" = "" ]; then
@@ -171,7 +175,7 @@ start_progress_bar() {
       local icon="/usr/share/icons/anon-icon-pack/whonix.ico"
    fi
 
-   if [ -f "/var/run/msgcollector/${identifier}.lefttop" ]; then
+   if [ -f "/var/run/msgcollector/$who_ami/${identifier}.lefttop" ]; then
       local lefttop="1"
    fi
 
@@ -179,8 +183,8 @@ start_progress_bar() {
       display=":0"
    fi
 
-   fifo="/var/run/msgcollector/${identifier}.${progressbaridx}.fifo"
-   progress_txt_file="/var/run/msgcollector/${identifier}.${progressbaridx}.progresstxt"
+   fifo="/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.fifo"
+   progress_txt_file="/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progresstxt"
 
    if [ -f "$progress_txt_file" ]; then
       ## Sometimes there is a race condition preventing the progressbar
@@ -216,7 +220,7 @@ start_progress_bar() {
 
    exec 3>"$fifo"
 
-   echo "$zenity_progress_pid" | sudo -u user tee "/var/run/msgcollector/${identifier}.${progressbaridx}.zenityprogresspid" > /dev/null
+   echo "$zenity_progress_pid" > "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.zenityprogresspid"
 
    if [ "$lefttop" = "1" ]; then
       ## set progressbar variable to 1, so the progress bar window will not be
