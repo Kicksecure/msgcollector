@@ -2,50 +2,83 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from PyQt4 import QtGui
-import os
+from PyQt4 import QtCore, QtGui
 
+try:
+    _fromUtf8 = QtCore.QString.fromUtf8
+except AttributeError:
+    _fromUtf8 = lambda s: s
 
-class dispatch(QtGui.QMessageBox):
+class Ui_Dialog(object):
+    def setupUi(self, Dialog):
+        Dialog.setMinimumSize(QtCore.QSize(700, vSize+80))
+        Dialog.setMaximumSize(QtCore.QSize(700, vSize+80))
+        Dialog.setWindowModality(QtCore.Qt.ApplicationModal)
+        Dialog.setWindowIcon(QtGui.QIcon(icon))
+        if pos == "1":
+            Dialog.move(0,  0)
 
-    def __init__(self):
-        super(dispatch, self).__init__()
-
-        self.initUI()
-
-    def initUI(self):
-
-        icon = str(sys.argv[5])
-        self.setWindowIcon(QtGui.QIcon(icon))
-
-        if str(sys.argv[4]) == "0":
- 	    self.move(0, 0)
-        elif str(sys.argv[4]) == "1":
-	    self.move(0, 0)
-	    self.show()
-
-        if str(sys.argv[1]) == "info":
-	    self.reply = QtGui.QMessageBox.information(self, str(sys.argv[2]) , str(sys.argv[3]),
-	    QtGui.QMessageBox.Ok, QtGui.QMessageBox.Ok)
-	    sys.exit(0)
-        elif str(sys.argv[1]) == "warning":
-            self.reply = QtGui.QMessageBox.warning(self, str(sys.argv[2]), str(sys.argv[3]),
-            QtGui.QMessageBox.Ok, QtGui.QMessageBox.Ok)
-            sys.exit(0)
-        elif str(sys.argv[1]) == "critcal":
-            self.reply = QtGui.QMessageBox.critical(self, str(sys.argv[2]), str(sys.argv[3]),
-            QtGui.QMessageBox.Ok, QtGui.QMessageBox.Ok)
-            sys.exit(0)
+        self.buttonBox = QtGui.QDialogButtonBox(Dialog)
+        self.buttonBox.setGeometry(QtCore.QRect(570, vSize+40, 111, 32))
+        if button == "ok":
+            self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Ok)
+        elif button == "yesno":
+            self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Yes|QtGui.QDialogButtonBox.No)
         else:
-            sys.exit(1)
+            self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Ok)
+
+        self.Message = QtGui.QLabel(Dialog)
+        self.Message.setGeometry(QtCore.QRect(90, 10, 591, vSize+10))
+        #self.Message.setFrameShape(QtGui.QFrame.Box)
+        self.Message.setTextFormat(QtCore.Qt.PlainText)
+        self.Message.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
+        self.Message.setWordWrap(True)
+
+        self.Info_Icon = QtGui.QLabel(Dialog)
+        self.Info_Icon.setGeometry(QtCore.QRect(10, 8, 71, 71))
+        self.Info_Icon.setPixmap(QtGui.QPixmap(_fromUtf8(itype)))
+
+        self.retranslateUi(Dialog)
+        if button == "ok":
+            QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("accepted()")), Dialog.accept)
+        elif button == "yesno":
+            QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("accepted()")), Dialog.accept)
+            QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("rejected()")), Dialog.reject)
+        QtCore.QMetaObject.connectSlotsByName(Dialog)
 
 
-def main():
+    def retranslateUi(self, Dialog):
+        Dialog.setWindowTitle(QtGui.QApplication.translate("Dialog", title, None, QtGui.QApplication.UnicodeUTF8))
+        self.Message.setText(QtGui.QApplication.translate("Dialog",msg, None, QtGui.QApplication.UnicodeUTF8))
+        return()
 
+
+if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
-    ex = dispatch()
+    Dialog = QtGui.QDialog()
+
+    if str(sys.argv[1]) == "info":
+        itype = "/usr/share/icons/oxygen/64x64/status/dialog-information.png"
+    elif str(sys.argv[1]) == "warning":
+        itype = "/usr/share/icons/oxygen/64x64/status/dialog-warning.png"
+    elif str(sys.argv[1]) == "critcal":
+        itype = "/usr/share/icons/oxygen/64x64/status/dialog-error.png"
+    else:
+        itype =""
+        sys.exit("'msgdispatcher_dispatch_x'. Information type not recognized: %s" % str(sys.argv[1]))
+
+    title = str(sys.argv[2])
+    msg = str(sys.argv[3])
+    pos = str(sys.argv[4])
+    icon = str(sys.argv[5])
+    button = str(sys.argv[6])
+
+    """ calculates (roughly) the vertical size of the message label """
+    newlines = msg.count("\n", 0, len(msg))
+    vSize = (int(len(msg)/96) + newlines +1) * 12
+
+    ui = Ui_Dialog()
+    ui.setupUi(Dialog)
+    Dialog.exec_()
     sys.exit(app.exec_())
 
-
-if __name__ == '__main__':
-    main()
