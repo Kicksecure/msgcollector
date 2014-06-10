@@ -71,7 +71,6 @@ if __name__ == "__main__":
     msg = str(sys.argv[3])
     pos = str(sys.argv[4])
     icon = str(sys.argv[5])
-    button = str(sys.argv[6])
 
     """ calculates (roughly) the vertical size of the message label """
     newlines = msg.count("\n", 0, len(msg))
