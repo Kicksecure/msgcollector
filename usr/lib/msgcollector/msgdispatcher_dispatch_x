@@ -20,12 +20,7 @@ class Ui_Dialog(object):
 
         self.buttonBox = QtGui.QDialogButtonBox(Dialog)
         self.buttonBox.setGeometry(QtCore.QRect(555, maxSize+30, 100, 32))
-        if button == "ok":
-            self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Ok)
-        elif button == "yesno":
-            self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Yes|QtGui.QDialogButtonBox.No)
-        else:
-            self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Ok)
+        self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Ok)
 
         self.Message = QtGui.QLabel(Dialog)
         self.Message.setGeometry(QtCore.QRect(85, 10, 562, vSize))
@@ -35,7 +30,7 @@ class Ui_Dialog(object):
         self.Message.setWordWrap(True)
 
         self.Scroll = QtGui.QScrollArea(Dialog)
-        self.Scroll.setGeometry(QtCore.QRect(85, 10, 585, maxSize+6))
+        self.Scroll.setGeometry(QtCore.QRect(85, 10, 585, maxSize+10))
         self.Scroll.setFrameShape(QtGui.QFrame.NoFrame)
         self.Scroll.setWidget(self.Message)
 
@@ -44,11 +39,7 @@ class Ui_Dialog(object):
         self.Info_Icon.setPixmap(QtGui.QPixmap(_fromUtf8(itype)))
 
         self.retranslateUi(Dialog)
-        if button == "ok":
-            QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("accepted()")), Dialog.accept)
-        elif button == "yesno":
-            QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("accepted()")), Dialog.accept)
-            QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("rejected()")), Dialog.reject)
+        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("accepted()")), Dialog.accept)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):
@@ -75,16 +66,15 @@ if __name__ == "__main__":
     msg = str(sys.argv[3])
     pos = str(sys.argv[4])
     icon = str(sys.argv[5])
-    button =str(sys.argv[6])
 
     maxvSize = QtGui.QDesktopWidget().availableGeometry().height() - 23  ## ??
     """ calculates (roughly) the vertical size of the message label """
     newlines = msg.count("\n", 0, len(msg))
     vSize = (int(len(msg)/90) + newlines + 3) * 12
-    if vSize < 300: #maxvSize -70:
+    if vSize < (maxvSize-70):
         maxSize = vSize
     else:
-        maxSize = 300 #maxvSize - 70
+        maxSize = (maxvSize-70)
 
     ui = Ui_Dialog()
     ui.setupUi(Dialog)
