@@ -11,45 +11,40 @@ except AttributeError:
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
-        Dialog.setMinimumSize(QtCore.QSize(700, vSize+80))
-        Dialog.setMaximumSize(QtCore.QSize(700, vSize+80))
+        Dialog.setMinimumSize(QtCore.QSize(680, maxSize + 65))
+        Dialog.setMaximumSize(QtCore.QSize(680, maxSize + 65))
         Dialog.setWindowModality(QtCore.Qt.ApplicationModal)
         Dialog.setWindowIcon(QtGui.QIcon(icon))
         if pos == "1":
             Dialog.move(0,  0)
 
         self.buttonBox = QtGui.QDialogButtonBox(Dialog)
-        self.buttonBox.setGeometry(QtCore.QRect(570, vSize+40, 111, 32))
-        if button == "ok":
-            self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Ok)
-        elif button == "yesno":
-            self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Yes|QtGui.QDialogButtonBox.No)
-        else:
-            self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Ok)
+        self.buttonBox.setGeometry(QtCore.QRect(555, maxSize+30, 100, 32))
+        self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Ok)
 
         self.Message = QtGui.QLabel(Dialog)
-        self.Message.setGeometry(QtCore.QRect(90, 10, 591, vSize+10))
+        self.Message.setGeometry(QtCore.QRect(85, 10, 562, vSize))
         #self.Message.setFrameShape(QtGui.QFrame.Box)
         self.Message.setTextFormat(QtCore.Qt.PlainText)
         self.Message.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.Message.setWordWrap(True)
+
+        self.Scroll = QtGui.QScrollArea(Dialog)
+        self.Scroll.setGeometry(QtCore.QRect(85, 10, 585, maxSize+10))
+        self.Scroll.setFrameShape(QtGui.QFrame.NoFrame)
+        self.Scroll.setWidget(self.Message)
 
         self.Info_Icon = QtGui.QLabel(Dialog)
         self.Info_Icon.setGeometry(QtCore.QRect(10, 8, 71, 71))
         self.Info_Icon.setPixmap(QtGui.QPixmap(_fromUtf8(itype)))
 
         self.retranslateUi(Dialog)
-        if button == "ok":
-            QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("accepted()")), Dialog.accept)
-        elif button == "yesno":
-            QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("accepted()")), Dialog.accept)
-            QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("rejected()")), Dialog.reject)
+        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("accepted()")), Dialog.accept)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
-
 
     def retranslateUi(self, Dialog):
         Dialog.setWindowTitle(QtGui.QApplication.translate("Dialog", title, None, QtGui.QApplication.UnicodeUTF8))
-        self.Message.setText(QtGui.QApplication.translate("Dialog",msg, None, QtGui.QApplication.UnicodeUTF8))
+        self.Message.setText(QtGui.QApplication.translate("Dialog", msg, None, QtGui.QApplication.UnicodeUTF8))
         return()
 
 
@@ -72,12 +67,16 @@ if __name__ == "__main__":
     pos = str(sys.argv[4])
     icon = str(sys.argv[5])
 
+    maxvSize = QtGui.QDesktopWidget().availableGeometry().height() - 23  ## ??
     """ calculates (roughly) the vertical size of the message label """
     newlines = msg.count("\n", 0, len(msg))
-    vSize = (int(len(msg)/96) + newlines +1) * 12
+    vSize = (int(len(msg)/90) + newlines + 3) * 12
+    if vSize < (maxvSize-70):
+        maxSize = vSize
+    else:
+        maxSize = (maxvSize-70)
 
     ui = Ui_Dialog()
     ui.setupUi(Dialog)
     Dialog.exec_()
     sys.exit(app.exec_())
-
