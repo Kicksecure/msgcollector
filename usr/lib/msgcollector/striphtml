@@ -1,0 +1,11 @@
+#!/usr/bin/python
+    
+def strip():
+    message=re.sub('<[^<]+?>', '', html)
+    print message
+    #return message
+
+if __name__=='__main__':
+    import sys,  re
+    html = sys.argv[1]
+    strip()

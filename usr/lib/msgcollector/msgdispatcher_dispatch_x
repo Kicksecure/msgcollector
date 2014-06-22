@@ -13,7 +13,6 @@ class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setMinimumSize(QtCore.QSize(680, maxSize + 65))
         Dialog.setMaximumSize(QtCore.QSize(680, maxSize + 65))
-        Dialog.setWindowModality(QtCore.Qt.ApplicationModal)
         Dialog.setWindowIcon(QtGui.QIcon(icon))
         if pos == "1":
             Dialog.move(0,  0)
@@ -25,12 +24,13 @@ class Ui_Dialog(object):
         self.Message = QtGui.QLabel(Dialog)
         self.Message.setGeometry(QtCore.QRect(85, 10, 562, vSize))
         #self.Message.setFrameShape(QtGui.QFrame.Box)
-        self.Message.setTextFormat(QtCore.Qt.PlainText)
+        self.Message.setTextFormat(QtCore.Qt.RichText)
         self.Message.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.Message.setWordWrap(True)
+        self.Message.setOpenExternalLinks(True)
 
         self.Scroll = QtGui.QScrollArea(Dialog)
-        self.Scroll.setGeometry(QtCore.QRect(85, 10, 585, maxSize+10))
+        self.Scroll.setGeometry(QtCore.QRect(85, 10, 585, maxSize+5))
         self.Scroll.setFrameShape(QtGui.QFrame.NoFrame)
         self.Scroll.setWidget(self.Message)
 
@@ -69,8 +69,9 @@ if __name__ == "__main__":
 
     maxvSize = QtGui.QDesktopWidget().availableGeometry().height() - 23  ## ??
     """ calculates (roughly) the vertical size of the message label """
-    newlines = msg.count("\n", 0, len(msg))
-    vSize = (int(len(msg)/90) + newlines + 3) * 12
+    newlines = msg.count("<p>", 0, len(msg)) * 2
+    linebreaks = msg.count("<br>", 0, len(msg))
+    vSize = (int(len(msg)/84) + newlines + linebreaks + 2) * 12
     if vSize < (maxvSize-70):
         maxSize = vSize
     else:
@@ -78,5 +79,5 @@ if __name__ == "__main__":
 
     ui = Ui_Dialog()
     ui.setupUi(Dialog)
-    Dialog.exec_()
+    Dialog.show()
     sys.exit(app.exec_())
