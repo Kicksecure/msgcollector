@@ -85,6 +85,9 @@ preparation() {
    trap "error_handler" ERR
 
    who_ami="$(whoami)"
+   if [ ! -d "/var/run/msgcollector/$who_ami" ]; then
+      mkdir --parents "/var/run/msgcollector/$who_ami"
+   fi
 }
 
 write_own_pid() {

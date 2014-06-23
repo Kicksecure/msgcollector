@@ -245,7 +245,9 @@ preparation() {
       who_ami="$(whoami)"
    fi
 
-   mkdir --parents "/var/run/msgcollector/$who_ami"
+   if [ ! -d "/var/run/msgcollector/$who_ami" ]; then
+      mkdir --parents "/var/run/msgcollector/$who_ami"
+   fi
 }
 
 colors() {
