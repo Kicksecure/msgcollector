@@ -541,13 +541,13 @@ collector() {
 
    ## {{ --forceactive
    if [ "$forceactive" = "1" ]; then
-      sudo -u user touch "/var/run/msgcollector/$who_ami/${identifier}.forceactive"
+      touch "/var/run/msgcollector/$who_ami/${identifier}.forceactive"
    fi
    ## }}
 
    ## {{ --lefttop
    if [ "$lefttop" = "1" ]; then
-      sudo -u user touch "/var/run/msgcollector/$who_ami/${identifier}.lefttop"
+      touch "/var/run/msgcollector/$who_ami/${identifier}.lefttop"
    fi
    ## }}
 
@@ -580,7 +580,7 @@ $message" >> "$write_to_file"
 
    ## {{ --done
    if [ "$done" = "1" ]; then
-      sudo -u user touch "${write_to_file}.done"
+      touch "${write_to_file}.done"
    fi
    ## }}
 }
