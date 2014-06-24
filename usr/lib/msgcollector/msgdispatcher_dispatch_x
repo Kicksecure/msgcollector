@@ -28,6 +28,7 @@ class Ui_Dialog(object):
         self.Message.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.Message.setWordWrap(True)
         self.Message.setOpenExternalLinks(True)
+        self.Message.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
 
         self.Scroll = QtGui.QScrollArea(Dialog)
         self.Scroll.setGeometry(QtCore.QRect(85, 10, 585, maxSize+5))
