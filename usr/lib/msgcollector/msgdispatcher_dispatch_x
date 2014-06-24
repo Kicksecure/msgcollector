@@ -56,7 +56,7 @@ if __name__ == "__main__":
         itype = "/usr/share/icons/oxygen/64x64/status/dialog-information.png"
     elif str(sys.argv[1]) == "warning":
         itype = "/usr/share/icons/oxygen/64x64/status/dialog-warning.png"
-    elif str(sys.argv[1]) == "critcal":
+    elif str(sys.argv[1]) == "error":
         itype = "/usr/share/icons/oxygen/64x64/status/dialog-error.png"
     else:
         itype =""
