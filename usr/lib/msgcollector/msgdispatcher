@@ -30,7 +30,7 @@ error_handler() {
    ############################################################
    echo "$msg"
    mkdir --parents ~/".msgcollector"
-   echo "$scriptname: BASH_COMMAND: $BASH_COMMAND | exit_code: $exit_code" > ~/".msgcollector/msgdispatcher-error.log"
+   echo "$scriptname: BASH_COMMAND: $BASH_COMMAND | exit_code: $exit_code" >> ~/".msgcollector/msgdispatcher-error.log"
 
    true
 }
