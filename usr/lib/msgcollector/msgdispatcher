@@ -93,6 +93,8 @@ preparation() {
 }
 
 write_own_pid() {
+   trap "error_handler" ERR
+
    if [ "$cli" = "1" ]; then
       echo "$$" > "/var/run/msgcollector/$who_ami/msgdispatcher_pidcli"
    elif [ "$x" = "1" ]; then
