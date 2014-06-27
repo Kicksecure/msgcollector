@@ -491,6 +491,7 @@ collector() {
       write_to_file="/var/run/msgcollector/$who_ami/${identifier}.waitmessagecli"
       if [ ! -z "$message" ]; then
          ## variable $message exists
+         message="$(/usr/lib/msgcollector/striphtml "$message")"
          pretty_type "$typecli"
          message="[$p_type] [$identifier] $message"
          echo "$message"
