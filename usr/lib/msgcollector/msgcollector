@@ -350,7 +350,7 @@ maybe_wait() {
 }
 ## }}
 
-pretty_type() {
+pretty_type_cli() {
    trap "error_handler" ERR
 
    if [ "$1" = "info" ]; then
@@ -478,7 +478,7 @@ collector() {
       if [ ! -z "$message" ]; then
          ## variable $message exists
          message="$(/usr/lib/msgcollector/striphtml "$message")"
-         pretty_type "$typecli"
+         pretty_type_cli "$typecli"
          message="[$p_type] [$identifier] $message"
          echo "$message"
       fi
@@ -492,7 +492,7 @@ collector() {
       if [ ! -z "$message" ]; then
          ## variable $message exists
          message="$(/usr/lib/msgcollector/striphtml "$message")"
-         pretty_type "$typecli"
+         pretty_type_cli "$typecli"
          message="[$p_type] [$identifier] $message"
          echo "$message"
       fi
