@@ -51,7 +51,14 @@ error_handler() {
       $output ${output_opts[@]} --messagex --typex "error" --titlex "$TITLE" --message "$MSG" --done
       $output ${output_opts[@]} --messagecli --typecli "error" --titlecli "$TITLE" --message "$MSG" --done
    else
-      echo "$MSG"
+      local stripped_msg
+      stripped_msg="$(/usr/lib/msgcollector/striphtml "$MSG")"
+      if [ "$stripped_msg" = "" ]; then
+         ## In case striphtml failed or is not available.
+         echo "$MSG"
+      else
+         echo "$stripped_msg"
+      fi
    fi
 
    ## Check if ex_funct command has been already defined. This is not the case,
