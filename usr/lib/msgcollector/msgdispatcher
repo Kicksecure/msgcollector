@@ -27,7 +27,14 @@ error_handler() {
    ## Popup window with the message above.
    /usr/lib/msgcollector/msgdispatcher_dispatch_x "warning" "$scriptname" "$msg" "0"
    ############################################################
-   echo "$msg"
+   local stripped_msg
+   stripped_msg="$(/usr/lib/msgcollector/striphtml "$MSG")"
+   if [ "$stripped_msg" = "" ]; then
+      ## In case striphtml failed or is not available.
+      echo "$MSG"
+   else
+      echo "$stripped_msg"
+   fi
    if [ ! -d ~/".msgcollector" ]; then
       mkdir --parents ~/".msgcollector"
    fi
