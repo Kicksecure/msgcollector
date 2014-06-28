@@ -9,38 +9,36 @@ error_handler() {
    BUG="1"
 
    if [ -d /usr/share/whonix ]; then
-      local MSG="\
-###############################################################################
-## $SCRIPTNAME script bug.
-## No panic. Nothing is broken. Just some rare condition has been hit.
-## Try again later. There is likely a solution for this problem.
-## Please see Whonix News, Whonix Blog and Whonix User Help Forum.
-## Please report this bug!
-##
-## BASH_COMMAND: $BASH_COMMAND
-## exit_code: $exit_code
-##
-## Experts only:
-## bash -x $SCRIPTNAME --verbose
-## for verbose output. Clean the output and report to Whonix developers.
-###############################################################################\
-"
+      local MSG="<p>###############################################################################
+<br></br>## $SCRIPTNAME script bug.
+<br></br>## No panic. Nothing is broken. Just some rare condition has been hit.
+<br></br>## Try again later. There is likely a solution for this problem.
+<br></br>## Please see Whonix News, Whonix Blog and Whonix User Help Forum.
+<br></br>## Please report this bug!
+<br></br>##
+<br></br>## BASH_COMMAND: $BASH_COMMAND
+<br></br>## exit_code: $exit_code
+<br></br>##
+<br></br>## Experts only:
+<br></br>## bash -x $SCRIPTNAME --verbose
+<br></br>## for verbose output. Clean the output and report to Whonix developers.
+<br></br>#########################################################################</p>"
    else
-      local MSG="\
-###############################################################################
-## $SCRIPTNAME script bug.
-## No panic. Nothing is broken. Just some rare condition has been hit.
-## Try again later. There is likely a solution for this problem.
-## Please report this bug!
-##
-## BASH_COMMAND: $BASH_COMMAND
-## exit_code: $exit_code
-##
-## Experts only:
-## bash -x $SCRIPTNAME --verbose
-## for verbose output. Clean the output and report a bug.
-###############################################################################\
-"
+      local MSG="<p>###############################################################################
+<br></br>## $SCRIPTNAME script bug.
+<br></br>## No panic. Nothing is broken. Just some rare condition has been hit.
+<br></br>## Try again later. There is likely a solution for this problem.
+<br></br>## Please see Whonix News, Whonix Blog and Whonix User Help Forum.
+<br></br>## Please report this bug!
+<br></br>##
+<br></br>## BASH_COMMAND: $BASH_COMMAND
+<br></br>## exit_code: $exit_code
+<br></br>##
+<br></br>## Experts only:
+<br></br>## bash -x $SCRIPTNAME --verbose
+<br></br>## for verbose output. Clean the output and report to Whonix developers.
+<br></br>#########################################################################</p>"
+
    fi
    ## Check if $output command has been already defined. This is not the case,
    ## when the script is terminated very early.

@@ -12,18 +12,17 @@ scriptname="$(basename $0)"
 error_handler() {
    local exit_code="$?"
 
-   local msg="\
-###############################################################################
-## $scriptname script bug.
-## No panic. Nothing is broken. Just some rare condition has been hit.
-## Try again later. There is likely a solution for this problem.
-## Please see Whonix News, Whonix Blog and Whonix User Help Forum.
-## Please report this bug!
-##
-## BASH_COMMAND: $BASH_COMMAND
-## exit_code: $exit_code
-###############################################################################\
-"
+   local msg="<p>
+<br></br>###############################################################################
+<br></br>## $scriptname script bug.
+<br></br>## No panic. Nothing is broken. Just some rare condition has been hit.
+<br></br>## Try again later. There is likely a solution for this problem.
+<br></br>## Please see Whonix News, Whonix Blog and Whonix User Help Forum.
+<br></br>## Please report this bug!
+<br></br>##
+<br></br>## BASH_COMMAND: $BASH_COMMAND
+<br></br>## exit_code: $exit_code
+<br></br>###############################################################################</p>"
    ############################################################
    ## Popup window with the message above.
    /usr/lib/msgcollector/msgdispatcher_dispatch_x "warning" "$scriptname" "$msg" "0"
