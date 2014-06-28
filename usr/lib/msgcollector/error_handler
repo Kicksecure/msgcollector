@@ -22,8 +22,7 @@ error_handler() {
 ##
 ## Experts only:
 ## bash -x $SCRIPTNAME --verbose
-## for verbose output. Clean the output and
-## submit to Whonix developers.
+## for verbose output. Clean the output and report to Whonix developers.
 ###############################################################################\
 "
    else
@@ -39,8 +38,7 @@ error_handler() {
 ##
 ## Experts only:
 ## bash -x $SCRIPTNAME --verbose
-## for verbose output. Clean the output and
-## submit to Whonix developers.
+## for verbose output. Clean the output and report a bug.
 ###############################################################################\
 "
    fi
