@@ -51,7 +51,7 @@ fallbacks() {
 }
 
 output_wait_for_window() {
-   ## also used by whonix-autosetup
+   ## also used by /usr/lib/whonixsetup
 
    trap "error_handler" ERR
 
