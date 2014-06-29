@@ -210,7 +210,7 @@ main_function() {
 
    while true; do
       unset identifier_list identifier temp_list temp_item
-      temp_list="/var/run/msgcollector/$who_ami/"*".done"
+      temp_list="/var/run/msgcollector/$who_ami/"*".done /var/run/msgcollector/global/"*".done"
       for temp_item in $temp_list; do
          ## Remove ".done".
          temp_item="${temp_item%%.*}"
