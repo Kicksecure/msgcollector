@@ -90,7 +90,7 @@ preparation() {
    fi
 
    if [ ! -d "/var/run/msgcollector/$who_ami" ]; then
-      mkdir --parents "/var/run/msgcollector/$who_ami"
+      mkdir --mode o+rwx --parents "/var/run/msgcollector/$who_ami"
    fi
 }
 

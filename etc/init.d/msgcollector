@@ -30,9 +30,10 @@
 # and status_of_proc is working.
 . /lib/lsb/init-functions
 
-mkdir --parents /var/run/msgcollector
-chmod --recursive o+w /var/run/msgcollector
-chmod --recursive g+w /var/run/msgcollector
+mkdir --mode o+rwx --parents /var/run/msgcollector
+setfacl --recursive --default --set u::rwx,g::rwx,o::rwx /var/run/msgcollector
+chmod --recursive g+rwx/var/run/msgcollector
+chmod --recursive o+rwx /var/run/msgcollector
 
 #
 # Function that starts the daemon/service
