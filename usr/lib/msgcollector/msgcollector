@@ -49,7 +49,9 @@ error_handler() {
 ###############################################################################\
 "
    echo "$msg"
-   mkdir --parents ~/".msgcollector"
+   if [ ! -d ~/".msgcollector" ]; then
+      mkdir --parents ~/".msgcollector"
+   fi
    echo "\
 scriptname: $scriptname
 my_command_line_parameters: $my_command_line_parameters

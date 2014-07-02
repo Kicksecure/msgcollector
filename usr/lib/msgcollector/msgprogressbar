@@ -28,7 +28,9 @@ error_handler() {
 ###############################################################################\
 "
    echo "$msg"
-   mkdir --parents ~/".msgcollector"
+   if [ ! -d ~/".msgcollector" ]; then
+      mkdir --parents ~/".msgcollector"
+   fi
    echo "$scriptname: BASH_COMMAND: $BASH_COMMAND | exit_code: $exit_code" >> ~/".msgcollector/msgdispatcher-error.log"
    exit 1
 }
