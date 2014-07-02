@@ -23,10 +23,12 @@ error_handler() {
 <br></br>## BASH_COMMAND: $BASH_COMMAND
 <br></br>## exit_code: $exit_code
 <br></br>###############################################################################</p>"
-   ############################################################
+
    ## Popup window with the message above.
-   /usr/lib/msgcollector/msgdispatcher_dispatch_x "warning" "$scriptname" "$msg" "0"
-   ############################################################
+   ## /usr/share/icons/anon-icon-pack/whonix.ico might not exist, but
+   ## fortunately msgdispatcher_dispatch_x works anyway.
+   /usr/lib/msgcollector/msgdispatcher_dispatch_x "warning" "$scriptname" "$msg" "0" "/usr/share/icons/anon-icon-pack/whonix.ico"
+
    local stripped_msg
    stripped_msg="$(/usr/lib/msgcollector/striphtml "$MSG")"
    if [ "$stripped_msg" = "" ]; then
