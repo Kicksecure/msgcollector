@@ -53,9 +53,9 @@ error_handler() {
       stripped_msg="$(/usr/lib/msgcollector/striphtml "$MSG")"
       if [ "$stripped_msg" = "" ]; then
          ## In case striphtml failed or is not available.
-         echo "$MSG"
+         echo "$MSG" >&2
       else
-         echo "$stripped_msg"
+         echo "$stripped_msg" >&2
       fi
    fi
 
@@ -65,11 +65,11 @@ error_handler() {
    command_v_output_exit_code="0"
    command -v "ex_funct" >/dev/null || { command_v_output_exit_code="$?" ; true; };
    if [ "$command_v_output_exit_code" = "0" ]; then
-      echo "$SCRIPTNAME: Error detected. Cleaning up... Exiting..."
+      echo "$SCRIPTNAME: Error detected. Cleaning up... Exiting..." >&2
       EXIT_TYPE="err"
       ex_funct
    else
-      echo "$SCRIPTNAME: Error detected. Skipping ex_funct since not yet load. Exiting..."
+      echo "$SCRIPTNAME: Error detected. Skipping ex_funct since not yet load. Exiting..." >&2
    fi
 
    exit 1

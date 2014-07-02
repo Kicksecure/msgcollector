@@ -33,9 +33,9 @@ error_handler() {
    stripped_msg="$(/usr/lib/msgcollector/striphtml "$MSG")"
    if [ "$stripped_msg" = "" ]; then
       ## In case striphtml failed or is not available.
-      echo "$MSG"
+      echo "$MSG" >&2
    else
-      echo "$stripped_msg"
+      echo "$stripped_msg" >&2
    fi
    if [ ! -d ~/".msgcollector" ]; then
       mkdir --parents ~/".msgcollector"
