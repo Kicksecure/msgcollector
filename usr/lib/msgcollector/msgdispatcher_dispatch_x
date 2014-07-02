@@ -18,7 +18,7 @@ class Ui_Dialog(object):
             Dialog.move(0,  0)
 
         self.buttonBox = QtGui.QDialogButtonBox(Dialog)
-        self.buttonBox.setGeometry(QtCore.QRect(555, maxSize+30, 100, 32))
+        self.buttonBox.setGeometry(QtCore.QRect(555, maxSize+25, 100, 32))
         self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Ok)
 
         self.Message = QtGui.QLabel(Dialog)
@@ -27,12 +27,12 @@ class Ui_Dialog(object):
         self.Message.setTextFormat(QtCore.Qt.RichText)
         self.Message.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.Message.setWordWrap(True)
+        self.Message.setTextInteractionFlags(QtCore.Qt.LinksAccessibleByMouse | QtCore.Qt.TextSelectableByMouse)
         self.Message.setOpenExternalLinks(True)
 
         self.Scroll = QtGui.QScrollArea(Dialog)
-        self.Scroll.setGeometry(QtCore.QRect(85, 10, 585, maxSize+5))
+        self.Scroll.setGeometry(QtCore.QRect(85, 10, 580, maxSize + 5))
         self.Scroll.setFrameShape(QtGui.QFrame.NoFrame)
-        self.Message.setTextInteractionFlags(QtCore.Qt.LinksAccessibleByMouse | QtCore.Qt.TextSelectableByMouse)
         self.Scroll.setWidget(self.Message)
 
         self.Info_Icon = QtGui.QLabel(Dialog)
@@ -72,7 +72,8 @@ if __name__ == "__main__":
     """ calculates (roughly) the vertical size of the message label """
     newlines = msg.count("<p>", 0, len(msg)) * 2
     blockquotes = msg.count("<blockquote>", 0, len(msg)) * 2
-    vSize = (int(len(msg)/84) + newlines + blockquotes) * 12
+    linebreaks = msg.count("<br>", 0, len(msg))
+    vSize = (int(len(msg)/84) + newlines + blockquotes + linebreaks) * 12
     if vSize < (maxvSize-70):
         maxSize = vSize
     else:
