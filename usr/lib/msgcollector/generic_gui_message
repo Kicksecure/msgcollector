@@ -1,0 +1,54 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+import sys
+from PyQt4 import QtGui,  QtCore
+
+
+class Notice(QtGui.QMessageBox):
+
+    def __init__(self):
+        super(Notice, self).__init__()
+        self.initUI()
+
+    def initUI(self):
+        itype = str(sys.argv[1])
+        title = str(sys.argv[2])
+        message = str(sys.argv[3])
+        question = str(sys.argv[4])
+        button = str(sys.argv[5])
+
+        if itype ==  "information":
+            self.setIcon(QtGui.QMessageBox.Question)
+        elif itype == "warning":
+            self.setIcon(QtGui.QMessageBox.Warning)
+        elif itype == "error":
+            self.setIcon(QtGui.QMessageBox.Critical)
+
+        self.setWindowTitle(title)
+        self.setText(message)
+        self.setInformativeText(question)
+
+        if button == "yesno":
+            self.setStandardButtons(QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
+        elif button == "ok":
+            self.setStandardButtons(QtGui.QMessageBox.Ok)
+
+        self.setTextFormat(QtCore.Qt.RichText)
+
+        self.exec_()
+
+        result = self.result()
+        if button == "yesno":
+            print result
+
+        sys.exit()
+
+
+def main():
+    app = QtGui.QApplication(sys.argv)
+    ex = Notice()
+    sys.exit(app.exec_())
+
+if __name__ == '__main__':
+    main()
