@@ -10,7 +10,7 @@
 
 set -o pipefail
 
-scriptname="$(basename $BASH_SOURCE)"
+scriptname="$(basename "$BASH_SOURCE")"
 
 error_handler() {
    local exit_code="$?"
