@@ -21,7 +21,7 @@
 #set -x
 set -o pipefail
 
-scriptname="$(basename $0)"
+scriptname="$(basename $BASH_SOURCE)"
 
 error_handler() {
    local exit_code="$?"
@@ -106,7 +106,7 @@ parse_cmd_options() {
                typecli="$2"
                shift 2
                if [ "$typecli" = "" ]; then
-                  echo "$0 ERROR: variable typecli is empty."
+                  echo "$BASH_SOURCE ERROR: variable typecli is empty."
                   exit 1
                fi
                ;;
@@ -114,7 +114,7 @@ parse_cmd_options() {
                typex="$2"
                shift 2
                if [ "$typex" = "" ]; then
-                  echo "$0 ERROR: variable typex is empty."
+                  echo "$BASH_SOURCE ERROR: variable typex is empty."
                   exit 1
                fi
                ;;
@@ -127,7 +127,7 @@ parse_cmd_options() {
                message="$2"
                shift 2
                if [ "$message" = "" ]; then
-                  echo "$0 ERROR: variable message is empty."
+                  echo "$BASH_SOURCE ERROR: variable message is empty."
                   exit 1
                fi
                ;;
@@ -165,7 +165,7 @@ parse_cmd_options() {
                progressx="$2"
                shift 2
                if [ "$progressx" = "" ]; then
-                  echo "$0 ERROR: variable progressx is empty."
+                  echo "$BASH_SOURCE ERROR: variable progressx is empty."
                   exit 1
                fi
                ;;
@@ -371,14 +371,14 @@ collector() {
 
    ## {{ --identifier
    if [ "${identifier}" = "" ]; then
-      echo "$0 ERROR: variable identifier is empty."
+      echo "$BASH_SOURCE ERROR: variable identifier is empty."
       exit 1
    fi
    ## }}
 
    ## {{ --icon
    if [ "$icon" = "" ]; then
-      echo "$0 ERROR: variable icon is empty."
+      echo "$BASH_SOURCE ERROR: variable icon is empty."
       exit 1
    fi
    echo "$icon" > "/var/run/msgcollector/$who_ami/${identifier}.icon"
@@ -386,7 +386,7 @@ collector() {
 
    ## {{ --parentpid
    if [ "$parentpid" = "" ]; then
-      #echo "$0 ERROR: variable parentpid is empty."
+      #echo "$BASH_SOURCE ERROR: variable parentpid is empty."
       #exit 1
       ## Small hack, so not all applications get killed when pressing the cancel button
       ## such as timesync.
@@ -593,7 +593,7 @@ return_status() {
 
    ## {{ --identifier
    if [ "${identifier}" = "" ]; then
-      echo "$0 ERROR: variable identifier is empty."
+      echo "$BASH_SOURCE ERROR: variable identifier is empty."
       exit 1
    fi
    ## }}
@@ -736,7 +736,7 @@ forgetwaitcli() {
 }
 
 ## Debugging.
-#echo "$0 ${1+"$@"}
+#echo "$BASH_SOURCE ${1+"$@"}
 #" >> "/home/user/msgcollector"
 
 parse_cmd_options ${1+"$@"}
