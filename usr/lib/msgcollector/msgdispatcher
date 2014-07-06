@@ -129,7 +129,7 @@ passive_popup_tool() {
    if [ ! "$(command -v "kdialog")" = "" ] ; then
       #/usr/lib/msgcollector/dispatch_X.py "$identifier" "$1" "$2"
       kdialog --title "$identifier" --passivepopup "$2" "$1"
-    elif [ ! "$(command -v "notify-send")" = "" ] ; then
+   elif [ ! "$(command -v "notify-send")" = "" ] ; then
       notify-send --expire-time "$1" "$identifier" "$2"
    else
       true
