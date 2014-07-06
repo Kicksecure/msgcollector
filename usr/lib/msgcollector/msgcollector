@@ -504,6 +504,7 @@ collector() {
 
    ## {{ --passivepopupqueuex
    if [ "$passivepopupqueuex" = "1" ]; then
+      message="$(/usr/lib/msgcollector/striphtml "$message")"
       write_to_file="/var/run/msgcollector/$who_ami/${identifier}.passivepopupqueuex"
       append_to_file
    fi
@@ -537,6 +538,7 @@ collector() {
          exit 4
       fi
       echo "$parentpid" > "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.parentpid"
+      message="$(/usr/lib/msgcollector/striphtml "$message")"
       write_to_file="/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbarx"
       append_to_file
    fi
