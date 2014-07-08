@@ -171,10 +171,10 @@ dispatch_x_active() {
    fi
 
    if [ "$verbose" = "1" ]; then
-      ## Launching into background, so it doesn't block msgdispatcher until
-      ## msgdispatcher_dispatch_x exits.
       /usr/lib/msgcollector/msgdispatcher_dispatch_x "$type" "$title" "$msg" "$lefttop" "$icon"
    else
+      ## Launching into background, so it doesn't block msgdispatcher until
+      ## msgdispatcher_dispatch_x exits.
       /usr/lib/msgcollector/msgdispatcher_dispatch_x "$type" "$title" "$msg" "$lefttop" "$icon" &
    fi
 }
