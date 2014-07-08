@@ -170,7 +170,11 @@ dispatch_x_active() {
       icon="/usr/share/icons/anon-icon-pack/whonix.ico"
    fi
 
-   /usr/lib/msgcollector/msgdispatcher_dispatch_x "$type" "$title" "$msg" "$lefttop" "$icon" &
+   if [ "$verbose" = "1" ]; then
+      /usr/lib/msgcollector/msgdispatcher_dispatch_x "$type" "$title" "$msg" "$lefttop" "$icon"
+   else
+      /usr/lib/msgcollector/msgdispatcher_dispatch_x "$type" "$title" "$msg" "$lefttop" "$icon" &
+   fi
 }
 
 dispatch_x_passive() {
