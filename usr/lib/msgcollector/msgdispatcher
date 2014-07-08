@@ -27,7 +27,7 @@ error_handler() {
    ## Popup window with the message above.
    ## /usr/share/icons/anon-icon-pack/whonix.ico might not exist, but
    ## fortunately msgdispatcher_dispatch_x works anyway.
-   /usr/lib/msgcollector/msgdispatcher_dispatch_x "warning" "$scriptname" "$msg" "0" "/usr/share/icons/anon-icon-pack/whonix.ico"
+   /usr/lib/msgcollector/msgdispatcher_dispatch_x "warning" "$scriptname" "$msg" "0" "/usr/share/icons/anon-icon-pack/whonix.ico" &
 
    local stripped_msg
    stripped_msg="$(/usr/lib/msgcollector/striphtml "$MSG")"
@@ -170,7 +170,7 @@ dispatch_x_active() {
       icon="/usr/share/icons/anon-icon-pack/whonix.ico"
    fi
 
-   /usr/lib/msgcollector/msgdispatcher_dispatch_x "$type" "$title" "$msg" "$lefttop" "$icon"
+   /usr/lib/msgcollector/msgdispatcher_dispatch_x "$type" "$title" "$msg" "$lefttop" "$icon" &
 }
 
 dispatch_x_passive() {
