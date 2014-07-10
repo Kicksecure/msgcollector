@@ -67,7 +67,7 @@ error_handler() {
    if [ "$command_v_output_exit_code" = "0" ]; then
       echo "$SCRIPTNAME: Error detected. Cleaning up... Exiting..." >&2
       SIGNAL_TYPE="ERR"
-      ex_funct
+      ex_funct || true
    else
       echo "$SCRIPTNAME: Error detected. Skipping ex_funct since not yet load. Exiting..." >&2
    fi
