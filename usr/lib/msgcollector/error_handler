@@ -72,5 +72,9 @@ error_handler() {
       echo "$SCRIPTNAME: Error detected. Skipping ex_funct since not yet load. Exiting..." >&2
    fi
 
-   exit 1
+   if [ "$EXIT_CODE" = "" ]; then
+      EXIT_CODE="1"
+   fi
+
+   exit "$EXIT_CODE"
 }
