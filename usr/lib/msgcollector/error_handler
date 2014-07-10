@@ -66,7 +66,7 @@ error_handler() {
    command -v "ex_funct" >/dev/null || { command_v_output_exit_code="$?" ; true; };
    if [ "$command_v_output_exit_code" = "0" ]; then
       echo "$SCRIPTNAME: Error detected. Cleaning up... Exiting..." >&2
-      EXIT_TYPE="err"
+      SIGNAL_TYPE="err"
       ex_funct
    else
       echo "$SCRIPTNAME: Error detected. Skipping ex_funct since not yet load. Exiting..." >&2
