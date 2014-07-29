@@ -82,6 +82,7 @@ output_wait_for_window() {
       echo "$temp" | grep --quiet "$title" || { grep_exit_code="$?" ; true; };
 
       if [ "$grep_exit_code" = "0" ]; then
+         true "Found window title \"$title\"."
          break
       fi
 
@@ -91,8 +92,10 @@ output_wait_for_window() {
       counter="$(( $counter + 1 ))"
 
       if [ "$counter" -ge "$max_wait" ]; then
-         true "Giving up on wmctrl. Break."
+         true "Giving up on wmctrl. Window title \"$title\" not found after $max_wait seconds."
          break
+      else
+         true "Waiting for window title \"$title\" up to $max_wait seconds. This might take a while. Please do not abort this! $counter / $max_wait"
       fi
    done
 }
