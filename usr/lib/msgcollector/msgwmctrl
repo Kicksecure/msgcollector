@@ -50,6 +50,58 @@ fallbacks() {
    fi
 }
 
+get_own_window_title() {
+   trap "error_handler" ERR
+
+   sleep .5 &
+   wait "$!" || true
+
+   ## TODO
+   if [ "$autostart" = "1" ]; then
+      ## Runs in background anyway, waiting a bit longer does not hurt.
+      local max_wait="120"
+   else
+      local max_wait="60"
+   fi
+
+   local counter
+   counter="0"
+
+   local own_window_id xwininfo_output xwininfo_first_useful_line
+
+   while true; do
+      xdotool_exit_code="0"
+      own_window_id="$(xdotool getactivewindow 2>&1)" || { xdotool_exit_code="$?" ; true; };
+
+      if [ "$xdotool_exit_code" = "0" ]; then
+         true "xdotool_exit_code exited 0. own_window_id: $own_window_id Success."
+         break
+      fi
+
+      counter="$(( $counter + 1 ))"
+
+      if [ "$counter" -ge "$max_wait" ]; then
+         true "Giving up on xdotool. own_window_id not found after $max_wait seconds."
+         own_window_title="false"
+         return 0
+      else
+         true "Waiting for own_window_id up to $max_wait seconds. This might take a while. Please do not abort this! $counter / $max_wait"
+         sleep "1" &
+         wait "$!" || true
+      fi
+   done
+
+   xwininfo_output="$(xwininfo -id "$own_window_id" 2>&1)"
+
+   xwininfo_first_useful_line="$(echo "$xwininfo_output" | grep '"*"')"
+   ## Example xwininfo_first_useful_line:
+   ## xwininfo: Window id: 0x2600012 "~/Whonix/packages/msgcollector : bash"
+
+   own_window_title="$(echo "$xwininfo_first_useful_line" | grep -oP '"\K[^"\047]+(?=["\047])')"
+   ## Example own_window_title:
+   ## ~/Whonix/packages/msgcollector : bash
+}
+
 output_wait_for_window() {
    ## also used by /usr/lib/whonixsetup
 
@@ -83,19 +135,20 @@ output_wait_for_window() {
 
       if [ "$grep_exit_code" = "0" ]; then
          true "Found window title \"$title\"."
+         window_title_found="true"
          break
       fi
-
-      sleep "1" &
-      wait "$!" || true
 
       counter="$(( $counter + 1 ))"
 
       if [ "$counter" -ge "$max_wait" ]; then
          true "Giving up on wmctrl. Window title \"$title\" not found after $max_wait seconds."
+         window_title_found="false"
          break
       else
          true "Waiting for window title \"$title\" up to $max_wait seconds. This might take a while. Please do not abort this! $counter / $max_wait"
+         sleep "1" &
+         wait "$!" || true
       fi
    done
 }
