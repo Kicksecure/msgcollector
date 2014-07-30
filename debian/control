@@ -15,7 +15,7 @@ Standards-Version: 3.9.4
 Package: msgcollector
 Architecture: all
 Depends: wmctrl, python, python-qt4, zenity, libnotify-bin | kde-baseapps-bin,
- sudo, acl, xdotool, x11-utils, ${misc:Depends}
+ sudo, acl, x11-utils, ${misc:Depends}
 Provides: ${diverted-files}
 Conflicts: ${diverted-files}
 Description: Notification System for X and Terminal
