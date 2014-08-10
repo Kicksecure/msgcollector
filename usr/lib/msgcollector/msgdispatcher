@@ -314,6 +314,10 @@ main_function() {
 }
 
 parse_cmd_options ${1+"$@"}
+
+source /usr/lib/msgcollector/msgcollector_shared
+maybe_wait
+
 preparation
 write_own_pid
 source /usr/lib/msgcollector/msgwmctrl

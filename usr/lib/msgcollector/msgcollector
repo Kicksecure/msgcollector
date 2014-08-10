@@ -304,54 +304,6 @@ true && {
 } 2>/dev/null ||:
 }
 
-loop_protection() {
-   trap "error_handler" ERR
-
-   prot="$(( $prot + 1 ))"
-   if [ $prot -gt "60" ]; then
-      exit 2
-   fi
-}
-
-## {{ In case /etc/init.d/msgcollector has not started yet, i.e. has not
-##    created "/var/run/msgcollector" yet, wait a bit.
-maybe_wait() {
-   trap "error_handler" ERR
-
-   ## initialize prot variable
-   if [ "$prot" = "" ]; then
-      prot="0"
-   fi
-
-   loop_protection
-
-   if [ ! -d "/var/run/msgcollector" ]; then
-      true "Waiting for /var/run/msgcollector..."
-      sleep 2 &
-      wait "$!"
-      maybe_wait
-      return 0
-   fi
-
-   ## The following tests are only of interest when run in cli mode.
-   if [ ! "$cli" = "1" ]; then
-      return 0
-   fi
-
-   local command_v_tput_exit_code
-   command_v_tput_exit_code="0"
-   command -v tput >/dev/null || { command_v_tput_exit_code="$?" ; true; };
-
-   if [ ! "$command_v_tput_exit_code" = "0" ]; then
-      true "Waiting for tput..."
-      sleep 2 &
-      wait "$!"
-      maybe_wait
-      return 0
-   fi
-}
-## }}
-
 pretty_type_cli() {
    trap "error_handler" ERR
 
@@ -742,7 +694,9 @@ forgetwaitcli() {
 #" >> "/home/user/msgcollector"
 
 parse_cmd_options ${1+"$@"}
-preparation
+
+source /usr/lib/msgcollector/msgcollector_shared
+maybe_wait
 
 if [ "$forget" = "1" ]; then
    forget
@@ -754,7 +708,7 @@ if [ "$forgetwaitcli" = "1" ]; then
    exit 0
 fi
 
-maybe_wait
+preparation
 colors
 
 if [ "$status" = "1" ]; then
