@@ -318,6 +318,28 @@ pretty_type_cli() {
    fi
 }
 
+pretty_type_x() {
+   trap "error_handler" ERR
+
+   local msgINFO="<p><span style=color:#008000>INFO</span>:"
+   local msgWARNING="<p><span style=color:#c00000>WARNING</span>:"
+   local msgERROR="<p><span style=font-weight:600;color:#ff0000>ERROR</span>:"
+
+   local first_three="${message:0:3}"
+   if [ "$first_three" = "<p>" ]; then
+      local message_length="${#message}"
+      local remaining_chars="$(( $message_length -3 ))"
+      local message_without_p="${message:3:$remaining_chars}"
+      if [ "$1" = "info" ]; then
+         message="<p>$msgINFO $message_without_p"
+      elif [ "$1" = "warning" ]; then
+         message="<p>$msgWARNING $message_without_p"
+      elif [ "$1" = "error" ]; then
+         message="<p>$msgERROR $message_without_p"
+      fi
+   fi
+}
+
 collector() {
    trap "error_handler" ERR
 
@@ -414,6 +436,7 @@ collector() {
 
    ## {{ --messagex
    if [ "$messagex" = "1" ]; then
+      pretty_type_x "$typex"
       write_to_file="/var/run/msgcollector/$who_ami/${identifier}.messagex"
       append_to_file
    fi
@@ -421,6 +444,7 @@ collector() {
 
    ## {{ --waitmessagex
    if [ "$waitmessagex" = "1" ]; then
+      pretty_type_x "$typex"
       write_to_file="/var/run/msgcollector/$who_ami/${identifier}.waitmessagex"
       append_to_file
    fi
