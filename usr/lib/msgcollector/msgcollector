@@ -321,15 +321,18 @@ pretty_type_cli() {
 pretty_type_x() {
    trap "error_handler" ERR
 
-   local msgINFO="<p><span style=color:#008000>INFO</span>:"
-   local msgWARNING="<p><span style=color:#c00000>WARNING</span>:"
-   local msgERROR="<p><span style=font-weight:600;color:#ff0000>ERROR</span>:"
+   local msgINFO msgWARNING msgERROR
+   msgINFO="<p><span style=color:#008000>INFO</span>:"
+   msgWARNING="<p><span style=color:#c00000>WARNING</span>:"
+   msgERROR="<p><span style=font-weight:600;color:#ff0000>ERROR</span>:"
 
-   local first_three="${message:0:3}"
+   local first_three
+   first_three="${message:0:3}"
    if [ "$first_three" = "<p>" ]; then
-      local message_length="${#message}"
-      local remaining_chars="$(( $message_length -3 ))"
-      local message_without_p="${message:3:$remaining_chars}"
+      local message_length remaining_chars message_without_p
+      message_length="${#message}"
+      remaining_chars="$(( $message_length -3 ))"
+      message_without_p="${message:3:$remaining_chars}"
       if [ "$1" = "info" ]; then
          message="<p>$msgINFO $message_without_p"
       elif [ "$1" = "warning" ]; then
