@@ -23,6 +23,7 @@ class Ui_Dialog(object):
 
         self.Message = QtGui.QLabel(Dialog)
         self.Message.setGeometry(QtCore.QRect(85, 10, 562, vSize))
+        #self.Message.setFrameShape(QtGui.QFrame.Box)
         self.Message.setTextFormat(QtCore.Qt.RichText)
         self.Message.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.Message.setWordWrap(True)
@@ -69,8 +70,8 @@ if __name__ == "__main__":
 
     maxvSize = QtGui.QDesktopWidget().availableGeometry().height() - 23  ## ??
     """ calculates (roughly) the vertical size of the message label """
-    newlines = msg.count("<p>", 0, len(msg)) #* 2
-    blockquotes = msg.count("<blockquote>", 0, len(msg)) #* 2
+    newlines = msg.count("<p>", 0, len(msg)) * 2
+    blockquotes = msg.count("<blockquote>", 0, len(msg)) * 2
     linebreaks = msg.count("<br>", 0, len(msg))
     vSize = (int(len(msg)/84) + newlines + blockquotes + linebreaks) * 12
     if vSize < (maxvSize-70):
