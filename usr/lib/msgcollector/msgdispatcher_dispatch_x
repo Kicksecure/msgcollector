@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import sys
 from PyQt4 import QtCore, QtGui
 
 try:
@@ -11,36 +10,49 @@ except AttributeError:
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
-        Dialog.setMinimumSize(QtCore.QSize(680, maxSize + 65))
-        Dialog.setMaximumSize(QtCore.QSize(680, maxSize + 65))
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        sizePolicy.setHeightForWidth(Dialog.sizePolicy().hasHeightForWidth())
+        Dialog.setSizePolicy(sizePolicy)
+        Dialog.setMinimumSize(QtCore.QSize(830, 0))
         Dialog.setWindowIcon(QtGui.QIcon(icon))
         if pos == "1":
             Dialog.move(0,  0)
 
-        self.buttonBox = QtGui.QDialogButtonBox(Dialog)
-        self.buttonBox.setGeometry(QtCore.QRect(555, maxSize+25, 100, 32))
-        self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Ok)
+        self.gridLayout = QtGui.QGridLayout(Dialog)
+
+        self.Info_Icon = QtGui.QLabel(Dialog)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Preferred)
+        sizePolicy.setHeightForWidth(self.Info_Icon.sizePolicy().hasHeightForWidth())
+        self.Info_Icon.setSizePolicy(sizePolicy)
+        self.Info_Icon.setPixmap(QtGui.QPixmap(itype))
+        self.Info_Icon.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
+        self.gridLayout.addWidget(self.Info_Icon, 0, 0, 1, 1)
 
         self.Message = QtGui.QLabel(Dialog)
-        self.Message.setGeometry(QtCore.QRect(85, 10, 562, vSize))
-        #self.Message.setFrameShape(QtGui.QFrame.Box)
-        self.Message.setTextFormat(QtCore.Qt.RichText)
-        self.Message.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        sizePolicy.setHeightForWidth(self.Message.sizePolicy().hasHeightForWidth())
+        self.Message.setSizePolicy(sizePolicy)
+        self.Message.setMinimumSize(QtCore.QSize(715, 0))
+        self.Message.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.Message.setWordWrap(True)
+        self.Message.setTextFormat(QtCore.Qt.RichText)
+        self.gridLayout.addWidget(self.Message, 0, 1, 1, 2)
         self.Message.setTextInteractionFlags(QtCore.Qt.LinksAccessibleByMouse | QtCore.Qt.TextSelectableByMouse)
         self.Message.setOpenExternalLinks(True)
 
-        self.Scroll = QtGui.QScrollArea(Dialog)
-        self.Scroll.setGeometry(QtCore.QRect(85, 10, 580, maxSize + 5))
-        self.Scroll.setFrameShape(QtGui.QFrame.NoFrame)
-        self.Scroll.setWidget(self.Message)
+        #self.Scroll = QtGui.QScrollArea(Dialog)
+        #self.Scroll.setGeometry(QtCore.QRect(85, 10, 580, maxSize + 5))
+        #self.Scroll.setFrameShape(QtGui.QFrame.NoFrame)
+        #self.Scroll.setWidget(self.Message)
 
-        self.Info_Icon = QtGui.QLabel(Dialog)
-        self.Info_Icon.setGeometry(QtCore.QRect(10, 8, 71, 71))
-        self.Info_Icon.setPixmap(QtGui.QPixmap(_fromUtf8(itype)))
+        self.buttonBox = QtGui.QDialogButtonBox(Dialog)
+        self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
+        self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Ok)
+        self.gridLayout.addWidget(self.buttonBox, 1, 1, 1, 1)
 
         self.retranslateUi(Dialog)
         QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("accepted()")), Dialog.accept)
+        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("rejected()")), Dialog.reject)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):
@@ -50,6 +62,7 @@ class Ui_Dialog(object):
 
 
 if __name__ == "__main__":
+    import sys
     app = QtGui.QApplication(sys.argv)
     Dialog = QtGui.QDialog()
 
@@ -68,18 +81,8 @@ if __name__ == "__main__":
     pos = str(sys.argv[4])
     icon = str(sys.argv[5])
 
-    maxvSize = QtGui.QDesktopWidget().availableGeometry().height() - 23  ## ??
-    """ calculates (roughly) the vertical size of the message label """
-    newlines = msg.count("<p>", 0, len(msg)) * 2
-    blockquotes = msg.count("<blockquote>", 0, len(msg)) * 2
-    linebreaks = msg.count("<br>", 0, len(msg))
-    vSize = (int(len(msg)/84) + newlines + blockquotes + linebreaks) * 12
-    if vSize < (maxvSize-70):
-        maxSize = vSize
-    else:
-        maxSize = (maxvSize-70)
-
     ui = Ui_Dialog()
     ui.setupUi(Dialog)
     Dialog.show()
     sys.exit(app.exec_())
+
