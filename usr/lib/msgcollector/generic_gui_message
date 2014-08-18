@@ -18,6 +18,8 @@ class Notice(QtGui.QMessageBox):
         question = str(sys.argv[4])
         button = str(sys.argv[5])
 
+        self.setWindowIcon(QtGui.QIcon("/usr/share/icons/anon-icon-pack/whonix.ico"))
+
         if itype ==  "information":
             self.setIcon(QtGui.QMessageBox.Question)
         elif itype == "warning":
