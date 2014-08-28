@@ -334,11 +334,11 @@ pretty_type_x() {
       remaining_chars="$(( $message_length -3 ))"
       message_without_p="${message:3:$remaining_chars}"
       if [ "$1" = "info" ]; then
-         message="<p>$msgINFO $message_without_p"
+         message="$msgINFO $message_without_p"
       elif [ "$1" = "warning" ]; then
-         message="<p>$msgWARNING $message_without_p"
+         message="$msgWARNING $message_without_p"
       elif [ "$1" = "error" ]; then
-         message="<p>$msgERROR $message_without_p"
+         message="$msgERROR $message_without_p"
       fi
    fi
 }
