@@ -13,7 +13,10 @@ class Ui_Dialog(object):
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         sizePolicy.setHeightForWidth(Dialog.sizePolicy().hasHeightForWidth())
         Dialog.setSizePolicy(sizePolicy)
-        Dialog.setMinimumSize(QtCore.QSize(830, 0))
+        if str(sys.argv[1]) == "warning" or str(sys.argv[1]) == "error":
+	    Dialog.setMinimumSize(QtCore.QSize(830, QtGui.QDesktopWidget().availableGeometry().height()/2))
+	else:
+	    Dialog.setMinimumSize(QtCore.QSize(1000, 0))
         Dialog.setWindowIcon(QtGui.QIcon(icon))
         if pos == "1":
             Dialog.move(0,  0)
@@ -28,17 +31,32 @@ class Ui_Dialog(object):
         self.Info_Icon.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.gridLayout.addWidget(self.Info_Icon, 0, 0, 1, 1)
 
-        self.Message = QtGui.QLabel(Dialog)
+        self.Message = QtGui.QTextBrowser(Dialog)
+
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         sizePolicy.setHeightForWidth(self.Message.sizePolicy().hasHeightForWidth())
         self.Message.setSizePolicy(sizePolicy)
-        self.Message.setMinimumSize(QtCore.QSize(715, 0))
-        self.Message.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
-        self.Message.setWordWrap(True)
-        self.Message.setTextFormat(QtCore.Qt.RichText)
-        self.gridLayout.addWidget(self.Message, 0, 1, 1, 2)
+        
+        palette = QtGui.QPalette()
+        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255, 0))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Active, QtGui.QPalette.Base, brush)
+        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255, 0))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Inactive, QtGui.QPalette.Base, brush)
+        brush = QtGui.QBrush(QtGui.QColor(244, 244, 244))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Base, brush)
+        self.Message.setPalette(palette)
+        
         self.Message.setTextInteractionFlags(QtCore.Qt.LinksAccessibleByMouse | QtCore.Qt.TextSelectableByMouse)
         self.Message.setOpenExternalLinks(True)
+        self.Message.setFrameShape(QtGui.QFrame.NoFrame)
+        #self.Message.setMinimumSize(QtCore.QSize(715, 0))
+        #self.Message.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
+        #self.Message.setWordWrap(True)
+        #self.Message.setTextFormat(QtCore.Qt.RichText)
+        self.gridLayout.addWidget(self.Message, 0, 1, 1, 2)
 
         #self.Scroll = QtGui.QScrollArea(Dialog)
         #self.Scroll.setGeometry(QtCore.QRect(85, 10, 580, maxSize + 5))
@@ -57,9 +75,8 @@ class Ui_Dialog(object):
 
     def retranslateUi(self, Dialog):
         Dialog.setWindowTitle(QtGui.QApplication.translate("Dialog", title, None, QtGui.QApplication.UnicodeUTF8))
-        self.Message.setText(QtGui.QApplication.translate("Dialog", msg, None, QtGui.QApplication.UnicodeUTF8))
-        return()
-
+        self.Message.setHtml(QtGui.QApplication.translate("Dialog", msg, None, QtGui.QApplication.UnicodeUTF8))
+        
 
 if __name__ == "__main__":
     import sys
