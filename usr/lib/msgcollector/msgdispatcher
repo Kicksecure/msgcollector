@@ -30,10 +30,10 @@ error_handler() {
    /usr/lib/msgcollector/msgdispatcher_dispatch_x "warning" "$scriptname" "$msg" "0" "/usr/share/icons/anon-icon-pack/whonix.ico" &
 
    local stripped_msg
-   stripped_msg="$(/usr/lib/msgcollector/striphtml "$MSG")"
+   stripped_msg="$(/usr/lib/msgcollector/striphtml "$msg")"
    if [ "$stripped_msg" = "" ]; then
       ## In case striphtml failed or is not available.
-      echo "$MSG" >&2
+      echo "$msg" >&2
    else
       echo "$stripped_msg" >&2
    fi
@@ -120,16 +120,17 @@ write_own_pid() {
 passive_popup_tool() {
    trap "error_handler" ERR
 
-   ## $1 - time
-   ## $2 - text
+   local time text
+   time="$1"
+   text="$2"
 
    ## check if kdialog, notify-send or no passive popup tool is installed
    ## - that is not the case for CLI Custom-Workstation users
    ## - that may not be the case for Gnome users
    if [ ! "$(command -v "kdialog")" = "" ] ; then
-      kdialog --title "$identifier" --passivepopup "$2" "$1"
+      kdialog --title "$identifier" --passivepopup "$text" "$time"
    elif [ ! "$(command -v "notify-send")" = "" ] ; then
-      notify-send --expire-time "$1" "$identifier" "$2"
+      notify-send --expire-time "$time" "$identifier" "$text"
    else
       true
    fi
@@ -138,6 +139,9 @@ passive_popup_tool() {
 
 dispatch_cli() {
    trap "error_handler" ERR
+
+   local msg
+   msg="$1"
 
    if [ -f "/var/run/msgcollector/$who_ami/${identifier}.parenttty" ]; then
       local parenttty
@@ -150,7 +154,7 @@ dispatch_cli() {
       fi
    fi
 
-   echo "$1"
+   echo "$msg"
 }
 
 dispatch_x_active() {
@@ -161,13 +165,17 @@ dispatch_x_active() {
       lefttop="1"
    fi
 
+   local icon
    if [ -f "/var/run/msgcollector/$who_ami/${identifier}.icon" ]; then
-      local icon
       icon="$(cat "/var/run/msgcollector/$who_ami/${identifier}.icon")"
    else
       ## Fallback.
-      local icon
       icon="/usr/share/icons/anon-icon-pack/whonix.ico"
+   fi
+
+   ## Fallback.
+   if [ "$type" = "" ]; then
+      type="info"
    fi
 
    if [ "$verbose" = "1" ]; then
@@ -239,7 +247,8 @@ main_function() {
             if [ -f "/var/run/msgcollector/$who_ami/${identifier}.waitmessagex.done" ]; then
                if [ -f "/var/run/msgcollector/$who_ami/${identifier}.waitmessagex" ]; then
                   msg="$(cat "/var/run/msgcollector/$who_ami/${identifier}.waitmessagex")"
-                  title="$(cat "/var/run/msgcollector/$who_ami/${identifier}.titlex")"
+                  ## TODO
+                  title="$(cat "/var/run/msgcollector/$who_ami/${identifier}.titlex")" || true
                   type="$(cat "/var/run/msgcollector/$who_ami/${identifier}.typex")"
                   dispatch_x_passive "$type" "$msg"
                   rm --force "/var/run/msgcollector/$who_ami/${identifier}.waitmessagex.done"
@@ -251,7 +260,8 @@ main_function() {
             if [ -f "/var/run/msgcollector/$who_ami/${identifier}.messagex.done" ]; then
                if [ -f "/var/run/msgcollector/$who_ami/${identifier}.messagex" ]; then
                   msg="$(cat "/var/run/msgcollector/$who_ami/${identifier}.messagex")"
-                  title="$(cat "/var/run/msgcollector/$who_ami/${identifier}.titlex")"
+                  ## TODO: prevent race condition; own titlex for messagex, passivepopupqueuex
+                  title="$(cat "/var/run/msgcollector/$who_ami/${identifier}.titlex")" || true
                   type="$(cat "/var/run/msgcollector/$who_ami/${identifier}.typex")"
                   dispatch_x_active "$type" "$msg"
                   rm --force "/var/run/msgcollector/$who_ami/${identifier}.messagex.done"
@@ -266,7 +276,8 @@ main_function() {
             if [ -f "/var/run/msgcollector/$who_ami/${identifier}.passivepopupqueuex.done" ]; then
                if [ -f "/var/run/msgcollector/$who_ami/${identifier}.passivepopupqueuex" ]; then
                   msg="$(cat "/var/run/msgcollector/$who_ami/${identifier}.passivepopupqueuex")"
-                  title="$(cat "/var/run/msgcollector/$who_ami/${identifier}.titlex")"
+                  ## TODO: prevent race condition; own titlex for messagex, passivepopupqueuex
+                  title="$(cat "/var/run/msgcollector/$who_ami/${identifier}.titlex")" || true
                   type="$(cat "/var/run/msgcollector/$who_ami/${identifier}.typex")"
                   if [ -f "/var/run/msgcollector/$who_ami/${identifier}.forceactive" ]; then
                      dispatch_x_active "$type" "$msg"
