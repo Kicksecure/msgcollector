@@ -1,3 +1,9 @@
+msgcollector (3:0.4-1) unstable; urgency=low
+
+  * New upstream version.
+
+ -- Patrick Schleizer <adrelanos@riseup.net>  Thu, 11 Sep 2014 22:05:10 +0000
+
 msgcollector (3:0.3-1) unstable; urgency=low
 
   * New upstream version.
