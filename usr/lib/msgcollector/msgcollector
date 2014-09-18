@@ -505,8 +505,12 @@ collector() {
       #caller="$(ps -p $PPID)" || true
       #echo "msgcollector: progressx: $progressx | caller: $PPID | $caller" >> /home/user/progresslog
 
-      ## & disown to prevent long waiting.
-      /usr/lib/msgcollector/msgprogress --identifier "$identifier" --whoami "$who_ami" --progressbaridx "${progressbaridx}" --progress "$progressx" & disown
+      if [ "$verbose" = "1" ]; then
+         bash -x /usr/lib/msgcollector/msgprogress --identifier "$identifier" --whoami "$who_ami" --progressbaridx "${progressbaridx}" --progress "$progressx"
+      else
+         ## & disown to prevent long waiting.
+         /usr/lib/msgcollector/msgprogress --identifier "$identifier" --whoami "$who_ami" --progressbaridx "${progressbaridx}" --progress "$progressx" & disown
+      fi
    fi
    ## }}
 

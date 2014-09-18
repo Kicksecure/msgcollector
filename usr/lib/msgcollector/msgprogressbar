@@ -94,11 +94,15 @@ preparation() {
    if [ ! -d "/var/run/msgcollector/$who_ami" ]; then
       mkdir --mode o+rwx --parents "/var/run/msgcollector/$who_ami"
    fi
+
+   fifo="/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.fifo"
+   progress_txt_file="/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progresstxt"
 }
 
 cleanup_self() {
    trap "error_handler" ERR
 
+   true "$0 $FUNCNAME: killing zenity_progress_pid $zenity_progress_pid..."
    kill -sigterm "$zenity_progress_pid" >/dev/null 2>/dev/null || true
    rm --force "$fifo"
    rm --force "$progress_txt_file"
@@ -132,10 +136,10 @@ because /var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.parentpid
    ps -p "$parentpid" >/dev/null 2>/dev/null || { ps__p_exit_code="$?"; true; };
 
    if [ "$ps__p_exit_code" = "0" ]; then
-      true "$output_signal_caught caught. Killing parentpid $parentpid."
-      kill -SIGTERM "$parentpid"
+      true "$output_signal_caught caught. Sending signal sigusr2 to $parentpid."
+      kill -sigusr2 "$parentpid"
    else
-      true "$output_signal_caught caught. Not killing parentpid $parentpid, because it is already terminated."
+      true "$output_signal_caught caught. Not sending signal sigusr2 to parentpid $parentpid, because it is already terminated."
    fi
 
    exit 0
@@ -197,19 +201,24 @@ start_progress_bar() {
       display=":0"
    fi
 
-   fifo="/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.fifo"
-   progress_txt_file="/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progresstxt"
-
    if [ -f "$progress_txt_file" ]; then
       ## Sometimes there is a race condition preventing the progressbar
       ## being closed. Let's use this alternative approach.
-      local progress_txt_file_progress
       progress_txt_file_progress="$(cat "$progress_txt_file")"
       if [ "$progress_txt_file_progress" = "100" ]; then
          true "Already 100%. Not even opening progress bar."
          cleanup_self
          exit 0
       fi
+   fi
+
+   ## Sanity test for $progress_txt_file_progress, because we use it without
+   ## quotes as argument for zenity below.
+   if [[ "$progress_txt_file_progress" != *[!0-9]* ]]; then
+      true "'$progress_txt_file_progress' is strictly numeric."
+   else
+      error "'$progress_txt_file_progress' is NOT strictly numeric!"
+      exit 1
    fi
 
    ## Clean up eventual old progress bar.
@@ -220,7 +229,6 @@ start_progress_bar() {
    ## Do not use < > inside zenity progress messages, zenity will mess that up.
    ## zenity --auto-kill will result in zenity sending a sighup signal upon
    ## pressing of cancel button.
-   ## Not sure what implications --auto-close had.
    zenity \
       --display="$display" \
       --timeout "86400" \
@@ -228,7 +236,8 @@ start_progress_bar() {
       --window-icon "$icon" \
       --title="$title" \
       --auto-kill \
-      --progress \
+      --auto-close \
+      --progress $progress_txt_file_progress \
       --text "$msg" \
       < "$fifo" & zenity_progress_pid="$!"
 
@@ -249,7 +258,6 @@ start_progress_bar() {
       if [ -f "$progress_txt_file" ]; then
          ## Sometimes there is a race condition preventing the progressbar
          ## being closed. Let's use this alternative approach.
-         local progress_txt_file_progress
          progress_txt_file_progress="$(cat "$progress_txt_file")"
          if [ "$progress_txt_file_progress" = "100" ]; then
             cleanup_self
@@ -260,21 +268,17 @@ start_progress_bar() {
       ## Happens when zentiy reached 100% or when cancel button is pressed.
       ## This will call the output_sighup function.
 
-      #if [ "$animate" = "1" ]; then
-         #if [ "$waitprogress" = "" ]; then
-            #waitprogress="0"
-         #fi
-         #waitprogress="$(( $waitprogress + 1 ))"
-         #if [ "$waitprogress" -ge "100" ]; then
-            #waitprogress="0"
-         #fi
-         #echo "$waitprogress" > "$fifo"
-         #sleep ".500" &
-         #wait "$!"
-      #else
-         sleep "2" &
-         wait "$!"
-      #fi
+      ## Check if still running.
+      local ps__p_exit_code
+      ps__p_exit_code="0"
+      ps -p "$zenity_progress_pid" >/dev/null 2>/dev/null || { ps__p_exit_code="$?"; true; };
+      if [ ! "$ps__p_exit_code" = "0" ]; then
+         cleanup_self
+         exit 0
+      fi
+
+      sleep "2" &
+      wait "$!"
    done
 }
 
