@@ -128,8 +128,10 @@ passive_popup_tool() {
    ## - that is not the case for CLI Custom-Workstation users
    ## - that may not be the case for Gnome users
    if [ ! "$(command -v "kdialog")" = "" ] ; then
+      ## Use $identifier as short title.
       kdialog --title "$identifier" --passivepopup "$text" "$time"
    elif [ ! "$(command -v "notify-send")" = "" ] ; then
+      ## Use $identifier as short title.
       notify-send --expire-time "$time" "$identifier" "$text"
    else
       true
