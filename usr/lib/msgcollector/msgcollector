@@ -173,6 +173,10 @@ parse_cmd_options() {
                progressbarx="1"
                shift
                ;;
+           --progressbarxrunning)
+               progressbarxrunning="1"
+               shift
+               ;;
            --animate)
                animate="1"
                shift
@@ -629,6 +633,27 @@ return_status() {
    fi
    ## }}
 
+   ## {{ --progressbarxrunning
+   if [ "$progressbarxrunning" = "1" ]; then
+      if [ -f "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.zenityprogresspid" ]; then
+         local pid
+         ## || true to prevent race condition
+         zenity_progress_pid="$(cat "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.zenityprogresspid")" || true
+         ## Check if still running.
+         local ps__p_exit_code
+         ps__p_exit_code="0"
+         ps -p "$zenity_progress_pid" >/dev/null 2>/dev/null || { ps__p_exit_code="$?"; true; };
+         if [ "$ps__p_exit_code" = "0" ]; then
+            exit 0
+         else
+            exit 1
+         fi
+      else
+         exit 1
+      fi
+   fi
+   ## }}
+
    ## {{ --typexstatus
    if [ "$typex_chosen" = "1" ]; then
       write_to_file="/var/run/msgcollector/$who_ami/${identifier}.typex"
@@ -641,7 +666,7 @@ return_status() {
    fi
    ## }}
 
-   ## Fallback error code, if none of the above matched.
+   true "Fallback exit code, none of the above matched."
    exit 3
 }
 
