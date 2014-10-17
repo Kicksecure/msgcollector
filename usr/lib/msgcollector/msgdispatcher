@@ -200,129 +200,129 @@ main_function() {
 
    shopt -s nullglob
 
-   local identifier_list identifier temp_list temp_item
+   local identifier temp_item file_name
 
-   while true; do
-      unset identifier_list identifier temp_list temp_item
-      temp_list="/var/run/msgcollector/$who_ami/"*".done /var/run/msgcollector/global/"*".done"
-      for temp_item in $temp_list; do
-         ## Remove ".done".
-         temp_item="${temp_item%%.*}"
-         ## Remove "/var/run/msgcollector/$who_ami/".
-         temp_item="${temp_item##*/}"
-         if [ "$identifier_list" = "" ]; then
-            identifier_list="$temp_item"
-         else
-            identifier_list="$identifier_list $temp_item"
-         fi
-      done
-      for identifier in $identifier_list; do
-         if [ "$x" = "1" ]; then
+   inotifywait --quiet --recursive --monitor --event create --format "%w%f" "/var/run/msgcollector/$who_ami" | while read -r file_name; do
+      unset identifier temp_item
 
-            local progressbaridx_file
-            ## The * matches progressbaridx.
-            for progressbaridx_file in /var/run/msgcollector/$who_ami/${identifier}.*.progressbarx.done; do
-               first_two="${progressbaridx_file%.*.*}"
-               progressbaridx=${first_two##*.}
-               if [ -f "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbarx.done" ]; then
-                  if [ -f "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbarx" ]; then
-                     if [ -f "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbarx.animate" ]; then
-                        rm --force "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbarx.animate"
-                        animate="--animate"
-                     else
-                        unset animate
-                     fi
-                     if [ "$verbose" = "1" ]; then
-                        bash -x /usr/lib/msgcollector/msgprogressbar --identifier "$identifier" --whoami "$who_ami" --progressbaridx "${progressbaridx}" --verbose $animate
-                     else
-                        /usr/lib/msgcollector/msgprogressbar --identifier "$identifier" --whoami "$who_ami" --progressbaridx "${progressbaridx}" $animate &
-                     fi
+      file_extension="${file_name##*.}"
+      if [ ! "$file_extension" = "done" ]; then
+         continue
+      fi
+
+      ## Remove ".done".
+      temp_item="${file_name%%.*}"
+      ## Remove "/var/run/msgcollector/$who_ami/".
+      identifier="${temp_item##*/}"
+
+      if [ "$x" = "1" ]; then
+         local progressbaridx_file
+         ## The * matches progressbaridx.
+         for progressbaridx_file in /var/run/msgcollector/$who_ami/${identifier}.*.progressbarx.done; do
+            first_two="${progressbaridx_file%.*.*}"
+            progressbaridx=${first_two##*.}
+            if [ -f "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbarx.done" ]; then
+               if [ -f "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbarx" ]; then
+                  if [ -f "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbarx.animate" ]; then
+                     rm --force "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbarx.animate"
+                     animate="--animate"
+                  else
                      unset animate
-                     rm --force "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbarx.done"
-                  else
-                     rm --force "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbarx.done"
                   fi
-               fi
-            done
-            unset progressbaridx_file
-
-            if [ -f "/var/run/msgcollector/$who_ami/${identifier}.waitmessagex.done" ]; then
-               if [ -f "/var/run/msgcollector/$who_ami/${identifier}.waitmessagex" ]; then
-                  msg="$(cat "/var/run/msgcollector/$who_ami/${identifier}.waitmessagex")"
-                  ## TODO
-                  title="$(cat "/var/run/msgcollector/$who_ami/${identifier}.titlex")" || true
-                  type="$(cat "/var/run/msgcollector/$who_ami/${identifier}.typex")"
-                  dispatch_x_passive "$type" "$msg"
-                  rm --force "/var/run/msgcollector/$who_ami/${identifier}.waitmessagex.done"
-                  rm --force "/var/run/msgcollector/$who_ami/${identifier}.waitmessagex"
-               else
-                  rm --force "/var/run/msgcollector/$who_ami/${identifier}.waitmessagex.done"
-               fi
-            fi
-            if [ -f "/var/run/msgcollector/$who_ami/${identifier}.messagex.done" ]; then
-               if [ -f "/var/run/msgcollector/$who_ami/${identifier}.messagex" ]; then
-                  msg="$(cat "/var/run/msgcollector/$who_ami/${identifier}.messagex")"
-                  ## TODO: prevent race condition; own titlex for messagex, passivepopupqueuex
-                  title="$(cat "/var/run/msgcollector/$who_ami/${identifier}.titlex")" || true
-                  type="$(cat "/var/run/msgcollector/$who_ami/${identifier}.typex")"
-                  dispatch_x_active "$type" "$msg"
-                  rm --force "/var/run/msgcollector/$who_ami/${identifier}.messagex.done"
-                  rm --force "/var/run/msgcollector/$who_ami/${identifier}.messagex"
-                  rm --force "/var/run/msgcollector/$who_ami/${identifier}.lefttop"
-               else
-                  ## Not using rm outside the if, to prevent race conditions.
-                  ## Not always using rm, without if to prevent forking.
-                  rm --force "/var/run/msgcollector/$who_ami/${identifier}.messagex.done"
-               fi
-            fi
-            if [ -f "/var/run/msgcollector/$who_ami/${identifier}.passivepopupqueuex.done" ]; then
-               if [ -f "/var/run/msgcollector/$who_ami/${identifier}.passivepopupqueuex" ]; then
-                  msg="$(cat "/var/run/msgcollector/$who_ami/${identifier}.passivepopupqueuex")"
-                  ## TODO: prevent race condition; own titlex for messagex, passivepopupqueuex
-                  title="$(cat "/var/run/msgcollector/$who_ami/${identifier}.titlex")" || true
-                  type="$(cat "/var/run/msgcollector/$who_ami/${identifier}.typex")"
-                  if [ -f "/var/run/msgcollector/$who_ami/${identifier}.forceactive" ]; then
-                     dispatch_x_active "$type" "$msg"
+                  if [ "$verbose" = "1" ]; then
+                     bash -x /usr/lib/msgcollector/msgprogressbar --identifier "$identifier" --whoami "$who_ami" --progressbaridx "${progressbaridx}" --verbose $animate
                   else
-                     dispatch_x_passive "$type" "$msg"
+                     /usr/lib/msgcollector/msgprogressbar --identifier "$identifier" --whoami "$who_ami" --progressbaridx "${progressbaridx}" $animate &
                   fi
-                  rm --force "/var/run/msgcollector/$who_ami/${identifier}.forceactive"
-                  rm --force "/var/run/msgcollector/$who_ami/${identifier}.passivepopupqueuex.done"
-                  rm --force "/var/run/msgcollector/$who_ami/${identifier}.passivepopupqueuex"
+                  unset animate
+                  rm --force "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbarx.done"
                else
-                  rm --force "/var/run/msgcollector/$who_ami/${identifier}.passivepopupqueuex.done"
+                  rm --force "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbarx.done"
                fi
+               continue
             fi
+         done
+         unset progressbaridx_file
 
-         elif [ "$cli" = "1" ]; then
-            if [ -f "/var/run/msgcollector/$who_ami/${identifier}.waitmessagecli.done" ]; then
-               if [ -f "/var/run/msgcollector/$who_ami/${identifier}.waitmessagecli" ]; then
-                  msg="$(cat "/var/run/msgcollector/$who_ami/${identifier}.waitmessagecli")"
-                  type="$(cat "/var/run/msgcollector/$who_ami/${identifier}.typecli")"
-                  dispatch_cli "$msg"
-                  rm --force "/var/run/msgcollector/$who_ami/${identifier}.waitmessagecli.done"
-                  rm --force "/var/run/msgcollector/$who_ami/${identifier}.waitmessagecli"
-               else
-                  rm --force "/var/run/msgcollector/$who_ami/${identifier}.waitmessagecli.done"
-               fi
+         if [ "$file_name" = "/var/run/msgcollector/$who_ami/${identifier}.waitmessagex.done" ]; then
+            if [ -f "/var/run/msgcollector/$who_ami/${identifier}.waitmessagex" ]; then
+               msg="$(cat "/var/run/msgcollector/$who_ami/${identifier}.waitmessagex")"
+               ## TODO
+               title="$(cat "/var/run/msgcollector/$who_ami/${identifier}.titlex")" || true
+               type="$(cat "/var/run/msgcollector/$who_ami/${identifier}.typex")"
+               dispatch_x_passive "$type" "$msg"
+               rm --force "/var/run/msgcollector/$who_ami/${identifier}.waitmessagex.done"
+               rm --force "/var/run/msgcollector/$who_ami/${identifier}.waitmessagex"
+            else
+               rm --force "/var/run/msgcollector/$who_ami/${identifier}.waitmessagex.done"
             fi
-            if [ -f "/var/run/msgcollector/$who_ami/${identifier}.messagecli.done" ]; then
-               if [ -f "/var/run/msgcollector/$who_ami/${identifier}.messagecli" ]; then
-                  msg="$(cat "/var/run/msgcollector/$who_ami/${identifier}.messagecli")"
-                  type="$(cat "/var/run/msgcollector/$who_ami/${identifier}.typecli")"
-                  dispatch_cli "$msg"
-                  rm --force "/var/run/msgcollector/$who_ami/${identifier}.messagecli.done"
-                  rm --force "/var/run/msgcollector/$who_ami/${identifier}.messagecli"
-               else
-                  rm --force "/var/run/msgcollector/$who_ami/${identifier}.messagecli.done"
-               fi
-            fi
-         else
-            exit 1
+            continue
          fi
-      done
-      sleep 1 &
-      wait "$!"
+         if [ "$file_name" = "/var/run/msgcollector/$who_ami/${identifier}.messagex.done" ]; then
+            if [ -f "/var/run/msgcollector/$who_ami/${identifier}.messagex" ]; then
+               msg="$(cat "/var/run/msgcollector/$who_ami/${identifier}.messagex")"
+               ## TODO: prevent race condition; own titlex for messagex, passivepopupqueuex
+               title="$(cat "/var/run/msgcollector/$who_ami/${identifier}.titlex")" || true
+               type="$(cat "/var/run/msgcollector/$who_ami/${identifier}.typex")"
+               dispatch_x_active "$type" "$msg"
+               rm --force "/var/run/msgcollector/$who_ami/${identifier}.messagex.done"
+               rm --force "/var/run/msgcollector/$who_ami/${identifier}.messagex"
+               rm --force "/var/run/msgcollector/$who_ami/${identifier}.lefttop"
+            else
+               ## Not using rm outside the if, to prevent race conditions.
+               ## Not always using rm, without if to prevent forking.
+               rm --force "/var/run/msgcollector/$who_ami/${identifier}.messagex.done"
+            fi
+            continue
+         fi
+         if [ "$file_name" = "/var/run/msgcollector/$who_ami/${identifier}.passivepopupqueuex.done" ]; then
+            if [ -f "/var/run/msgcollector/$who_ami/${identifier}.passivepopupqueuex" ]; then
+               msg="$(cat "/var/run/msgcollector/$who_ami/${identifier}.passivepopupqueuex")"
+               ## TODO: prevent race condition; own titlex for messagex, passivepopupqueuex
+               title="$(cat "/var/run/msgcollector/$who_ami/${identifier}.titlex")" || true
+               type="$(cat "/var/run/msgcollector/$who_ami/${identifier}.typex")"
+               if [ -f "/var/run/msgcollector/$who_ami/${identifier}.forceactive" ]; then
+                  dispatch_x_active "$type" "$msg"
+               else
+                  dispatch_x_passive "$type" "$msg"
+               fi
+               rm --force "/var/run/msgcollector/$who_ami/${identifier}.forceactive"
+               rm --force "/var/run/msgcollector/$who_ami/${identifier}.passivepopupqueuex.done"
+               rm --force "/var/run/msgcollector/$who_ami/${identifier}.passivepopupqueuex"
+            else
+               rm --force "/var/run/msgcollector/$who_ami/${identifier}.passivepopupqueuex.done"
+            fi
+            continue
+         fi
+
+      elif [ "$cli" = "1" ]; then
+         if [ "$file_name" = "/var/run/msgcollector/$who_ami/${identifier}.waitmessagecli.done" ]; then
+            if [ -f "/var/run/msgcollector/$who_ami/${identifier}.waitmessagecli" ]; then
+               msg="$(cat "/var/run/msgcollector/$who_ami/${identifier}.waitmessagecli")"
+               type="$(cat "/var/run/msgcollector/$who_ami/${identifier}.typecli")"
+               dispatch_cli "$msg"
+               rm --force "/var/run/msgcollector/$who_ami/${identifier}.waitmessagecli.done"
+               rm --force "/var/run/msgcollector/$who_ami/${identifier}.waitmessagecli"
+            else
+               rm --force "/var/run/msgcollector/$who_ami/${identifier}.waitmessagecli.done"
+            fi
+            continue
+         fi
+         if [ "$file_name" = "/var/run/msgcollector/$who_ami/${identifier}.messagecli.done" ]; then
+            if [ -f "/var/run/msgcollector/$who_ami/${identifier}.messagecli" ]; then
+               msg="$(cat "/var/run/msgcollector/$who_ami/${identifier}.messagecli")"
+               type="$(cat "/var/run/msgcollector/$who_ami/${identifier}.typecli")"
+               dispatch_cli "$msg"
+               rm --force "/var/run/msgcollector/$who_ami/${identifier}.messagecli.done"
+               rm --force "/var/run/msgcollector/$who_ami/${identifier}.messagecli"
+            else
+               rm --force "/var/run/msgcollector/$who_ami/${identifier}.messagecli.done"
+            fi
+            continue
+         fi
+      else
+         exit 1
+      fi
    done
 }
 
