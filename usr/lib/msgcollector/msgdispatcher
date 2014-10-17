@@ -326,13 +326,20 @@ inotifywait_loop() {
    done
 }
 
-parse_cmd_options ${1+"$@"}
+msgdispatcher_loop() {
+   trap "error_handler" ERR
+   while true; do
+      preparation
+      write_own_pid
+      fallbacks ## provided by /usr/lib/msgcollector/msgwmctrl
+      inotifywait_loop
+      sleep 2 &
+      wait "$!"
+   done
+}
 
 source /usr/lib/msgcollector/msgcollector_shared
 source /usr/lib/msgcollector/msgwmctrl
 
-maybe_wait
-preparation
-write_own_pid
-fallbacks ## provided by /usr/lib/msgcollector/msgwmctrl
-inotifywait_loop
+parse_cmd_options ${1+"$@"}
+msgdispatcher_loop
