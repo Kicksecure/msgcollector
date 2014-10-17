@@ -195,7 +195,7 @@ dispatch_x_passive() {
    passive_popup_tool "20" "$msg"
 }
 
-main_function() {
+inotifywait_loop() {
    trap "error_handler" ERR
 
    shopt -s nullglob
@@ -329,10 +329,10 @@ main_function() {
 parse_cmd_options ${1+"$@"}
 
 source /usr/lib/msgcollector/msgcollector_shared
-maybe_wait
+source /usr/lib/msgcollector/msgwmctrl
 
+maybe_wait
 preparation
 write_own_pid
-source /usr/lib/msgcollector/msgwmctrl
 fallbacks ## provided by /usr/lib/msgcollector/msgwmctrl
-main_function
+inotifywait_loop
