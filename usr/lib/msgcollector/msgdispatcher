@@ -47,6 +47,25 @@ error_handler() {
 
 trap "error_handler" ERR
 
+ex_funct() {
+   true "$FUNCNAME: Signal $SIGNAL_TYPE received. Cleaning up..."
+
+   if [ ! "$inotifywait_subshell_pid" = "" ]; then
+      kill -sigterm "$inotifywait_subshell_pid" || true
+   fi
+
+   if [ -f "$pid_file" ]; then
+      rm --force "$pid_file"
+   fi
+   if [ -f "$inotifywait_subshell_fifo" ]; then
+      rm --force "$inotifywait_subshell_fifo"
+   fi
+
+   true "$FUNCNAME: Signal $SIGNAL_TYPE received. Exiting."
+
+   exit "$EXIT_CODE"
+}
+
 trap_sighup() {
    set -x
    true
@@ -54,6 +73,26 @@ trap_sighup() {
 }
 
 trap "trap_sighup" SIGHUP
+
+trap_sigterm() {
+   trap "error_handler" ERR
+
+   SIGNAL_TYPE="SIGTERM"
+   EXIT_CODE="143"
+   ex_funct
+}
+
+trap "trap_sigterm" SIGTERM
+
+trap_sigint() {
+   trap "error_handler" ERR
+
+   SIGNAL_TYPE="SIGINT"
+   EXIT_CODE="130"
+   ex_funct
+}
+
+trap "trap_sigint" SIGINT ## ctrl + c
 
 parse_cmd_options() {
    trap "error_handler" ERR
@@ -94,8 +133,24 @@ parse_cmd_options() {
 preparation() {
    trap "error_handler" ERR
 
+   ## Sanity test.
+   command -v flock >/dev/null 2>/dev/null
+
    if [ "$who_ami" = "" ]; then
       who_ami="$(whoami)"
+   fi
+
+   if [ "$cli" = "1" ]; then
+      pid_file="/var/run/msgcollector/$who_ami/msgdispatcher_pidcli"
+      lock_file="/var/run/msgcollector/$who_ami/msgdispatcher_cli_lock"
+      inotifywait_subshell_fifo="/var/run/msgcollector/$who_ami/cli_subshell_fifo"
+   elif [ "$x" = "1" ]; then
+      pid_file="/var/run/msgcollector/$who_ami/msgdispatcher_pidx"
+      lock_file="/var/run/msgcollector/$who_ami/msgdispatcher_x_lock"
+      inotifywait_subshell_fifo="/var/run/msgcollector/$who_ami/x_subshell_fifo"
+   else
+      echo "$$" > "/var/run/msgcollector/$who_ami/msgdispatcher_piderror"
+      exit 3
    fi
 
    if [ ! -d "/var/run/msgcollector/$who_ami" ]; then
@@ -106,13 +161,50 @@ preparation() {
 write_own_pid() {
    trap "error_handler" ERR
 
-   if [ "$cli" = "1" ]; then
-      echo "$$" > "/var/run/msgcollector/$who_ami/msgdispatcher_pidcli"
-   elif [ "$x" = "1" ]; then
-      echo "$$" > "/var/run/msgcollector/$who_ami/msgdispatcher_pidx"
+   local subshell_pid wait_exit_code msgdispatcher_pid
+   msgdispatcher_pid="$$"
+
+   (
+      flock_exit_code="0"
+      flock --nonblock --exclusive 200
+      flock_exit_code="$?"
+      true "$scriptname $FUNCNAME (subshell) (pid: $$): lock_file: $lock_file | flock_exit_code: $flock_exit_code"
+
+      if [ -f "$pid_file" ]; then
+         true "$scriptname $FUNCNAME (subshell) (pid: $$): pid file $pid_file already exists."
+         pid="$(cat "$pid_file")" || true
+         true "$scriptname $FUNCNAME (subshell) (pid: $$): pid file $pid_file contains pid: $pid"
+         if [ ! "$pid" = "" ]; then
+            kill_exit_code="0"
+            kill -0 "$pid" || { kill_exit_code="$?" ; true; };
+            if [ "$kill_exit_code" = "0" ]; then
+               true "$scriptname $FUNCNAME (subshell) (pid: $$): msgdispatcher with pid $pid already running."
+               exit 1
+            else
+              true "$scriptname $FUNCNAME (subshell) (pid: $$): msgdispatcher with pid $pid not running."
+            fi
+         fi
+      fi
+
+      if [ "$flock_exit_code" = "0" ]; then
+         true "$scriptname $FUNCNAME (subshell) (pid: $$): writing msgdispatcher_pid $msgdispatcher_pid to pid_file $pid_file."
+         echo "$msgdispatcher_pid" > "$pid_file"
+      else
+         true "$scriptname $FUNCNAME (subshell) (pid: $$): Could not acquire lock."
+         exit 2
+      fi
+   ) 200>"$lock_file" &
+
+   subshell_pid="$!"
+
+   wait_exit_code="0"
+   wait "$subshell_pid" || { wait_exit_code="$?" ; true; };
+
+   if [ ! "$wait_exit_code" = "0" ]; then
+      true "$scriptname $FUNCNAME (pid: $$): Subshell exit code: $wait_exit_code. Exiting."
+      exit 0
    else
-      echo "$$" > "/var/run/msgcollector/$who_ami/msgdispatcher_piderror"
-      exit 3
+      true "$scriptname $FUNCNAME (pid: $$): Acquire lock ok."
    fi
 }
 
@@ -195,14 +287,41 @@ dispatch_x_passive() {
    passive_popup_tool "20" "$msg"
 }
 
+inotifywait_setup() {
+   trap "error_handler" ERR
+
+   if [ ! "$inotifywait_subshell_pid" = "" ]; then
+      kill -sigterm "$inotifywait_subshell_pid" || true
+   fi
+
+   rm --force "$inotifywait_subshell_fifo"
+   mkfifo "$inotifywait_subshell_fifo"
+
+   {
+      inotifywait_subshell_trap_sigterm() {
+         true "$FUNCNAME: signal SIGTERM received. Exiting."
+         exit 143
+      }
+      trap "inotifywait_subshell_trap_sigterm" SIGTERM
+      inotifywait --quiet --recursive --monitor --event create --format "%w%f" "/var/run/msgcollector/$who_ami" &
+      inotifywait_pid="$!"
+      wait "$inotifywait_pid"
+   } > "$inotifywait_subshell_fifo" &
+
+   inotifywait_subshell_pid="$!"
+   true "$scriptname $FUNCNAME (pid: $$): Started subshell for inotify with pid: $inotifywait_subshell_pid"
+}
+
 inotifywait_loop() {
    trap "error_handler" ERR
+
+   true "$scriptname $FUNCNAME (pid: $$): Starting loop."
 
    shopt -s nullglob
 
    local identifier temp_item file_name
 
-   inotifywait --quiet --recursive --monitor --event create --format "%w%f" "/var/run/msgcollector/$who_ami" | while read -r file_name; do
+   while read -r file_name; do
       unset identifier temp_item
 
       file_extension="${file_name##*.}"
@@ -323,7 +442,7 @@ inotifywait_loop() {
       else
          exit 1
       fi
-   done
+   done < "$inotifywait_subshell_fifo"
 }
 
 msgdispatcher_loop() {
@@ -333,8 +452,9 @@ msgdispatcher_loop() {
       preparation
       write_own_pid
       fallbacks ## provided by /usr/lib/msgcollector/msgwmctrl
+      inotifywait_setup
       inotifywait_loop
-      sleep 2 &
+      sleep 10 &
       wait "$!"
    done
 }

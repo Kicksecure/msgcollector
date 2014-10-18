@@ -15,7 +15,7 @@ else
    if [ -f "/var/run/msgcollector/$who_ami/msgdispatcher_pidcli" ]; then
       pid="$(cat "/var/run/msgcollector/$who_ami/msgdispatcher_pidcli")"
       if [ ! "$pid" = "" ]; then
-         kill -9 "$pid"
+         kill -sigterm "$pid"
       fi
    fi
 fi
