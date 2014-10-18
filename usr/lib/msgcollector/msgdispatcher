@@ -322,6 +322,7 @@ inotifywait_loop() {
    local identifier temp_item file_name last_two first_two progressbaridx
 
    while read -r file_name; do
+      true "file_name: $file_name"
       file_extension="${file_name##*.}"
       if [ ! "$file_extension" = "done" ]; then
          continue
