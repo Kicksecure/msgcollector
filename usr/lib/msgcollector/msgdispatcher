@@ -317,8 +317,6 @@ inotifywait_loop() {
 
    true "$scriptname $FUNCNAME (pid: $$): Starting loop."
 
-   shopt -s nullglob
-
    local identifier temp_item file_name last_two first_two progressbaridx
 
    while read -r file_name; do
