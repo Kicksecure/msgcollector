@@ -11,6 +11,11 @@ scriptname="$(basename "$BASH_SOURCE")"
 
 error_handler() {
    local exit_code="$?"
+   if [ ! "$1" = "" ]; then
+      error_text="$1"
+   else
+      error_text="$BASH_COMMAND"
+   fi
 
    local msg="<p>
 <br></br>###############################################################################
@@ -20,8 +25,8 @@ error_handler() {
 <br></br>## Please see Whonix News, Whonix Blog and Whonix User Help Forum.
 <br></br>## Please report this bug!
 <br></br>##
-<br></br>## BASH_COMMAND: $BASH_COMMAND
-<br></br>## exit_code: $exit_code
+<br></br>## error_text: $error_text
+<br></br>## last exit_code: $exit_code
 <br></br>###############################################################################</p>"
 
    ## Popup window with the message above.
@@ -165,9 +170,9 @@ write_own_pid() {
    msgdispatcher_pid="$$"
 
    (
+      trap "error_handler" ERR
       flock_exit_code="0"
-      flock --nonblock --exclusive 200
-      flock_exit_code="$?"
+      flock --nonblock --exclusive 200 || { flock_exit_code="$?" ; true; };
       true "$scriptname $FUNCNAME (subshell) (pid: $$): lock_file: $lock_file | flock_exit_code: $flock_exit_code"
 
       if [ -f "$pid_file" ]; then
@@ -298,14 +303,20 @@ inotifywait_setup() {
    mkfifo "$inotifywait_subshell_fifo"
 
    {
+      trap "error_handler" ERR
       inotifywait_subshell_trap_sigterm() {
+         trap "error_handler" ERR
          true "$FUNCNAME: signal SIGTERM received. Exiting."
          exit 143
       }
       trap "inotifywait_subshell_trap_sigterm" SIGTERM
-      inotifywait --quiet --recursive --monitor --event create --format "%w%f" "/var/run/msgcollector/$who_ami" &
+      inotifywait_folder="/var/run/msgcollector/$who_ami"
+      inotifywait --quiet --recursive --monitor --event create --format "%w%f" "$inotifywait_folder" &
       inotifywait_pid="$!"
-      wait "$inotifywait_pid"
+      wait_exit_code="0"
+      wait "$inotifywait_pid" || { wait_exit_code="$?" ; true; };
+      error_handler "Failed to set up inotifywait! inotifywait_folder: $inotifywait_folder | wait_exit_code: $wait_exit_code"
+      exit "$wait_exit_code"
    } > "$inotifywait_subshell_fifo" &
 
    inotifywait_subshell_pid="$!"
