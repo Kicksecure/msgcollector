@@ -149,14 +149,22 @@ preparation() {
       pid_file="/var/run/msgcollector/$who_ami/msgdispatcher_pidcli"
       lock_file="/var/run/msgcollector/$who_ami/msgdispatcher_cli_lock"
       inotifywait_subshell_fifo="/var/run/msgcollector/$who_ami/msgdispatcher_cli_subshell_fifo"
+      inotifywait_success_file="/var/run/msgcollector/$who_ami/msgdispatcher_cli_inotifywait_success"
    elif [ "$x" = "1" ]; then
       pid_file="/var/run/msgcollector/$who_ami/msgdispatcher_pidx"
       lock_file="/var/run/msgcollector/$who_ami/msgdispatcher_x_lock"
       inotifywait_subshell_fifo="/var/run/msgcollector/$who_ami/msgdispatcher_x_subshell_fifo"
+      inotifywait_success_file="/var/run/msgcollector/$who_ami/msgdispatcher_x_inotifywait_success"
    else
       echo "$$" > "/var/run/msgcollector/$who_ami/msgdispatcher_piderror"
       exit 3
    fi
+
+   if [ -f "$inotifywait_success_file" ]; then
+      rm --force "$inotifywait_success_file"
+   fi
+
+   inotifywait_folder="/var/run/msgcollector/$who_ami"
 
    if [ ! -d "/var/run/msgcollector/$who_ami" ]; then
       mkdir --mode o+rwx --parents "/var/run/msgcollector/$who_ami"
@@ -303,19 +311,37 @@ inotifywait_setup() {
    mkfifo "$inotifywait_subshell_fifo"
 
    {
-      trap "error_handler" ERR
+      inotifywait_subshell_error_handler() {
+         local exit_code="$?"
+         if [ ! "$1" = "" ]; then
+            error_text="exit_code: $exit_code | text: $1"
+         else
+            error_text="exit_code: $exit_code | BASH_COMMAND: $BASH_COMMAND"
+         fi
+         rm --force "$inotifywait_success_file"
+         error_handler "$error_text"
+         exit 1
+      }
+
+      trap "inotifywait_subshell_error_handler" ERR
+
       inotifywait_subshell_trap_sigterm() {
          trap "error_handler" ERR
+         true "$FUNCNAME: signal SIGTERM received. Cleaning up..."
+         rm --force "$inotifywait_success_file"
          true "$FUNCNAME: signal SIGTERM received. Exiting."
          exit 143
       }
+
       trap "inotifywait_subshell_trap_sigterm" SIGTERM
-      inotifywait_folder="/var/run/msgcollector/$who_ami"
+
       inotifywait --quiet --recursive --monitor --event create --format "%w%f" "$inotifywait_folder" &
       inotifywait_pid="$!"
+      touch "$inotifywait_success_file"
       wait_exit_code="0"
+      ## Should wait forever.
       wait "$inotifywait_pid" || { wait_exit_code="$?" ; true; };
-      error_handler "Failed to set up inotifywait! inotifywait_folder: $inotifywait_folder | wait_exit_code: $wait_exit_code"
+      inotifywait_subshell_error_handler "Failed to set up inotifywait! inotifywait_folder: $inotifywait_folder | wait_exit_code: $wait_exit_code"
       exit "$wait_exit_code"
    } > "$inotifywait_subshell_fifo" &
 
