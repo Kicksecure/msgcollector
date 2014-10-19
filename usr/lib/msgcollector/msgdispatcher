@@ -143,11 +143,11 @@ preparation() {
    if [ "$cli" = "1" ]; then
       pid_file="/var/run/msgcollector/$who_ami/msgdispatcher_pidcli"
       lock_file="/var/run/msgcollector/$who_ami/msgdispatcher_cli_lock"
-      inotifywait_subshell_fifo="/var/run/msgcollector/$who_ami/cli_subshell_fifo"
+      inotifywait_subshell_fifo="/var/run/msgcollector/$who_ami/msgdispatcher_cli_subshell_fifo"
    elif [ "$x" = "1" ]; then
       pid_file="/var/run/msgcollector/$who_ami/msgdispatcher_pidx"
       lock_file="/var/run/msgcollector/$who_ami/msgdispatcher_x_lock"
-      inotifywait_subshell_fifo="/var/run/msgcollector/$who_ami/x_subshell_fifo"
+      inotifywait_subshell_fifo="/var/run/msgcollector/$who_ami/msgdispatcher_x_subshell_fifo"
    else
       echo "$$" > "/var/run/msgcollector/$who_ami/msgdispatcher_piderror"
       exit 3
