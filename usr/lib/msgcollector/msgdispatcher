@@ -369,30 +369,6 @@ inotifywait_loop() {
       identifier="${temp_item##*/}"
 
       if [ "$x" = "1" ]; then
-         last_two="${file_name#*.*.}"
-         if [ "$last_two" = "progressbarx.done" ]; then
-            first_two="${file_name%.*.*}"
-            progressbaridx=${first_two##*.}
-            if [ -f "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbarx" ]; then
-               if [ -f "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbarx.animate" ]; then
-                  rm --force "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbarx.animate"
-                  animate="--animate"
-               else
-                  unset animate
-               fi
-               if [ "$verbose" = "1" ]; then
-                  bash -x /usr/lib/msgcollector/msgprogressbar --identifier "$identifier" --whoami "$who_ami" --progressbaridx "${progressbaridx}" --verbose $animate
-               else
-                  /usr/lib/msgcollector/msgprogressbar --identifier "$identifier" --whoami "$who_ami" --progressbaridx "${progressbaridx}" $animate &
-               fi
-               unset animate
-               rm --force "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbarx.done"
-            else
-               rm --force "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbarx.done"
-            fi
-            continue
-         fi
-
          if [ "$file_name" = "/var/run/msgcollector/$who_ami/${identifier}.waitmessagex.done" ]; then
             if [ -f "/var/run/msgcollector/$who_ami/${identifier}.waitmessagex" ]; then
                msg="$(cat "/var/run/msgcollector/$who_ami/${identifier}.waitmessagex")"
@@ -440,6 +416,30 @@ inotifywait_loop() {
                rm --force "/var/run/msgcollector/$who_ami/${identifier}.passivepopupqueuex"
             else
                rm --force "/var/run/msgcollector/$who_ami/${identifier}.passivepopupqueuex.done"
+            fi
+            continue
+         fi
+
+         last_two="${file_name#*.*.}"
+         if [ "$last_two" = "progressbarx.done" ]; then
+            first_two="${file_name%.*.*}"
+            progressbaridx=${first_two##*.}
+            if [ -f "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbarx" ]; then
+               if [ -f "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbarx.animate" ]; then
+                  rm --force "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbarx.animate"
+                  animate="--animate"
+               else
+                  unset animate
+               fi
+               if [ "$verbose" = "1" ]; then
+                  bash -x /usr/lib/msgcollector/msgprogressbar --identifier "$identifier" --whoami "$who_ami" --progressbaridx "${progressbaridx}" --verbose $animate
+               else
+                  /usr/lib/msgcollector/msgprogressbar --identifier "$identifier" --whoami "$who_ami" --progressbaridx "${progressbaridx}" $animate &
+               fi
+               unset animate
+               rm --force "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbarx.done"
+            else
+               rm --force "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbarx.done"
             fi
             continue
          fi
