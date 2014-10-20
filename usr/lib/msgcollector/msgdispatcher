@@ -351,14 +351,21 @@ inotifywait_setup() {
    true "$scriptname $FUNCNAME (pid: $$): Started subshell for inotify with pid: $inotifywait_subshell_pid"
 }
 
-inotifywait_loop() {
+parse_existing_files() {
    trap "error_handler" ERR
 
-   true "$scriptname $FUNCNAME (pid: $$): Starting loop."
+   ## Prevent race condition while inotifywait might not be started yet.
+   sleep "2" &
+   wait "$!"
 
-   local identifier temp_item file_name last_two first_two progressbaridx
+   for file_name in "$inotifywait_folder/"*; do
+      msgdispatcher_handler
+   done
+}
 
-   while read -r file_name; do
+msgdispatcher_handler() {
+   trap "error_handler" ERR
+
       true "file_name: $file_name"
       file_extension="${file_name##*.}"
       if [ ! "$file_extension" = "done" ]; then
@@ -474,6 +481,17 @@ inotifywait_loop() {
       else
          exit 1
       fi
+}
+
+inotifywait_loop() {
+   trap "error_handler" ERR
+
+   true "$scriptname $FUNCNAME (pid: $$): Starting loop."
+
+   local identifier temp_item last_two first_two progressbaridx
+
+   while read -r file_name; do
+      msgdispatcher_handler
    done < "$inotifywait_subshell_fifo"
 }
 
@@ -485,6 +503,7 @@ msgdispatcher_loop() {
       write_own_pid
       fallbacks ## provided by /usr/lib/msgcollector/msgwmctrl
       inotifywait_setup
+      parse_existing_files
       inotifywait_loop
       sleep 10 &
       wait "$!"
