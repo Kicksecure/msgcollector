@@ -5,6 +5,7 @@
 ## See the file COPYING for copying conditions.
 
 #set -x
+#trap 'sleep 1' DEBUG
 set -o pipefail
 
 scriptname="$(basename "$BASH_SOURCE")"
@@ -160,9 +161,10 @@ preparation() {
       exit 3
    fi
 
-   if [ -f "$inotifywait_success_file" ]; then
-      rm --force "$inotifywait_success_file"
-   fi
+   ## Care for race condition.
+   #if [ -f "$inotifywait_success_file" ]; then
+      #rm --force "$inotifywait_success_file"
+   #fi
 
    inotifywait_folder="/var/run/msgcollector/$who_ami"
 
