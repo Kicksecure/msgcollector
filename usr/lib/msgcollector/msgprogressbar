@@ -62,6 +62,14 @@ parse_cmd_options() {
                progressbaridx="$2"
                shift 2
                ;;
+           --progressbartitlex)
+               progressbartitlex="$2"
+               shift 2
+               ;;
+           --progressbarx)
+               progressbarx="$2"
+               shift 2
+               ;;
            --animate)
                animate="1"
                shift
@@ -164,23 +172,12 @@ trap "output_sigterm" SIGTERM
 start_progress_bar() {
    trap "error_handler" ERR
 
-   if [ -f "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbarx" ]; then
-      local msg
-      msg="$(cat "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbarx")"
-      rm --force "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbarx"
+   if [ "$progressbarx" = "" ]; then
+      progressbarx="Progress bar message is empty, please report this Whonix bug!"
    fi
 
-   if [ "$msg" = "" ]; then
-      local msg="Progress bar message is empty, please report this Whonix bug!"
-   fi
-
-   if [ -f "/var/run/msgcollector/$who_ami/${identifier}.titlex" ]; then
-      local title
-      title="$(cat "/var/run/msgcollector/$who_ami/${identifier}.titlex")"
-   fi
-
-   if [ "$title" = "" ]; then
-      local title="Variable title does not exist. Please report this bug!"
+   if [ "$progressbartitlex" = "" ]; then
+      progressbartitlex="Variable progressbartitlex does not exist. Please report this bug!"
    fi
 
    if [ -f "/var/run/msgcollector/$who_ami/${identifier}.icon" ]; then
@@ -234,11 +231,11 @@ start_progress_bar() {
       --timeout "86400" \
       --no-markup \
       --window-icon "$icon" \
-      --title="$title" \
+      --title="$progressbartitlex" \
       --auto-kill \
       --auto-close \
       --progress $progress_txt_file_progress \
-      --text "$msg" \
+      --text "$progressbarx" \
       < "$fifo" & zenity_progress_pid="$!"
 
    exec 3>"$fifo"
@@ -251,7 +248,7 @@ start_progress_bar() {
       progressbar="1"
 
       ## provided by /usr/lib/msgcollector/msgwmctrl
-      output_wmctrl_move_window_to_left_top "$title"
+      output_wmctrl_move_window_to_left_top "$progressbartitlex"
    fi
 
    while true; do

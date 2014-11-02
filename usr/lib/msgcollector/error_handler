@@ -46,8 +46,8 @@ error_handler() {
    command_v_output_exit_code="0"
    command -v "$output" >/dev/null || { command_v_output_exit_code="$?" ; true; };
    if [ "$command_v_output_exit_code" = "0" ]; then
-      $output ${output_opts[@]} --messagex --typex "error" --titlex "$TITLE" --message "$MSG" --done
-      $output ${output_opts[@]} --messagecli --typecli "error" --titlecli "$TITLE" --message "$MSG" --done
+      $output ${output_opts[@]} --messagex --typex "error" --message "$MSG" --done
+      $output ${output_opts[@]} --messagecli --typecli "error" --message "$MSG" --done
    else
       local stripped_msg
       stripped_msg="$(/usr/lib/msgcollector/striphtml "$MSG")"

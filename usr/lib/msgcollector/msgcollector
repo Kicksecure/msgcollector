@@ -4,20 +4,6 @@
 ## Copyright (C) 2012 - 2014 Patrick Schleizer <adrelanos@riseup.net>
 ## See the file COPYING for copying conditions.
 
-## Examples:
-## /usr/lib/msgcollector/msgcollector --identifier whonixcheck --whoami user --icon /usr/share/icons/anon-icon-pack/whonix.ico --parentpid "$$" --typecli "warning" --titlecli "test title" --messagecli --message "test"
-## /usr/lib/msgcollector/msgcollector --identifier whonixcheck --whoami user --icon /usr/share/icons/anon-icon-pack/whonix.ico --parentpid "$$" --typex "warning" --titlex "test title" --messagex --message "test" --lefttop
-## /usr/lib/msgcollector/msgcollector --identifier whonixcheck --whoami user --icon /usr/share/icons/anon-icon-pack/whonix.ico --parentpid "$$" --typex "warning" --titlex "test title" --waitmessagex --message "test"
-## /usr/lib/msgcollector/msgcollector --identifier whonixcheck --whoami user --icon /usr/share/icons/anon-icon-pack/whonix.ico --parentpid "$$" --typex "warning" --titlex "test title" --passivepopupqueuex --message "test"
-## /usr/lib/msgcollector/msgcollector --identifier whonixcheck --whoami user --icon /usr/share/icons/anon-icon-pack/whonix.ico --parentpid "$$" --typex "warning" --titlex "test title" --progressbarx --message "test" --done
-## /usr/lib/msgcollector/msgcollector --identifier whonixcheck --whoami user --icon /usr/share/icons/anon-icon-pack/whonix.ico --parentpid "$$" --progressx "50"
-## /usr/lib/msgcollector/msgdispatcher --x
-## /usr/lib/msgcollector/msgdispatcher --cli
-
-## Tests:
-## /usr/lib/msgcollector/msgcollector --identifier whonixcheck --whoami user --icon /usr/share/icons/anon-icon-pack/whonix.ico --parentpid "$$" --typex "warning" --titlex "test title" --progressbaridx "test" --progressbarx --message "test" --done
-## /usr/lib/msgcollector/msgcollector --icon /usr/share/icons/anon-icon-pack/timesync.ico --parentpid 8196 --identifier whonixcheck --whoami user --progressbaridx "test" --progressx 100
-
 #set -x
 set -o pipefail
 
@@ -95,6 +81,10 @@ parse_cmd_options() {
                ;;
            --icon)
                icon="$2"
+               if [ "$icon" = "" ]; then
+                  echo "$BASH_SOURCE ERROR: variable icon is empty."
+                  exit 1
+               fi
                shift 2
                ;;
            --parentpid)
@@ -140,6 +130,14 @@ parse_cmd_options() {
                titlex="$2"
                shift 2
                ;;
+           --progressbartitlex)
+               progressbartitlex="$2"
+               shift 2
+               ;;
+           --passivepopupqueuextitle)
+               passivepopupqueuextitle="$2"
+               shift 2
+               ;;
            --messagex)
                messagex="1"
                shift
@@ -151,10 +149,6 @@ parse_cmd_options() {
                ;;
            --waitmessagecli)
                waitmessagecli="1"
-               shift
-               ;;
-           --waitmessagex)
-               waitmessagex="1"
                shift
                ;;
            --passivepopupqueuex)
@@ -358,11 +352,9 @@ collector() {
    ## }}
 
    ## {{ --icon
-   if [ "$icon" = "" ]; then
-      echo "$BASH_SOURCE ERROR: variable icon is empty."
-      exit 1
+   if [ ! "$icon" = "" ]; then
+      echo "$icon" > "/var/run/msgcollector/$who_ami/${identifier}.icon"
    fi
-   echo "$icon" > "/var/run/msgcollector/$who_ami/${identifier}.icon"
    ## }}
 
    ## {{ --parentpid
@@ -380,7 +372,9 @@ collector() {
    ## {{ --titlecli
    if [ ! -z "$titlecli" ]; then
       ## variable $titlecli exists
-      echo "$titlecli" > "/var/run/msgcollector/$who_ami/${identifier}.titlecli"
+      ## TODO
+      true "TODO: --titlecli not yet implemented in msgdispatcher"
+      #echo "$titlecli" > "/var/run/msgcollector/$who_ami/${identifier}.titlecli"
    fi
    ## }}
 
@@ -388,6 +382,20 @@ collector() {
    if [ ! -z "$titlex" ]; then
       ## variable $titlex exists
       echo "$titlex" > "/var/run/msgcollector/$who_ami/${identifier}.titlex"
+   fi
+   ## }}
+
+   ## {{ --passivepopupqueuextitle
+   if [ ! -z "$passivepopupqueuextitle" ]; then
+      ## variable $passivepopupqueuextitle exists
+      echo "$passivepopupqueuextitle" > "/var/run/msgcollector/$who_ami/${identifier}.passivepopupqueuextitle"
+   fi
+   ## }}
+
+   ## {{ --progressbartitlex
+   if [ ! -z "$progressbartitlex" ]; then
+      ## variable $progressbartitlex exists
+      echo "$progressbartitlex" > "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbartitlex"
    fi
    ## }}
 
@@ -445,14 +453,6 @@ collector() {
    if [ "$messagex" = "1" ]; then
       pretty_type_x "$typex"
       write_to_file="/var/run/msgcollector/$who_ami/${identifier}.messagex"
-      append_to_file
-   fi
-   ## }}
-
-   ## {{ --waitmessagex
-   if [ "$waitmessagex" = "1" ]; then
-      pretty_type_x "$typex"
-      write_to_file="/var/run/msgcollector/$who_ami/${identifier}.waitmessagex"
       append_to_file
    fi
    ## }}
@@ -594,13 +594,6 @@ return_status() {
    fi
    ## }}
 
-   ## {{ --waitmessagex
-   if [ "$waitmessagex" = "1" ]; then
-      write_to_file="/var/run/msgcollector/$who_ami/${identifier}.waitmessagex"
-      return_status_file
-   fi
-   ## }}
-
    ## {{ --messagecli
    if [ "$messagecli" = "1" ]; then
       write_to_file="/var/run/msgcollector/$who_ami/${identifier}.messagecli"
@@ -693,14 +686,14 @@ forget() {
       "/var/run/msgcollector/$who_ami/${identifier}.icon"
       "/var/run/msgcollector/$who_ami/${identifier}.titlecli"
       "/var/run/msgcollector/$who_ami/${identifier}.titlex"
+      "/var/run/msgcollector/$who_ami/${identifier}.passivepopupqueuextitle"
+      "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbartitlex"
       "/var/run/msgcollector/$who_ami/${identifier}.typecli"
       "/var/run/msgcollector/$who_ami/${identifier}.typex"
       "/var/run/msgcollector/$who_ami/${identifier}.progressbarx.done"
       "/var/run/msgcollector/$who_ami/${identifier}.progressbarx"
       "/var/run/msgcollector/$who_ami/${identifier}.passivepopupqueuex.done"
       "/var/run/msgcollector/$who_ami/${identifier}.passivepopupqueuex"
-      "/var/run/msgcollector/$who_ami/${identifier}.waitmessagex.done"
-      "/var/run/msgcollector/$who_ami/${identifier}.waitmessagex"
       "/var/run/msgcollector/$who_ami/${identifier}.messagex.done"
       "/var/run/msgcollector/$who_ami/${identifier}.messagex"
       "/var/run/msgcollector/$who_ami/${identifier}.waitmessagecli.done"
