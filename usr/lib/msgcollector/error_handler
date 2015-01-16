@@ -56,6 +56,7 @@ $error_text"
    command_v_output_exit_code="0"
    command -v "ex_funct" >/dev/null || { command_v_output_exit_code="$?" ; true; };
    if [ "$command_v_output_exit_code" = "0" ]; then
+      ## ex_funct exists. It is up to ex_funct to exit.
       echo "$SCRIPTNAME: Error detected. Cleaning up... Exiting..." >&2
       SIGNAL_TYPE="ERR"
       ex_funct || true
