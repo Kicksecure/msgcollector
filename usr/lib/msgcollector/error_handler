@@ -91,6 +91,5 @@ $error_text"
    if [ "$EXIT_CODE" = "" ]; then
       EXIT_CODE="1"
    fi
-
    exit "$EXIT_CODE"
 }
