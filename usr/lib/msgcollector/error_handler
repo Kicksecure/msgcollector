@@ -48,8 +48,8 @@ $error_text"
 <br></br>## bash -x $SCRIPTNAME --verbose
 <br></br>## for verbose output. Clean the output and report to Whonix developers.
 <br></br>#########################################################################</p>"
-
    fi
+
    ## Check if $output command has been already defined. This is not the case,
    ## when the script is terminated very early.
    local command_v_output_exit_code
