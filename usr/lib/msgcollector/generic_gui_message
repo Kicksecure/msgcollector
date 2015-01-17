@@ -20,7 +20,7 @@ class Notice(QtGui.QMessageBox):
 
         self.setWindowIcon(QtGui.QIcon("/usr/share/icons/anon-icon-pack/whonix.ico"))
 
-        if itype ==  "information":
+        if itype ==  "info":
             self.setIcon(QtGui.QMessageBox.Question)
         elif itype == "warning":
             self.setIcon(QtGui.QMessageBox.Warning)
