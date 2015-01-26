@@ -78,7 +78,7 @@ class Ui_Dialog(object):
     #    frameGm = Dialog.frameGeometry()
     #    centerPoint = QtGui.QDesktopWidget().availableGeometry().center()
     #    frameGm.moveCenter(centerPoint)
-    #    Dialog.move(frameGm.topLeft())    
+    #    Dialog.move(frameGm.topLeft())
 
 
 if __name__ == "__main__":
