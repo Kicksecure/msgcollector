@@ -33,6 +33,7 @@ class Notice(QtGui.QMessageBox):
 
         if button == "yesno":
             self.setStandardButtons(QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
+            self.setDefaultButton(QtGui.QMessageBox.No)
         elif button == "ok":
             self.setStandardButtons(QtGui.QMessageBox.Ok)
 
