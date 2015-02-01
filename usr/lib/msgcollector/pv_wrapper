@@ -8,5 +8,6 @@ set -e
 
 while read -r line; do
    percent="$line"
+   eval $pv_echo_command
    eval $pv_wrapper_command
 done
