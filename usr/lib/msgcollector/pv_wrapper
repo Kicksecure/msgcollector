@@ -1,0 +1,12 @@
+#!/bin/bash
+
+## This file is part of Whonix.
+## Copyright (C) 2012 - 2014 Patrick Schleizer <adrelanos@riseup.net>
+## See the file COPYING for copying conditions.
+
+set -e
+
+while read -r line; do
+   percent="$line"
+   eval $pv_wrapper_command
+done
