@@ -2,56 +2,108 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from PyQt4 import QtGui,  QtCore
+from PyQt4 import QtCore, QtGui
 
+try:
+    _fromUtf8 = QtCore.QString.fromUtf8
+except AttributeError:
+    _fromUtf8 = lambda s: s
 
-class Notice(QtGui.QMessageBox):
-
+class GuiMessage(QtGui.QDialog):
     def __init__(self):
-        super(Notice, self).__init__()
-        self.initUI()
+        super(GuiMessage, self).__init__()
+        self.setup_ui()
 
-    def initUI(self):
-        itype = str(sys.argv[1])
-        title = str(sys.argv[2])
-        message = str(sys.argv[3])
-        question = str(sys.argv[4])
-        button = str(sys.argv[5])
+    def setup_ui(self):
+        try:
+            itype = str(sys.argv[1])
+            title = str(sys.argv[2])
+            message = str(sys.argv[3])
+            question = str(sys.argv[4])
+            button = str(sys.argv[5])
+
+        except (IndexError) as e:
+            sys.exit('Arguments parsing error')
+
+        itype = "/usr/share/icons/oxygen/64x64/status/dialog-information.png"
+
+        if str(sys.argv[1]) == "warning":
+            itype = "/usr/share/icons/oxygen/64x64/status/dialog-warning.png"
+
+        elif str(sys.argv[1]) == "error":
+            itype = "/usr/share/icons/oxygen/128x128/status/dialog-error.png"
+
+        message = message + '<blocquote>' + question + '</blocquote>'
+        # We use QTextBrowser with a white background.
+        # Set a default (transparent) background.
+        palette = QtGui.QPalette()
+        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255, 0))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Active, QtGui.QPalette.Base, brush)
+        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255, 0))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Inactive, QtGui.QPalette.Base, brush)
+        brush = QtGui.QBrush(QtGui.QColor(244, 244, 244))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Base, brush)
+        self.setPalette(palette)
 
         self.setWindowIcon(QtGui.QIcon("/usr/share/icons/anon-icon-pack/whonix.ico"))
+        self.setWindowTitle(_fromUtf8(title))
 
-        if itype ==  "info":
-            self.setIcon(QtGui.QMessageBox.Question)
-        elif itype == "warning":
-            self.setIcon(QtGui.QMessageBox.Warning)
-        elif itype == "error":
-            self.setIcon(QtGui.QMessageBox.Critical)
+        self.gridLayout = QtGui.QGridLayout(self)
 
-        self.setWindowTitle(title)
-        self.setText(message)
-        self.setInformativeText(question)
+        self.label = QtGui.QLabel(self)
+        self.label.setPixmap(QtGui.QPixmap(itype))
+        self.label.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
+        self.gridLayout.addWidget(self.label, 0, 0)
 
-        if button == "yesno":
-            self.setStandardButtons(QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
-            self.setDefaultButton(QtGui.QMessageBox.No)
-        elif button == "ok":
-            self.setStandardButtons(QtGui.QMessageBox.Ok)
+        self.text = QtGui.QTextBrowser(self)
+        self.text.setMinimumSize(380, 0)
+        self.text.setFrameShape(QtGui.QFrame.NoFrame)
+        self.text.setTextInteractionFlags(QtCore.Qt.LinksAccessibleByMouse)
+        self.text.setOpenExternalLinks(True)
+        self.text.setText(_fromUtf8(message))
+        self.gridLayout.addWidget(self.text, 0, 1)
 
-        self.setTextFormat(QtCore.Qt.RichText)
+        self.buttonBox = QtGui.QDialogButtonBox(self)
+
+        if button == 'yesno':
+            self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Yes|QtGui.QDialogButtonBox.No)
+            QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("accepted()"), self.yes_pressed)
+            QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("rejected()"), self.no_pressed)
+
+        elif button == 'ok':
+            self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Ok)
+            QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("accepted()")), self.yes_pressed)
+
+        self.gridLayout.addWidget(self.buttonBox, 1, 1)
+
+        QtCore.QTimer.singleShot(0, self.setSize)
 
         self.exec_()
 
-        result = self.result()
-        if button == "yesno":
-            print result
+    def setSize(self):
+        ## Size is returned
+        messageHeight = self.text.document().size().height()
+        maximumHeight = QtGui.QDesktopWidget().availableGeometry().height() - 25
+        if messageHeight <= maximumHeight:
+            self.resize(0, messageHeight + 55)
+        else:
+            self.resize(0, maximumHeight)
 
+    def yes_pressed(self):
+        print 'yes'
         sys.exit()
 
+    def no_pressed(self):
+        print 'no'
+        sys.exit()
 
 def main():
     app = QtGui.QApplication(sys.argv)
-    ex = Notice()
-    sys.exit(app.exec_())
+    message = GuiMessage()
+    sys.exit()
 
 if __name__ == '__main__':
     main()
