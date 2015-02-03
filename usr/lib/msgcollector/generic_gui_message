@@ -28,7 +28,7 @@ class GuiMessage(QtGui.QDialog):
         itype = "/usr/share/icons/oxygen/64x64/status/dialog-information.png"
 
         if str(sys.argv[1]) == "warning":
-            itype = "/usr/share/icons/oxygen/64x64/status/dialog-warning.png"
+            itype = "/usr/share/icons/oxygen/128x128/status/dialog-warning.png"
 
         elif str(sys.argv[1]) == "error":
             itype = "/usr/share/icons/oxygen/128x128/status/dialog-error.png"
