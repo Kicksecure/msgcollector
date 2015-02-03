@@ -93,11 +93,11 @@ class GuiMessage(QtGui.QDialog):
             self.resize(0, maximumHeight)
 
     def yes_pressed(self):
-        print 'yes'
+        print '65536'
         sys.exit()
 
     def no_pressed(self):
-        print 'no'
+        print '16384'
         sys.exit()
 
 def main():
