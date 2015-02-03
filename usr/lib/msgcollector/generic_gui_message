@@ -61,7 +61,6 @@ class GuiMessage(QtGui.QDialog):
 
         self.text = QtGui.QLabel(self)
         self.text.setMinimumSize(380, 0)
-        #self.text,setTextFormat(QtCore.Qt.RichText)
         self.text.setTextFormat(QtCore.Qt.RichText)
         self.text.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.text.setWordWrap(True)
@@ -92,12 +91,12 @@ class GuiMessage(QtGui.QDialog):
 
     def setSize(self):
         ## Size is returned
-        messageHeight = self.text.document().size().height()
+        messageHeight = self.text.size().height()
         maximumHeight = QtGui.QDesktopWidget().availableGeometry().height() - 25
         if messageHeight <= maximumHeight:
-            self.resize(0, messageHeight + 55)
+            self.resize(495, messageHeight + 55)
         else:
-            self.resize(0, maximumHeight)
+            self.resize(495, maximumHeight)
 
     def yes_pressed(self):
         print '16384'
