@@ -33,7 +33,7 @@ class GuiMessage(QtGui.QDialog):
         elif str(sys.argv[1]) == "error":
             itype = "/usr/share/icons/oxygen/128x128/status/dialog-error.png"
 
-        message = message + '<blocquote>' + question + '</blocquote>'
+        message = message + '<p>' + question + '</p>'
 
         # We use QTextBrowser with a white background.
         # Set a default (transparent) background.
@@ -50,7 +50,7 @@ class GuiMessage(QtGui.QDialog):
         self.setPalette(palette)
 
         self.setWindowIcon(QtGui.QIcon("/usr/share/icons/anon-icon-pack/whonix.ico"))
-        self.setWindowTitle(_fromUtf8(title))
+        self.setWindowTitle(title)
 
         self.gridLayout = QtGui.QGridLayout(self)
 
@@ -59,12 +59,16 @@ class GuiMessage(QtGui.QDialog):
         self.label.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.gridLayout.addWidget(self.label, 0, 0)
 
-        self.text = QtGui.QTextBrowser(self)
+        self.text = QtGui.QLabel(self)
         self.text.setMinimumSize(380, 0)
+        #self.text,setTextFormat(QtCore.Qt.RichText)
+        self.text.setTextFormat(QtCore.Qt.RichText)
+        self.text.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
+        self.text.setWordWrap(True)
         self.text.setFrameShape(QtGui.QFrame.NoFrame)
         self.text.setTextInteractionFlags(QtCore.Qt.LinksAccessibleByMouse)
         self.text.setOpenExternalLinks(True)
-        self.text.setText(_fromUtf8(message))
+        self.text.setText(message)
         self.gridLayout.addWidget(self.text, 0, 1)
 
         self.buttonBox = QtGui.QDialogButtonBox(self)
