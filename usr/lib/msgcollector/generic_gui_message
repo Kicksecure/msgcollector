@@ -34,6 +34,7 @@ class GuiMessage(QtGui.QDialog):
             itype = "/usr/share/icons/oxygen/128x128/status/dialog-error.png"
 
         message = message + '<blocquote>' + question + '</blocquote>'
+
         # We use QTextBrowser with a white background.
         # Set a default (transparent) background.
         palette = QtGui.QPalette()
@@ -69,7 +70,9 @@ class GuiMessage(QtGui.QDialog):
         self.buttonBox = QtGui.QDialogButtonBox(self)
 
         if button == 'yesno':
-            self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Yes|QtGui.QDialogButtonBox.No)
+            self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.No|QtGui.QDialogButtonBox.Yes)
+            self.no_button = self.buttonBox.button(QtGui.QDialogButtonBox.No)
+            self.no_button.setDefault(True)
             QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("accepted()"), self.yes_pressed)
             QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("rejected()"), self.no_pressed)
 
@@ -93,11 +96,11 @@ class GuiMessage(QtGui.QDialog):
             self.resize(0, maximumHeight)
 
     def yes_pressed(self):
-        print '65536'
+        print '16384'
         sys.exit()
 
     def no_pressed(self):
-        print '16384'
+        print '65536'
         sys.exit()
 
 def main():
