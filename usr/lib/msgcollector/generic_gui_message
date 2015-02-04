@@ -31,7 +31,7 @@ class GuiMessage(QtGui.QDialog):
             itype = "/usr/share/icons/oxygen/128x128/status/dialog-warning.png"
 
         elif str(sys.argv[1]) == "error":
-            itype = "/usr/share/icons/oxygen/128x128/status/dialog-error.png"
+            itype = "/usr/share/icons/oxygen/64x64/status/dialog-error.png"
 
         message = message + '<p>' + question + '</p>'
 
@@ -60,10 +60,11 @@ class GuiMessage(QtGui.QDialog):
         self.gridLayout.addWidget(self.label, 0, 0)
 
         self.text = QtGui.QTextBrowser(self)
-        self.text.setMinimumSize(380, 0)
+        self.text.setMinimumSize(410, 0)
         self.text.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.text.setFrameShape(QtGui.QFrame.NoFrame)
         self.text.setTextInteractionFlags(QtCore.Qt.LinksAccessibleByMouse)
+        self.text.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
         self.text.setOpenExternalLinks(True)
         self.text.setText(message)
         self.gridLayout.addWidget(self.text, 0, 1)
@@ -92,9 +93,9 @@ class GuiMessage(QtGui.QDialog):
         messageHeight = self.text.document().size().height()
         maximumHeight = QtGui.QDesktopWidget().availableGeometry().height() - 25
         if messageHeight <= maximumHeight:
-            self.resize(495, messageHeight + 60)
+            self.resize(500, messageHeight + 60)
         else:
-            self.resize(495, maximumHeight - 20)
+            self.resize(500, maximumHeight - 20)
 
     def yes_pressed(self):
         print '16384'
