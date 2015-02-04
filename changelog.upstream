@@ -1,0 +1,1110 @@
+commit c0eb2fc2461d761868e3d7be9fe3e07c74bede4b
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Feb 4 00:40:45 2015 +0000
+
+    updated makefile generic to version 1.3
+
+commit b2d3bcc5c529b0eabf228e36b3301f53dea2c022
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Feb 3 23:58:49 2015 +0000
+
+    Added creation of upstream changelog to debian/rules
+
+commit c28632ca2e08d3e05b0f003381af6e11b193bed3
+Merge: b7970c7 5ac02c5
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Feb 3 23:22:32 2015 +0000
+
+    Merge remote-tracking branch 'troubadoour/master'
+
+commit 5ac02c574890cffdbc56f1ae36c05e33dba1a2cd
+Author: troubadoour <trobador@riseup.net>
+Date:   Tue Feb 3 20:22:29 2015 +0000
+
+    fix: message_height
+
+commit b7970c796867d6cc6c31a02891e283424aae804e
+Merge: da9f1a0 79e4dfd
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Feb 3 17:22:09 2015 +0000
+
+    Merge remote-tracking branch 'troubadoour/master'
+
+commit 79e4dfda022c2ee15492f1a1cc6186765cbc7ced
+Author: troubadoour <trobador@riseup.net>
+Date:   Tue Feb 3 17:09:24 2015 +0000
+
+    fix richtext
+
+commit da9f1a03949aef1cab82d095c02a8d576f59ee57
+Merge: c719d5a b6362bf
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Feb 3 17:09:09 2015 +0000
+
+    Merge remote-tracking branch 'troubadoour/master'
+
+commit b6362bf21f2cbbf40638727b03ad588f98510a37
+Author: troubadoour <trobador@riseup.net>
+Date:   Tue Feb 3 06:04:28 2015 +0000
+
+    default button "No"
+
+commit b887ad5551ab19ab307f99247a60cf62cd0a8a97
+Author: troubadoour <trobador@riseup.net>
+Date:   Tue Feb 3 05:21:20 2015 +0000
+
+    warning sign bigger
+
+commit 986f7b013cf10ab33a75b3d05d0ad77e855e5e1a
+Author: troubadoour <trobador@riseup.net>
+Date:   Tue Feb 3 04:20:37 2015 +0000
+
+    output "16384" for compatibilty with bash scripts
+
+commit 4f8636866557709cf2d6c6ca490cbc8e369f72e3
+Author: troubadoour <trobador@riseup.net>
+Date:   Mon Feb 2 21:53:40 2015 +0000
+
+    generic_gui_message rewriting: open external links.
+
+commit c719d5ab31785a037dcc847cfc4f942faca09465
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Feb 1 22:19:29 2015 +0000
+
+    pv wrapper
+
+commit 1ccfddd4b02739145038a365fb8a377c5a344947
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Feb 1 21:53:38 2015 +0000
+
+    added /usr/lib/msgcollector/pv_wrapper
+
+commit a58b53639276f3107930e2aba5c2a5178537af8c
+Merge: f1ebf9d 1999fd9
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jan 30 22:02:54 2015 +0000
+
+    Merge remote-tracking branch 'troubadoour/master'
+
+commit 1999fd9c7ec0471da68f25824520b94be6ad9dd3
+Author: troubadoour <trobador@riseup.net>
+Date:   Fri Jan 30 12:58:04 2015 +0000
+
+    default button NO -> generic_gui_message
+
+commit f1ebf9d1b2bba1c34e74053468488c9007871d31
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jan 26 21:55:47 2015 +0000
+
+    removed trailing spaces
+
+commit 1ed2ce01877c9e34909891cb1bfc5645db9a095b
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Jan 17 06:01:30 2015 +0000
+
+    fix
+
+commit a7fa534821ff8f3de521226e805ecafd69333736
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jan 16 18:49:32 2015 +0000
+
+    comment
+
+commit 51a880e3a87b2f72a0b0d8aed56a0638deb0154a
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jan 16 18:48:56 2015 +0000
+
+    minor
+
+commit 365b90bba455e9233cec645963ab96f6b7254c9e
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jan 16 18:48:45 2015 +0000
+
+    fix
+
+commit 9d62ce8f7b7c241d160e417420a50a08f64a4e30
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jan 16 18:45:19 2015 +0000
+
+    refactoring
+
+commit ac4bdd3c540a4129427b037df5501545fda8944a
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jan 16 18:07:13 2015 +0000
+
+    improved error_handler
+
+commit 21654dc0b0c469b6f5b09b6de8d9d2c03d1ba6cc
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Jan 15 04:18:14 2015 +0000
+
+    added dependency inotify-tools
+
+commit 6c9aae47d9463676dbb7671afaab296195156c3f
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Jan 7 19:34:48 2015 +0000
+
+    bumped compat from 8 to 9
+
+commit 262d72490e6743ccce067023dd02668226c11f2f
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Dec 5 19:01:16 2014 +0000
+
+    updated generic makefile
+
+commit 9268ba3cecb4e0c131f2e302082a6ae8133728b4
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Nov 2 06:13:34 2014 +0000
+
+    refactoring, fewer leftover files in /var/run/msgcollector
+
+commit ec7d51b6b7e649da4a0b9f810e557c2b0b5b4de8
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Oct 28 22:35:25 2014 +0000
+
+    makefile: refactoring, avoid using IFS
+
+commit a3db96b615c3177c1e2626708043e2e55d49f825
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Oct 25 01:58:52 2014 +0000
+
+    makefile:
+    - make debdist; make undebdist
+    - cleanup
+    - refactoring
+
+commit 8aac78196f08cfe862f85a00698fd2add5d609f2
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Oct 23 22:43:03 2014 +0000
+
+    makefile:
+    - new target "make undist", which deletes the upstream tarball
+    - $DISTDIR variable for make (un)dist, which defaults to ".." and can be used to create upstream tarballs in arbitrary locations
+    - refactoring, all function names and global variables now start with "make_" to make the script `source`ing friendly
+    - made `source`able
+
+commit 30467101a3d457e8446feddb76c209a3ad052d42
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Oct 20 01:12:38 2014 +0000
+
+    indent
+
+commit c240a581dfa57c91a2fc169834ddcf44a0b06783
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Oct 20 01:09:14 2014 +0000
+
+    fix, also handle files that have been created prior setting up inotifywait
+
+commit 85c232d9cc6c209d330802608e20810ef5519584
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Oct 20 00:55:52 2014 +0000
+
+    fix
+
+commit 807e91138eee2680c4eb1b2ac19de57c0a6e75a4
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Oct 20 00:36:14 2014 +0000
+
+    refactoring, go for the easy and fast comparisons first
+
+commit 366052423ec5ddd634169185c141a6716643e562
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Oct 19 22:37:29 2014 +0000
+
+    create inotifywait_success_file; refactoring; comments
+
+commit afa37ee62c1654d867766c58fb25493ec5e449a6
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Oct 19 03:55:35 2014 +0000
+
+    better error handling
+
+commit 997d6f4e041446c0edbde5c9bc7f6b6111bea08f
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Oct 19 03:41:17 2014 +0000
+
+    improve inotifywait_subshell_fifo file name
+
+commit 82b508b0e65187be919a3072a02ae8d0581a845a
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Oct 18 14:05:54 2014 +0000
+
+    cleanup
+
+commit 625382c84cf06a71fb043256dc69dcac9c479d1a
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Oct 18 00:53:31 2014 +0000
+
+    debugging
+
+commit d6a856cb7d94af126e78bb3497a17056f5624cf2
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Oct 18 00:50:47 2014 +0000
+
+    cleanup
+
+commit 5e61114ebe528d5eff747c9aa9292dde3ae9d2c2
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Oct 18 00:18:26 2014 +0000
+
+    prevent duplicate instances; proper exit codes; clean up all daemons on shut down; refactoring
+
+commit 295e97e8cb902aaa3b0ec05030e3372bc16fa49e
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Oct 17 03:24:49 2014 +0000
+
+    fix
+
+commit 0711b765dbea4f865b713d2ae2aa5a094c183b96
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Oct 17 03:22:51 2014 +0000
+
+    msgdispatcher: wait forever in start up phase on very slow systems
+
+commit 4f5110f8aea76f3ae918f7e7dfac814a027fb821
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Oct 17 03:20:07 2014 +0000
+
+    refactoring
+
+commit 8ce5a9feb13e56e9b5a069fac8fe2c72a376541c
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Oct 17 03:12:41 2014 +0000
+
+    use the much more efficient inotifywait rather than sleep/pulling
+
+commit 0939d584da1d663e75fd3a2f37f686067230ab3f
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Oct 17 01:20:18 2014 +0000
+
+    make sure /var/run/msgcollector is mounted in RAM by mounting it as 10 MB big tmpfs
+
+commit 2a6fda11cc60ad22a18f8b47760ccd67b8deead5
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Oct 13 12:36:55 2014 +0000
+
+    readme
+
+commit f8fcd462ea2036b59c4660ab807e14f8a6946159
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Oct 10 18:18:47 2014 +0000
+
+    implemented --status --progressbarxrunning; refactoring
+
+commit bc68445bb26fe000edc465f6dc69bdcf6eb29e67
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Oct 6 22:09:58 2014 +0000
+
+    comments
+
+commit 8aa07eda87dc8a38d46ebb0de8856bedfd1f341d
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Sep 18 16:13:23 2014 +0000
+
+    bumped version number
+
+commit a5cd0849b0b6cab1ceec18ab0af4b58d0ddde2c9
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Sep 18 16:11:37 2014 +0000
+
+    msgcollector: clean up obsolete /var/run/msgcollector/user/*.progresstxt files; refactoring; comments
+
+commit 57b9cf565e7d6faf28b883f9a135d14301342700
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Sep 11 22:05:23 2014 +0000
+
+    bumped changelog version
+
+commit e93dfbdb6982a6a9ec8ca5586e3f2a79fc777406
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Sep 11 22:05:00 2014 +0000
+
+    fix; refactoring; todo
+
+commit a35b01bc6496823b9fcd742a404cd3a1ffeb221e
+Author: troubadoour <trobador@riseup.net>
+Date:   Sat Sep 6 20:26:15 2014 +0000
+
+    Auto resizing of the dialog eventually working.
+    
+    Added a timer signal calling a setSize function to adjust the height of the dialog after setHtml.
+    The height is limited to the available space. Vertical scroll bar when needed.
+
+commit fb3c1b88175292b2436be6279f449dacaa4953ea
+Author: troubadoour <trobador@riseup.net>
+Date:   Thu Sep 4 21:17:58 2014 +0000
+
+    Replace QLabel by QTextBrowser
+
+commit e25cd5cfb25db2cfee4ef5c7ab3afc244680c178
+Author: troubadoour <trobador@riseup.net>
+Date:   Thu Aug 28 20:56:30 2014 +0000
+
+    Removed extr <p> in pretty_type_x
+
+commit 867e32f88cfabc1fa2b956d30bdef479451e07cd
+Author: troubadoour <trobador@riseup.net>
+Date:   Wed Aug 27 20:53:57 2014 +0000
+
+    Revert to window autosizing
+
+commit ae74a2864bdacb01ee7adbd4d462b6587a5b32f9
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Aug 19 18:52:40 2014 +0000
+
+    makefile: added new feature "make deb-chl-bumpup" - Bump upstream version number in debian/changelog.
+
+commit f225fb56b124d2e4156d77c31f20fc7a1024c7f8
+Author: troubadoour <trobador@riseup.net>
+Date:   Mon Aug 18 18:58:30 2014 +0000
+
+    Whonix icon in generic_gui_message
+
+commit eef0c1d6e9746bdb049a2bb7ee2948f890cb8109
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Aug 17 20:54:25 2014 +0000
+
+    Updated debian/changelog.
+
+commit 793fde766aa6a6d151c8dde3e707620c2d41aad0
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Aug 17 20:47:28 2014 +0000
+
+    Fixed changelog date.
+
+commit 31cfa60d6e884bf89c0fb1a7eec5df74f1e1e93f
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Aug 17 18:03:28 2014 +0000
+
+    bump version number
+
+commit df1761b72111e035039a6ff103e10cbf2ec9bb6a
+Author: troubadoour <trobador@riseup.net>
+Date:   Sat Aug 16 21:18:15 2014 +0000
+
+    Automatic window resizing. Fixes issue #265 #272. Maximize button enabled
+
+commit 2bf39a88af6de26bd47b01a36744229de955c189
+Merge: 428c4f2 48fbaea
+Author: troubadoour <trobador@riseup.net>
+Date:   Sat Aug 16 21:09:58 2014 +0000
+
+    Merge remote-tracking branch 'origin'
+
+commit 48fbaeac0fb4796b972d94943ba02c0d36b73f4c
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Aug 16 15:51:11 2014 +0000
+
+    revert "msgdispatcher_dispatch_x vertical size" commit 722980bbbc15a30cd38dbcb5106a7f79f887c8f7 as per https://github.com/Whonix/Whonix/issues/272
+
+commit 428c4f2ca655c6e65507964630d516ce60b087fb
+Author: troubadoour <trobador@riseup.net>
+Date:   Sat Aug 16 02:56:20 2014 +0000
+
+    Revert "msgdispatcher_dispatch_x vertical size"
+    
+    This reverts commit 722980bbbc15a30cd38dbcb5106a7f79f887c8f7.
+
+commit 9b88f40c28d9fca1dd8af99917fc9e004902d673
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Aug 14 13:35:18 2014 +0000
+
+    Implemented make deb-icup: Combination of make deb-pkg, make deb-pkg-install and make deb-pkg-cleanup.
+
+commit 3646f06fb744316dfa0b8f098d6b365c94e36411
+Author: troubadoour <trobador@riseup.net>
+Date:   Wed Aug 13 16:19:55 2014 +0000
+
+    local declaration
+
+commit 1109f6b293e08aaa3d6a837c899778a82a6f291c
+Author: troubadoour <trobador@riseup.net>
+Date:   Wed Aug 13 08:56:48 2014 +0000
+
+    pretty_type in messagex
+
+commit 722980bbbc15a30cd38dbcb5106a7f79f887c8f7
+Author: troubadoour <trobador@riseup.net>
+Date:   Wed Aug 13 08:53:27 2014 +0000
+
+    msgdispatcher_dispatch_x vertical size
+
+commit fcb9c43f9cb87d9705311ed7c658068d9aaa12c4
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Aug 10 17:49:23 2014 +0000
+
+    prevent race condition if init script is not done yet; refactoring
+
+commit 15fa41b60e2c90c4192dc7f8387a4e4cde337b80
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Jul 30 00:40:46 2014 +0000
+
+    fix, replaced xdotool with $WINDOWID
+
+commit 5fe6fd2cd06dce6720c86eda0286d330a08347d5
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Jul 29 18:58:06 2014 +0000
+
+    new function get_own_window_title
+
+commit 4129bca749ab90f00c15b40fab5373fdf18d432b
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Jul 29 14:14:35 2014 +0000
+
+    output
+
+commit adf64e4fcbd68a8ae6f8c31c21f58e58803c4d1d
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Jul 27 12:42:27 2014 +0000
+
+    packaging
+
+commit 967cb35f7164d96fd7b5d0db81eed8d53b78afb4
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Jul 27 04:01:12 2014 +0000
+
+    packaging
+
+commit 4856c776e6aca5b69eb01a7f7c8db203cddace7f
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Jul 26 15:26:37 2014 +0000
+
+    packaging
+
+commit 771c41aa01d23407031935f3817ecb0e08d54fce
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jul 14 01:36:14 2014 +0000
+
+    quotes
+
+commit a49aa1ed0185ef7fba75540c2cc5ce20bc4a933d
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Jul 12 17:11:01 2014 +0000
+
+    packaging
+
+commit d617eeb346c2b0945f7d45eec5f856f5e1095c93
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Jul 12 15:34:18 2014 +0000
+
+    packaging
+
+commit 2c0de443574e02bb3cbb4dcf17772797af270f57
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Jul 10 15:39:46 2014 +0000
+
+    fix
+
+commit d0858c805ffc9f2e1374b060bfc240643db23b28
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Jul 10 15:33:31 2014 +0000
+
+    fix
+
+commit 67a51942df5b1b17df1aaa99619e2ef63e924f4b
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Jul 10 15:32:47 2014 +0000
+
+    output
+
+commit f585b73c31cc8de310ef2bc3b3922b50cdbeded6
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Jul 10 15:32:25 2014 +0000
+
+    refactoring
+
+commit 4bd4ff44cc6360226aaee9b607b4fed28ef0657f
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Jul 8 14:09:39 2014 +0000
+
+    fix comment
+
+commit 4506cb7ee46d2f1245eb9dbcbd59826cf6bb2463
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Jul 8 14:09:14 2014 +0000
+
+    comment
+
+commit bb75151598ba276e3d9c4313cf0416d1d5586e4d
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Jul 8 14:08:13 2014 +0000
+
+    don't launch msgdispatcher_dispatch_x into background when using --verbose
+
+commit d9846dc564275d6fe4d6e625fcc39e540113f270
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Jul 8 14:04:23 2014 +0000
+
+    fix
+
+commit 78a821aa72387192375722259313523a7bf19e26
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Jul 6 22:42:48 2014 +0000
+
+    removed deprecated broken comment
+
+commit d69ff51f4f935e77d8db969262286da785eeafb6
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Jul 6 22:41:29 2014 +0000
+
+    minor
+
+commit c98aa69e4d4827e6f229f73311f87938c42ccd20
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Jul 6 22:39:15 2014 +0000
+
+    cleanup, removed unused deprecated output_write_to_tty function
+
+commit e57a457bd379c57946293f7fe4617e97d205ca72
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Jul 6 22:17:17 2014 +0000
+
+    fix
+
+commit be237dd53e4af1bdcdf6b06dbdf73c526958fb77
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Jul 6 13:30:59 2014 +0000
+
+    quotes
+
+commit a21689250febf960adfe5414b5ef0e57b19e072a
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Jul 6 13:24:16 2014 +0000
+
+    use $BASH_SOURCE instead of $0
+
+commit f6432bd57fee86a95db7bdf201ecd9907fe5f2cf
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Jul 5 08:09:44 2014 +0000
+
+    Bumped debian revision number to avoid lintian warning "new-package-should-close-itp-bug" so we can use lintian --fail-on-warnings as sanity test.
+
+commit 04f078e93d03f323b3f8f07e8bf3e7a45dde653f
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jul 4 04:30:14 2014 +0000
+
+    merged generic-gui-message into msgcollector
+
+commit 36e4153427a937a9c3426f09cbb83ab4b42dc667
+Author: troubadoour <trobador@riseup.net>
+Date:   Wed Jul 2 21:57:03 2014 +0000
+
+    msgdispatcher_dispatch_x vertical size
+
+commit 0d9946819265d7d056deaede5147872ab504b522
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Jul 2 11:01:47 2014 +0000
+
+    echo errors to stderr
+
+commit d3dba53f174b0f2f018575b06e013d5460d22621
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Jul 2 10:58:00 2014 +0000
+
+    fix
+
+commit 4fd137d3e62b93dacef997ce100310fed542cadb
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Jul 2 10:56:19 2014 +0000
+
+    fix
+
+commit a2faca06f814bcfaa47e9611938a20c13877026f
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Jul 2 10:50:46 2014 +0000
+
+    fix
+
+commit a3ff1ea4939da4905e507181cbff04432066ad1a
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Jul 1 12:18:07 2014 +0000
+
+    improved init script
+
+commit f11afe4a0db042ebfbbb0fec79e9cb1f60f3cf02
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Jul 1 12:00:51 2014 +0000
+
+    fix
+
+commit c1588a842ac0375c666f45abaea70d01f3188b40
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jun 30 14:42:38 2014 +0000
+
+    Allow other users (such as sdwdate) writing into other user's (such as user "user") msgcollector folders.
+    This allows daemons (such as sdwdate) running as user "sdwdate" to show notifications to other users (such as user "user").
+
+commit 739a7d7b902e783717dff5bc69bc4f0dd2cbabca
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jun 30 12:39:42 2014 +0000
+
+    fix
+
+commit 53177afdd0654da48c4a7ede1b2a9ed4c1ad7efe
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Jun 29 23:24:07 2014 +0000
+
+    .
+
+commit 39a2e36acafee5dcba31eadedf086d1669a3be5a
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Jun 28 23:32:31 2014 +0000
+
+    strip html from echo
+
+commit 4be0c8fa2310f10fd56597b9b6f935d96d4b3122
+Author: troubadoour <trobador@riseup.net>
+Date:   Sat Jun 28 20:29:10 2014 +0000
+
+    html tags -> error_handler in msgdispatcher and msgcollector
+
+commit 533dec1084646146d475cedcf2e99ba5dd133711
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Jun 28 18:47:33 2014 +0000
+
+    comment
+
+commit 7e2de70050bafdefd2783a2859f10613237a57c2
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Jun 28 16:19:39 2014 +0000
+
+    strip html in error handler
+
+commit 432473a4e517cf106503946025c5527e0d49a972
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Jun 28 15:58:40 2014 +0000
+
+    output
+
+commit ec824de1e5f5b7371b5fcff257caefe398215dd2
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Jun 28 15:09:29 2014 +0000
+
+    added EXIT_TYPE for ex_funct
+
+commit 761446a6e03178a49f2013cce9b34d1a6ea87e66
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jun 27 14:37:25 2014 +0000
+
+    refactoring
+
+commit fd7a70d515ff8f76be3e54d34baae8fec0eb0be5
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jun 27 11:34:18 2014 +0000
+
+    fix
+
+commit 66d867ef1af68e05cbd641dd93a899c34794a211
+Author: troubadoour <trobador@riseup.net>
+Date:   Thu Jun 26 18:12:40 2014 +0000
+
+    links + text selectable
+
+commit 31e65a99c3d055d92fbc74c061d859530d73a800
+Author: troubadoour <trobador@riseup.net>
+Date:   Tue Jun 24 22:30:10 2014 +0000
+
+    copy/paste support
+
+commit 503825332ff77c784ab6e8e7e6060fe20465be38
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Jun 24 21:54:06 2014 +0000
+
+    fix
+
+commit f94506525976349727a2a4a94b2184cf7979bffb
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Jun 24 21:50:42 2014 +0000
+
+    check if ~/".msgcollector" exists before forking to mkdir
+
+commit f26194c45a9ed63d811eaf0f3a0705052eec3a6d
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Jun 24 21:49:51 2014 +0000
+
+    fix error log writing
+
+commit 5c8ff82f6728898973d5d14e29b56e522a6ce0ee
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Jun 24 21:46:42 2014 +0000
+
+    removed obsolete comment
+
+commit f91bbc15641bdde14dc949209abf02495c6f9075
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Jun 24 21:44:39 2014 +0000
+
+    removed deprecated comments
+
+commit c7a67b81ba8ad381d921a6526b11d346b3ba5b97
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Jun 24 21:42:05 2014 +0000
+
+    fix
+
+commit 982afafe3ea32eb8e330c4fb952ab0c3fbda2f25
+Author: troubadoour <trobador@riseup.net>
+Date:   Tue Jun 24 16:28:04 2014 +0000
+
+    type error
+
+commit 858bc781bfa3f979dd0cd226b0c31b59c8b8b9c6
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Jun 24 15:45:13 2014 +0000
+
+    added debian epoch; added dotglob
+
+commit 3db63dea61371b86715656ddb7ab1a91df0253ef
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Jun 24 14:27:43 2014 +0000
+
+    fix
+
+commit d1e53a18d2bc8276a62ff54b4bed4815d804924e
+Merge: e572db0 5ed469e
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jun 23 23:34:41 2014 +0000
+
+    Merge remote-tracking branch 'troubadoour/master'
+
+commit 5ed469e7e061d4868b9c10af6ccba65288585724
+Author: troubadoour <trobador@riseup.net>
+Date:   Mon Jun 23 22:00:55 2014 +0000
+
+    new vertical size calculation in msgdispatcher_dispatch_x
+
+commit e572db05901fe938c997c6871e49c81f65ec0ae3
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jun 23 09:42:58 2014 +0000
+
+    fix
+
+commit 135427d735a4ecfde922923519315617af53addb
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Jun 22 21:38:20 2014 +0000
+
+    also add striphtml to waitmessagecli
+
+commit 7b27ed4bb112eaad743036cdc17c8086ae0673cf
+Author: troubadoour <trobador@riseup.net>
+Date:   Sun Jun 22 15:56:29 2014 +0000
+
+    rich text
+
+commit 525c036dfd754950c5f84872082eb1da5e25fffa
+Merge: 22d6639 8dd4bda
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Jun 17 21:17:41 2014 +0000
+
+    Merge remote-tracking branch 'troubadoour/master'
+
+commit 22d663967da00b5124a063411af6eadd0f042666
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Jun 17 21:16:33 2014 +0000
+
+    packaging
+
+commit 8dd4bda0e33c214b5bd3ebbe6fc7475030b215bb
+Author: troubadoour <trobador@riseup.net>
+Date:   Fri Jun 13 07:18:36 2014 +0000
+
+    fixed bug from testing version
+
+commit 7d48317c99cb038823715bad3ff6c5eb77ef7d37
+Author: troubadoour <trobador@riseup.net>
+Date:   Thu Jun 12 20:17:56 2014 +0000
+
+    Max vertical size. Scroll bar.
+
+commit 81819c304b56a01c5d313d22e14ea2e5a281f52e
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Jun 12 14:36:53 2014 +0000
+
+    no longer depend on essential package ncurses-bin to fix a lintian warning
+
+commit d6f14e66b0284546a2459e935b6e48652c535e72
+Author: troubadoour <trobador@riseup.net>
+Date:   Tue Jun 10 21:59:24 2014 +0000
+
+    removed str(sys.argc[6] = ....
+
+commit ea80eca8143d0a85f33f425a8fd40294470ad1fd
+Author: troubadoour <trobador@riseup.net>
+Date:   Tue Jun 10 20:57:16 2014 +0000
+
+    New msgdispatcher_dispatch_x. No parent window.
+
+commit 04e81aebf9cdc1d9666fc0781cd45e2e63cab976
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jun 9 13:04:22 2014 +0000
+
+    new --typexstatus feature; fix
+
+commit 210ea185e50a269da974331847c1fcd63d8bd3c4
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jun 9 12:51:05 2014 +0000
+
+    fix: made compatible for multi user environments
+
+commit 329254401ce694002e9ecd0b98239d15a3db058f
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Jun 3 18:27:33 2014 +0000
+
+    readme
+
+commit f669de49ced326e77ccd7df8a6f887799cbc8c2f
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jun 2 14:37:43 2014 +0000
+
+    typo
+
+commit 1ad071802b1014c062dd6f22f9fb2bf9ef5d8b22
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Jun 1 15:38:34 2014 +0000
+
+    readme
+
+commit e68deeda33a220d425efb29c79888154448282d5
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Jun 1 15:21:26 2014 +0000
+
+    packaging
+
+commit a495ea45615fa304924c988c1ae985de60db8c83
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu May 29 12:49:34 2014 +0000
+
+    work with any identifier; fixed paths
+
+commit 5c8bdbc1407bae773b74c6570eb7d24f68a7e1f9
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon May 26 12:28:03 2014 +0000
+
+    removed trailing spaces
+
+commit 0da1345284eab0163ea5ab8af097d0b6a460c5e6
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon May 26 11:22:27 2014 +0000
+
+    removed leading spaces
+
+commit bdeb03351f2e2526ddf57d5a3dbc65a7d68ed2ce
+Merge: 020a46e 3bf2d2e
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon May 26 11:20:47 2014 +0000
+
+    Merge remote-tracking branch 'troubadoour/master'
+
+commit 020a46e44983c793fa3c5066f9bfef81fbc658d9
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon May 26 11:19:04 2014 +0000
+
+    .
+
+commit 698148b3e397d13cdb928e62df1b0a6e4065b427
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon May 26 11:18:34 2014 +0000
+
+    packaging
+
+commit 3bf2d2ed93b38925fc0ee1671f3b4d2bd5baf23e
+Author: troubadoour <trobador@riseup.net>
+Date:   Mon May 26 02:31:05 2014 +0000
+
+    lower case, topleft, flavicon
+
+commit b920272628c7fd063ce38f660427154a9d6a4a2c
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed May 21 22:15:23 2014 +0000
+
+    formatting
+
+commit 39e956822ac798e2f389e2d94b865c5d65cc4758
+Merge: d139b4a 96087d8
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed May 21 22:14:33 2014 +0000
+
+    Merge remote-tracking branch 'troubadoour/master'
+
+commit 96087d89fe7c9c6c285f0179f6c1d9d85882d749
+Author: troubadoour <trobador@riseup.net>
+Date:   Wed May 21 20:33:42 2014 +0000
+
+    python-qt4
+
+commit d139b4ac5c3c6b135364093fd6258039f7abbe5b
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed May 21 14:46:52 2014 +0000
+
+    comments
+
+commit 48012f966c6d01adfcb63f768dac35455b4f1204
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed May 21 14:44:33 2014 +0000
+
+    typo
+
+commit 28d6a61abd512611c7b150bd89e5862d767b6456
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed May 21 14:43:14 2014 +0000
+
+    fixed spaces
+
+commit 933a67516419687763699bad5790f217889912da
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed May 21 14:36:17 2014 +0000
+
+    removed Whonix specifics
+
+commit 4bb2fa3a47c0d9c825794a4442cd0993958068df
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed May 21 14:35:14 2014 +0000
+
+    TODO
+
+commit d88d8dcc6467f06beb8779ed1026250889613dc4
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed May 21 14:30:48 2014 +0000
+
+    fix
+
+commit 26d4e39ceadbd344276033cc425fab74a929b856
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed May 21 14:23:56 2014 +0000
+
+    fix
+
+commit c17f8051a6240a9ba908bf76654d6a5bfadfaf37
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed May 21 14:18:42 2014 +0000
+
+    .whonix -> .msgcollector
+
+commit 9d57c27f27ca929dd8f7cd60d565873ea17f13f0
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed May 21 13:46:48 2014 +0000
+
+    packaging
+
+commit f77406a60014f59186b018ac403eb83d18ce4097
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed May 21 13:46:07 2014 +0000
+
+    made /usr/lib/msgcollector/msgdispatcher_dispatch_X executable
+
+commit 47e22e93fcb959e5e2f2807c748a42c88697768b
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed May 21 12:29:50 2014 +0000
+
+    cleanup
+
+commit 5baf48f6efec6ccf74e5d0fe24d987dfed560f3f
+Merge: 8362dc5 3e4152a
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed May 21 12:25:53 2014 +0000
+
+    manual merge of troubadoour's work.
+    troubadoour's changelog:
+    Added the python script 'msgdispatcher_dispatch_X'
+    to replace the zenity popup at the completion of
+    timesync and whonixcheck.
+    Will have to rename '/var/run/msgcollector/${identifier}.lefttop'
+    as the the window move to bootomright in case whonixcheck and
+    timesync popups might overlap.
+
+commit 8362dc51dde30e29194b00644e7558542653123b
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed May 21 12:14:07 2014 +0000
+
+    .
+
+commit 3e4152a421a315b5082dc8fa9f80194964406d39
+Author: troubadoour <trobador@riseup.net>
+Date:   Tue May 20 21:51:15 2014 +0000
+
+    Added msgdispatcher_dispatch_X
+
+commit 48a77bd536abcac7bf07c263a696a7747965c51b
+Author: troubadoour <trobador@riseup.net>
+Date:   Tue May 20 21:09:07 2014 +0000
+
+    message
+
+commit 2fc7d603ee0b8374845674895e0e07ca5fd1a370
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue May 20 03:20:31 2014 +0000
+
+    .
+
+commit 84258e5dd22b5214592bb2f4f34b0a22f260b9d8
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Apr 29 17:58:37 2014 +0000
+
+    refactoring
+
+commit 51cd6d99957139eacdfba2509e70e2e17c3b0447
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Apr 27 18:51:08 2014 +0000
+
+    comments
+
+commit e19259367e48d51394aca43b27e58a58a95b28a5
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Apr 27 18:29:19 2014 +0000
+
+    new file: .gitattributes
+
+commit 4ac61f979110eed273011ca18c36885de516e1d3
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Apr 27 18:21:45 2014 +0000
+
+    fix
+
+commit 7fb1720757d160247649126ef4f676adb573097d
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Apr 27 18:20:55 2014 +0000
+
+    lower priority to optional for possible inclusion into debian
+
+commit 84e976b358131c3677be567a21fdc4ef3cb1ec4d
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Apr 27 18:19:47 2014 +0000
+
+    Depends: zenity;
+    Recommends: libnotify-bin | kde-baseapps-bin
+
+commit a09fa7001b41aa83afb5aff9376aa67c5471ef5d
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Apr 27 18:13:32 2014 +0000
+
+    comments
+
+commit d7de3f72ec69dedf4b56ac5b4a4fbe7216dda7e0
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Apr 27 18:12:28 2014 +0000
+
+    comments
+
+commit 51dcbdd458cadb4662acf0c78718a729a3ed6ce1
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Apr 27 18:07:45 2014 +0000
+
+    refactoring
+
+commit 301451a1c13d8cd4e951e6e11ffa5cc4840e3a0f
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Apr 18 12:55:54 2014 +0000
+
+    .
+
+commit df77ad77b5b580274f91a25e38d1f8091a24b0b2
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Apr 6 19:05:37 2014 +0000
+
+    .
+
+commit 663450435662157158abbbacd37b90c49e1cf88f
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Apr 6 19:04:01 2014 +0000
+
+    initial commit
