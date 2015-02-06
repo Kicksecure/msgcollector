@@ -93,9 +93,9 @@ class GuiMessage(QtGui.QDialog):
         messageHeight = self.text.document().size().height()
         maximumHeight = QtGui.QDesktopWidget().availableGeometry().height() - 25
         if messageHeight <= maximumHeight:
-            self.resize(500, messageHeight + 60)
+            self.resize(590, messageHeight + 60)
         else:
-            self.resize(500, maximumHeight - 20)
+            self.resize(590, maximumHeight - 20)
 
     def yes_pressed(self):
         print '16384'
