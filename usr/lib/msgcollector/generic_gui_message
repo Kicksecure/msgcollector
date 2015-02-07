@@ -28,12 +28,14 @@ class GuiMessage(QtGui.QDialog):
         itype = "/usr/share/icons/oxygen/64x64/status/dialog-information.png"
 
         if str(sys.argv[1]) == "warning":
-            itype = "/usr/share/icons/oxygen/128x128/status/dialog-warning.png"
+            itype = "/usr/share/icons/oxygen/64x64/status/dialog-warning.png"
 
         elif str(sys.argv[1]) == "error":
             itype = "/usr/share/icons/oxygen/64x64/status/dialog-error.png"
 
         message = message + '<p>' + question + '</p>'
+
+        self.gridLayout = QtGui.QGridLayout(self)
 
         # We use QTextBrowser with a white background.
         # Set a default (transparent) background.
@@ -51,8 +53,14 @@ class GuiMessage(QtGui.QDialog):
 
         self.setWindowIcon(QtGui.QIcon("/usr/share/icons/anon-icon-pack/whonix.ico"))
         self.setWindowTitle(title)
-
-        self.gridLayout = QtGui.QGridLayout(self)
+        #self.resize(600, 300)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.sizePolicy().hasHeightForWidth())
+        self.setSizePolicy(sizePolicy)
+        self.setMinimumSize(QtCore.QSize(600, 0))
+        self.setMaximumSize(QtCore.QSize(600, 16777215))
 
         self.label = QtGui.QLabel(self)
         self.label.setPixmap(QtGui.QPixmap(itype))
@@ -60,29 +68,49 @@ class GuiMessage(QtGui.QDialog):
         self.gridLayout.addWidget(self.label, 0, 0)
 
         self.text = QtGui.QTextBrowser(self)
-        self.text.setMinimumSize(410, 0)
+        self.text.setMinimumSize(510, 0)
         self.text.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.text.setFrameShape(QtGui.QFrame.NoFrame)
+        self.text.setFocusPolicy(QtCore.Qt.NoFocus)
         self.text.setTextInteractionFlags(QtCore.Qt.LinksAccessibleByMouse)
         self.text.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
         self.text.setOpenExternalLinks(True)
         self.text.setText(message)
         self.gridLayout.addWidget(self.text, 0, 1)
 
-        self.buttonBox = QtGui.QDialogButtonBox(self)
+        self.button_group = QtGui.QGroupBox(self)
+        self.button_group.setMinimumSize(0, 25)
+        self.button_group.setFlat(True)
 
         if button == 'yesno':
-            self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.No|QtGui.QDialogButtonBox.Yes)
-            self.no_button = self.buttonBox.button(QtGui.QDialogButtonBox.No)
+            self.yes_button = QtGui.QPushButton(self.button_group)
+            self.yes_button.setGeometry(370, 0, 65, 25)
+            self.yes_button.setText('Yes')
+            icon = QtGui.QIcon(self.yes_button)
+            icon.addFile('/usr/share/icons/oxygen/16x16/actions/dialog-ok-apply.png')
+            self.yes_button.setIcon(icon)
+            self.yes_button.clicked.connect(self.yes_pressed)
+
+            self.no_button = QtGui.QPushButton(self.button_group)
+            self.no_button.setGeometry(440, 0, 65, 25)
+            self.no_button.setText('No')
+            icon = QtGui.QIcon(self.no_button)
+            icon.addFile('/usr/share/icons/oxygen/16x16/actions/dialog-cancel.png')
+            self.no_button.setIcon(icon)
+            self.no_button.setAutoDefault(True)
             self.no_button.setDefault(True)
-            QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("accepted()"), self.yes_pressed)
-            QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("rejected()"), self.no_pressed)
+            self.no_button.clicked.connect(self.no_pressed)
 
         elif button == 'ok':
-            self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Ok)
-            QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("accepted()")), self.yes_pressed)
+            self.ok_button = QtGui.QPushButton(self.button_group)
+            self.ok_button.setGeometry(440, 0, 65, 25)
+            self.ok_button.setText('OK')
+            icon = QtGui.QIcon(self.ok_button)
+            icon.addFile('/usr/share/icons/oxygen/16x16/actions/dialog-ok.png')
+            self.ok_button.setIcon(icon)
+            self.ok_button.clicked.connect(self.accept)
 
-        self.gridLayout.addWidget(self.buttonBox, 1, 1)
+        self.gridLayout.addWidget(self.button_group, 1, 1)
 
         QtCore.QTimer.singleShot(0, self.setSize)
 
@@ -91,11 +119,15 @@ class GuiMessage(QtGui.QDialog):
     def setSize(self):
         ## Size is returned
         messageHeight = self.text.document().size().height()
-        maximumHeight = QtGui.QDesktopWidget().availableGeometry().height() - 25
+        maximumHeight = QtGui.QDesktopWidget().availableGeometry().height() - 60
         if messageHeight <= maximumHeight:
-            self.resize(590, messageHeight + 60)
+            self.setMinimumSize(QtCore.QSize(600, messageHeight + 60))
+            self.setMaximumSize(QtCore.QSize(600, messageHeight + 60))
+            self.resize(600, messageHeight + 60)
         else:
-            self.resize(590, maximumHeight - 20)
+            self.setMinimumSize(QtCore.QSize(600, maximumHeight))
+            self.setMaximumSize(QtCore.QSize(600, maximumHeight))
+            self.resize(600, maximumHeight)
 
     def yes_pressed(self):
         print '16384'
