@@ -71,14 +71,16 @@ class Ui_Dialog(object):
         maximumHeight = QtGui.QDesktopWidget().availableGeometry().height() - 25
         if messageHeight <= maximumHeight:
             Dialog.resize(830, messageHeight + 55)
+            self.center()
         else:
             Dialog.resize(830, maximumHeight)
+            self.center()
 
-    #def center(self):
-    #    frameGm = Dialog.frameGeometry()
-    #    centerPoint = QtGui.QDesktopWidget().availableGeometry().center()
-    #    frameGm.moveCenter(centerPoint)
-    #    Dialog.move(frameGm.topLeft())
+    def center(self):
+       frameGm = Dialog.frameGeometry()
+       centerPoint = QtGui.QDesktopWidget().availableGeometry().center()
+       frameGm.moveCenter(centerPoint)
+       Dialog.move(frameGm.topLeft())
 
 
 if __name__ == "__main__":
