@@ -1,0 +1,166 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+import sys
+from PyQt4 import QtCore, QtGui
+
+#try:
+    #_fromUtf8 = QtCore.QString.fromUtf8
+#except AttributeError:
+    #_fromUtf8 = lambda s: s
+
+class GuiMessage(QtGui.QDialog):
+    def __init__(self):
+        super(GuiMessage, self).__init__()
+
+        try:
+            self.itype = str(sys.argv[1])
+            self.title = str(sys.argv[2])
+            self.installed_version = str(sys.argv[3])
+            self.online_versions = str(sys.argv[4])
+            self.message = str(sys.argv[5])
+            self.question = str(sys.argv[6])
+            self.button = str(sys.argv[7])
+
+        except (IndexError) as e:
+            sys.exit('Arguments parsing error')
+
+        self.layout = QtGui.QGridLayout(self)
+        self.i_label = QtGui.QLabel(self)
+        self.label = QtGui.QLabel(self)
+        self.version_group = QtGui.QGroupBox(self)
+        self.text = QtGui.QTextBrowser(self)
+        self.button_box = QtGui.QDialogButtonBox(self)
+
+        self.setup_ui()
+
+    def setup_ui(self):
+        itype = "/usr/share/icons/oxygen/64x64/status/dialog-information.png"
+
+        if self.itype == "warning":
+            itype = "/usr/share/icons/oxygen/64x64/status/dialog-warning.png"
+
+        elif self.itype == "error":
+            itype = "/usr/share/icons/oxygen/64x64/status/dialog-error.png"
+
+        versions = self.online_versions.split(',')
+
+        message = self.message + '<p>' + self.question + '</p>'
+
+        # We use QTextBrowser with a white background.
+        # Set a default (transparent) background.
+        palette = QtGui.QPalette()
+        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255, 0))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Active, QtGui.QPalette.Base, brush)
+        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255, 0))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Inactive, QtGui.QPalette.Base, brush)
+        brush = QtGui.QBrush(QtGui.QColor(244, 244, 244))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Base, brush)
+        self.setPalette(palette)
+
+        self.setWindowIcon(QtGui.QIcon("/usr/share/icons/anon-icon-pack/whonix.ico"))
+        self.setWindowTitle(self.title)
+
+        self.i_label.setPixmap(QtGui.QPixmap(itype))
+        self.i_label.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
+        self.layout.addWidget(self.i_label, 0, 0, 1, 1)
+
+        self.label.setText('<p><b>Download confirmation</b></p>\
+                            </p>Curently installed version: %s <p/>' % self.installed_version)
+        self.label.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
+        self.layout.addWidget(self.label, 0, 1, 1, 1)
+
+        self.version_group.setTitle('Online versions')
+        self.version_group.setMinimumSize(QtCore.QSize(0, 20 + (len(versions) * 20) + 10))
+
+        i = 0
+        for version in versions:
+            self.version = QtGui.QRadioButton(self.version_group)
+            if i == 0:
+                self.version.setChecked(True)
+            self.version.Name = version
+            self.version.setText(version)
+            self.version.setGeometry(QtCore.QRect(10, i * 20  + 20, 510, 21))
+            i += 1
+
+        self.layout.addWidget(self.version_group, 1, 1, 1, 1)
+
+        self.text.setMinimumSize(510, 0)
+        self.text.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
+        self.text.setFrameShape(QtGui.QFrame.NoFrame)
+        self.text.setTextInteractionFlags(QtCore.Qt.LinksAccessibleByMouse|QtCore.Qt.TextSelectableByMouse)
+        self.text.setOpenExternalLinks(True)
+        self.text.setText(message)
+        self.layout.addWidget(self.text, 2, 1, 1, 1)
+
+        if self.button == 'yesno':
+            self.button_box.setStandardButtons(QtGui.QDialogButtonBox.Yes|QtGui.QDialogButtonBox.No)
+
+            self.yes_button = self.button_box.button(QtGui.QDialogButtonBox.Yes)
+            self.yes_button.clicked.connect(self.yes_pressed)
+
+            self.no_button = self.button_box.button(QtGui.QDialogButtonBox.No)
+            self.no_button.setAutoDefault(True)
+            self.no_button.setDefault(True)
+            self.no_button.clicked.connect(self.no_pressed)
+
+        elif self.button == 'ok':
+            self.button_box.setStandardButtons(QtGui.QDialogButtonBox.Ok)
+            self.ok_button = self.button_box.button(QtGui.QDialogButtonBox.Ok)
+            self.ok_button.clicked.connect(self.accept)
+
+        self.layout.addWidget(self.button_box, 3, 1, 1, 1)
+        self.setLayout(self.layout)
+
+        self.center()
+        QtCore.QTimer.singleShot(0, self.setSize)
+
+        self.exec_()
+
+    def setSize(self):
+        ## Size is returned
+        window_height = (self.label.size().height() + self.text.document().size().height()
+                        + self.version_group.size().height())
+        maximum_height = QtGui.QDesktopWidget().availableGeometry().height() - 60
+        if window_height <= maximum_height:
+            self.resize(500, window_height)
+            self.center()
+            if self.button == 'yesno':
+                self.no_button.setFocus()
+            elif self.button == 'ok':
+                self.ok_button.setFocus()
+
+        else:
+            self.resize(500, maximum_height)
+            self.center()
+            if self.button == 'yesno':
+                self.no_button.setFocus()
+            elif self.button == 'ok':
+                self.ok_button.setFocus()
+
+    def center(self):
+       frame_geometry = self.frameGeometry()
+       center_point = QtGui.QDesktopWidget().availableGeometry().center()
+       frame_geometry.moveCenter(center_point)
+       self.move(frame_geometry.topLeft())
+
+    def yes_pressed(self):
+        for version in self.version_group.findChildren(QtGui.QRadioButton):
+            if version.isChecked():
+                print version.Name
+        sys.exit()
+
+    def no_pressed(self):
+        print '65536'
+        sys.exit()
+
+def main():
+    app = QtGui.QApplication(sys.argv)
+    message = GuiMessage()
+    sys.exit()
+
+if __name__ == '__main__':
+    main()
