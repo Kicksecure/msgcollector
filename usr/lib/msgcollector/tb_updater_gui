@@ -66,12 +66,10 @@ class GuiMessage(QtGui.QDialog):
 
         self.i_label.setPixmap(QtGui.QPixmap(itype))
         self.i_label.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
-        self.layout.addWidget(self.i_label, 0, 0, 1, 1)
-
         self.label.setText('<p><b>Download confirmation</b></p>\
                             </p>Curently installed version: %s <p/>' % self.installed_version)
         self.label.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
-        self.layout.addWidget(self.label, 0, 1, 1, 1)
+        self.label.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
 
         self.version_group.setTitle('Online versions')
         self.version_group.setMinimumSize(QtCore.QSize(0, 20 + (len(versions) * 20) + 10))
@@ -86,15 +84,12 @@ class GuiMessage(QtGui.QDialog):
             self.version.setGeometry(QtCore.QRect(10, i * 20  + 20, 510, 21))
             i += 1
 
-        self.layout.addWidget(self.version_group, 1, 1, 1, 1)
-
-        self.text.setMinimumSize(510, 0)
+        self.text.setMinimumSize(530, 0)
         self.text.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.text.setFrameShape(QtGui.QFrame.NoFrame)
         self.text.setTextInteractionFlags(QtCore.Qt.LinksAccessibleByMouse|QtCore.Qt.TextSelectableByMouse)
         self.text.setOpenExternalLinks(True)
         self.text.setText(message)
-        self.layout.addWidget(self.text, 2, 1, 1, 1)
 
         if self.button == 'yesno':
             self.button_box.setStandardButtons(QtGui.QDialogButtonBox.Yes|QtGui.QDialogButtonBox.No)
@@ -105,25 +100,33 @@ class GuiMessage(QtGui.QDialog):
             self.no_button = self.button_box.button(QtGui.QDialogButtonBox.No)
             self.no_button.setAutoDefault(True)
             self.no_button.setDefault(True)
-            self.no_button.clicked.connect(self.no_pressed)
+            self.no_button.clicked.connect(self.reject)
 
         elif self.button == 'ok':
             self.button_box.setStandardButtons(QtGui.QDialogButtonBox.Ok)
             self.ok_button = self.button_box.button(QtGui.QDialogButtonBox.Ok)
             self.ok_button.clicked.connect(self.accept)
 
+        self.layout.addWidget(self.i_label, 0, 0, 1, 1)
+        self.layout.addWidget(self.label, 0, 1, 1, 1)
+        self.layout.addWidget(self.version_group, 1, 1, 1, 1)
+        self.layout.addWidget(self.text, 2, 1, 1, 1)
         self.layout.addWidget(self.button_box, 3, 1, 1, 1)
-        self.setLayout(self.layout)
 
         self.center()
+
         QtCore.QTimer.singleShot(0, self.setSize)
 
         self.exec_()
 
+    def reject(self):
+        print '65536'
+        sys.exit()
+
     def setSize(self):
         ## Size is returned
         window_height = (self.label.size().height() + self.text.document().size().height()
-                        + self.version_group.size().height())
+                        + self.version_group.size().height() + 60)
         maximum_height = QtGui.QDesktopWidget().availableGeometry().height() - 60
         if window_height <= maximum_height:
             self.resize(500, window_height)
