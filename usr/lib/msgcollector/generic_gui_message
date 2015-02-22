@@ -53,7 +53,6 @@ class GuiMessage(QtGui.QDialog):
 
         self.setWindowIcon(QtGui.QIcon("/usr/share/icons/anon-icon-pack/whonix.ico"))
         self.setWindowTitle(title)
-        self.resize(0, 0)
 
         self.label = QtGui.QLabel(self)
         self.label.setPixmap(QtGui.QPixmap(itype))
@@ -70,7 +69,6 @@ class GuiMessage(QtGui.QDialog):
         self.gridLayout.addWidget(self.text, 0, 1)
 
         self.buttonBox = QtGui.QDialogButtonBox(self)
-
         if self.button == 'yesno':
             self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Yes|QtGui.QDialogButtonBox.No)
 
@@ -80,7 +78,7 @@ class GuiMessage(QtGui.QDialog):
             self.no_button = self.buttonBox.button(QtGui.QDialogButtonBox.No)
             self.no_button.setAutoDefault(True)
             self.no_button.setDefault(True)
-            self.no_button.clicked.connect(self.no_pressed)
+            self.no_button.clicked.connect(self.reject)
 
         elif self.button == 'ok':
             self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Ok)
@@ -124,7 +122,7 @@ class GuiMessage(QtGui.QDialog):
         print '16384'
         sys.exit()
 
-    def no_pressed(self):
+    def reject(self):
         print '65536'
         sys.exit()
 
