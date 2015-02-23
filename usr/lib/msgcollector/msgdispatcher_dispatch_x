@@ -91,9 +91,9 @@ if __name__ == "__main__":
     if str(sys.argv[1]) == "info":
         itype = "/usr/share/icons/oxygen/64x64/status/dialog-information.png"
     elif str(sys.argv[1]) == "warning":
-        itype = "/usr/share/icons/oxygen/64x64/status/dialog-warning.png"
+        itype = "/usr/share/icons/oxygen/128x128/status/dialog-warning.png"
     elif str(sys.argv[1]) == "error":
-        itype = "/usr/share/icons/oxygen/64x64/status/dialog-error.png"
+        itype = "/usr/share/icons/oxygen/128x128/status/dialog-error.png"
     else:
         itype =""
         sys.exit("'msgdispatcher_dispatch_x'. Information type not recognized: %s" % str(sys.argv[1]))

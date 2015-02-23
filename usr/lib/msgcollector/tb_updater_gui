@@ -38,10 +38,10 @@ class GuiMessage(QtGui.QDialog):
         itype = "/usr/share/icons/oxygen/64x64/status/dialog-information.png"
 
         if self.itype == "warning":
-            itype = "/usr/share/icons/oxygen/64x64/status/dialog-warning.png"
+            itype = "/usr/share/icons/oxygen/128x128/status/dialog-warning.png"
 
         elif self.itype == "error":
-            itype = "/usr/share/icons/oxygen/64x64/status/dialog-error.png"
+            itype = "/usr/share/icons/oxygen/128x128/status/dialog-error.png"
 
         versions = self.online_versions.split(',')
 
