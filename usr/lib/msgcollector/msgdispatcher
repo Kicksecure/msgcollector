@@ -388,6 +388,7 @@ msgdispatcher_handler() {
             rm --force "/var/run/msgcollector/$who_ami/${identifier}.titlex"
             rm --force "/var/run/msgcollector/$who_ami/${identifier}.messagex"
             rm --force "/var/run/msgcollector/$who_ami/${identifier}.lefttop"
+            rm --force "/var/run/msgcollector/$who_ami/${identifier}.typex"
          else
             ## Not using rm outside the if, to prevent race conditions.
             ## Not always using rm, without if to prevent forking.
@@ -399,10 +400,13 @@ msgdispatcher_handler() {
          if [ -f "/var/run/msgcollector/$who_ami/${identifier}.passivepopupqueuex" ]; then
             msg="$(cat "/var/run/msgcollector/$who_ami/${identifier}.passivepopupqueuex")"
             title="$(cat "/var/run/msgcollector/$who_ami/${identifier}.passivepopupqueuextitle")"
-            ## TODO
-            type="$(cat "/var/run/msgcollector/$who_ami/${identifier}.typex")"
+            ## TODO: do not use ".typex" to avoid conflicts with "messagex.done".
+            #type="$(cat "/var/run/msgcollector/$who_ami/${identifier}.typex")"
+            type="info"
             if [ -f "/var/run/msgcollector/$who_ami/${identifier}.forceactive" ]; then
-               dispatch_x_active "$type" "$msg"
+               ## TODO: --forceactive not yet implemented.
+               #dispatch_x_active "$type" "$msg"
+               dispatch_x_passive "$type" "$msg"
             else
                dispatch_x_passive "$type" "$msg"
             fi
