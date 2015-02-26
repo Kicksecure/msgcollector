@@ -107,7 +107,7 @@ class GuiMessage(QtGui.QDialog):
             self.ok_button = self.button_box.button(QtGui.QDialogButtonBox.Ok)
             self.ok_button.clicked.connect(self.accept)
 
-        self.layout.addWidget(self.i_label, 0, 0, 1, 1)
+        self.layout.addWidget(self.i_label, 0, 0, 0, 1)
         self.layout.addWidget(self.label, 0, 1, 1, 1)
         self.layout.addWidget(self.version_group, 1, 1, 1, 1)
         self.layout.addWidget(self.text, 2, 1, 1, 1)
