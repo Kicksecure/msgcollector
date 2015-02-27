@@ -1,8 +1,9 @@
+#!/usr/bin/python
+
 ## Copyright (C) 2014 troubadour <trobador@riseup.net>
 ## Copyright (C) 2014 Patrick Schleizer <adrelanos@riseup.net>
 ## See the file COPYING for copying conditions.
 
-#!/usr/bin/python
 import sys
 in_ = sys.argv[1]
 print in_
