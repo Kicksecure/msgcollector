@@ -50,6 +50,29 @@ $error_text"
 <br></br>#########################################################################</p>"
    fi
 
+   ## {{{ add/show error message
+
+   local command_v_output_exit_code
+   command_v_output_exit_code="0"
+   command -v "$output" >/dev/null || { command_v_output_exit_code="$?" ; true; };
+   ## Check if $output command has been already defined. This is not the case,
+   ## when the script is terminated very early.
+   if [ "$command_v_output_exit_code" = "0" ]; then
+      $output ${output_opts[@]} --messagex --typex "error" --message "$MSG"
+      $output ${output_opts[@]} --messagecli --typecli "error" --message "$MSG"
+   else
+      local stripped_msg
+      stripped_msg="$(/usr/lib/msgcollector/striphtml "$MSG")"
+      if [ "$stripped_msg" = "" ]; then
+         ## In case striphtml failed or is not available.
+         echo "$MSG" >&2
+      else
+         echo "$stripped_msg" >&2
+      fi
+   fi
+
+   ## }}}
+
    ## Check if ex_funct command has been already defined. This is not the case,
    ## when the script is terminated very early.
    local command_v_output_exit_code
@@ -66,29 +89,9 @@ $error_text"
          EXIT_CODE="1"
       fi
       exit "$EXIT_CODE"
-   else
-      echo "$SCRIPTNAME: Error detected. Skipping ex_funct since not yet load. Exiting..." >&2
    fi
 
-   ## Check if $output command has been already defined. This is not the case,
-   ## when the script is terminated very early.
-   local command_v_output_exit_code
-   command_v_output_exit_code="0"
-   command -v "$output" >/dev/null || { command_v_output_exit_code="$?" ; true; };
-   if [ "$command_v_output_exit_code" = "0" ]; then
-      $output ${output_opts[@]} --messagex --typex "error" --message "$MSG" --done
-      $output ${output_opts[@]} --messagecli --typecli "error" --message "$MSG" --done
-   else
-      local stripped_msg
-      stripped_msg="$(/usr/lib/msgcollector/striphtml "$MSG")"
-      if [ "$stripped_msg" = "" ]; then
-         ## In case striphtml failed or is not available.
-         echo "$MSG" >&2
-      else
-         echo "$stripped_msg" >&2
-      fi
-   fi
-
+   echo "$SCRIPTNAME: Error detected. Skipping ex_funct since not yet load. Exiting..." >&2
    if [ "$EXIT_CODE" = "" ]; then
       EXIT_CODE="1"
    fi
