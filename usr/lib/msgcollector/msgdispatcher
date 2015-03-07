@@ -330,6 +330,9 @@ inotifywait_setup() {
       inotifywait_subshell_trap_sigterm() {
          trap "error_handler" ERR
          true "$FUNCNAME: signal SIGTERM received. Cleaning up..."
+         if [ ! "$inotifywait_pid" = "" ]; then
+            kill -sigterm "$inotifywait_pid"
+         fi
          rm --force "$inotifywait_success_file"
          true "$FUNCNAME: signal SIGTERM received. Exiting."
          exit 143
