@@ -60,7 +60,7 @@ class GuiMessage(QtGui.QDialog):
         self.gridLayout.addWidget(self.label, 0, 0)
 
         self.text = QtGui.QTextBrowser(self)
-        self.text.setMinimumSize(510, 0)
+        self.text.setMinimumSize(530, 0)
         self.text.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.text.setFrameShape(QtGui.QFrame.NoFrame)
         self.text.setTextInteractionFlags(QtCore.Qt.LinksAccessibleByMouse|QtCore.Qt.TextSelectableByMouse)
@@ -97,7 +97,7 @@ class GuiMessage(QtGui.QDialog):
         messageHeight = self.text.document().size().height()
         maximumHeight = QtGui.QDesktopWidget().availableGeometry().height() - 60
         if messageHeight <= maximumHeight:
-            self.resize(600, messageHeight + 60)
+            self.resize(620, messageHeight + 60)
             self.center()
             if self.button == 'yesno':
                 self.no_button.setFocus()
@@ -105,7 +105,7 @@ class GuiMessage(QtGui.QDialog):
                 self.ok_button.setFocus()
 
         else:
-            self.resize(600, maximumHeight)
+            self.resize(620, maximumHeight)
             self.center()
             if self.button == 'yesno':
                 self.no_button.setFocus()
