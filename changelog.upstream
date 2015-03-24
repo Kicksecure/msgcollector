@@ -1,3 +1,194 @@
+commit 20d661d0338306b74dcb6e6f8c138650e019a0f7
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Mar 24 17:26:41 2015 +0000
+
+    updated makefile generic to version 1.4
+
+commit aa6e5c7d04626d79976d5329806082e00265f87e
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Mar 22 18:21:01 2015 +0000
+
+    fixed br_add duplicate output - https://phabricator.whonix.org/T244
+
+commit 1ebb1f82c3412c9abac5dd8a34718cfcc83d14ed
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Mar 7 00:11:48 2015 +0000
+
+    shut down inotifywait cleanly on signal sigterm
+
+commit 04ec40d78b8fb1f474b2b72e090f52695c6ee801
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Mar 5 16:27:40 2015 +0000
+
+    fix
+
+commit ef03b5dc44873e441207667df9b813a991c9fdd9
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Feb 27 20:06:27 2015 +0000
+
+    fix
+
+commit 64df959030f841fe7c296462e557219de165bc1d
+Merge: dc6efc7 2e2c464
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Feb 27 20:05:50 2015 +0000
+
+    Merge remote-tracking branch 'troubadoour/master'
+
+commit 2e2c464bc503db257d08a9bb2b38018512b72de0
+Author: troubadoour <trobador@riseup.net>
+Date:   Fri Feb 27 19:57:44 2015 +0000
+
+    license
+
+commit dc6efc77d0b84d5325e9e888333b507c959bdeac
+Merge: 998d85d c68878a
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Feb 27 00:21:39 2015 +0000
+
+    Merge remote-tracking branch 'troubadoour/master'
+
+commit c68878afb05d9d9e5560fa819f3027b57ffd1918
+Author: troubadoour <trobador@riseup.net>
+Date:   Thu Feb 26 21:52:00 2015 +0000
+
+    new file br_add: add html line break to messages containing \n
+
+commit 998d85d3483bf5bd7339998fd1ceaeef3f5ca7f3
+Merge: 0021aa8 e2cdfa3
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Feb 26 21:20:24 2015 +0000
+
+    Merge remote-tracking branch 'troubadoour/master'
+
+commit e2cdfa3cc8416260d3fa56bbd888dd46e91d4416
+Author: troubadoour <trobador@riseup.net>
+Date:   Thu Feb 26 20:50:49 2015 +0000
+
+    layout
+
+commit 0021aa8acffde84ce30e841e21fa3e831b987e45
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Feb 24 23:39:33 2015 +0000
+
+    fix
+
+commit b453beef4a82e54d77d972b0993eb11bd62e514d
+Merge: a43aaa7 3673d01
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Feb 23 21:06:53 2015 +0000
+
+    Merge remote-tracking branch 'troubadoour/master'
+
+commit 3673d014b6fd751824c59155b17726b2b7a45e72
+Author: troubadoour <trobador@riseup.net>
+Date:   Mon Feb 23 20:42:00 2015 +0000
+
+    bigger icon for warning/error in msgdispatcher_dispatch_x and tb_updater_gui
+
+commit a43aaa73c898327987320a85518711387470e6b9
+Merge: 12e1d70 d7be2fd
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Feb 22 21:37:05 2015 +0000
+
+    Merge remote-tracking branch 'troubadoour/master'
+
+commit d7be2fd1b5bf06543e316c01cc4dc5848f99ce0c
+Author: troubadoour <trobador@riseup.net>
+Date:   Sun Feb 22 20:28:29 2015 +0000
+
+    return "65536" when window closed with [x]
+
+commit 790ffd6bc773f60057f8edede40c53b3ced24c48
+Author: troubadoour <trobador@riseup.net>
+Date:   Sun Feb 22 20:20:08 2015 +0000
+
+    misc fixes
+
+commit 12e1d709b51002c712067ab7bf7027628593bdb3
+Merge: 32e23e4 ae09f9c
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Feb 22 12:10:44 2015 +0000
+
+    Merge remote-tracking branch 'troubadoour/master'
+
+commit ae09f9c695401bcc8bcc54c0a46d3b81244b8fe7
+Author: troubadoour <trobador@riseup.net>
+Date:   Sat Feb 21 18:50:42 2015 +0000
+
+    + tb_updater_gui
+
+commit 32e23e470906eefb8a102075472c8a22c178aa0e
+Merge: f73bb73 248f6a5
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Feb 11 16:38:36 2015 +0000
+
+    Merge remote-tracking branch 'troubadoour/master'
+
+commit 248f6a50d8ef9e7c4ee280f038852d7905fe7e70
+Author: troubadoour <trobador@riseup.net>
+Date:   Wed Feb 11 16:15:07 2015 +0000
+
+    fix center window
+
+commit f73bb733a8a3fb20fea09bc9d05f997de9942ba1
+Merge: 353438e 54b0943
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Feb 8 15:31:49 2015 +0000
+
+    Merge remote-tracking branch 'troubadoour/master'
+
+commit 54b094306d458dab56252989f0354d9a408edeb7
+Author: troubadoour <trobador@riseup.net>
+Date:   Sun Feb 8 15:01:20 2015 +0000
+
+    back to StandardButtons, window sizeable
+
+commit 353438e2937089eba368d2d3d997cba56b1ba880
+Merge: 66f6a8a 9ced203
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Feb 7 19:55:24 2015 +0000
+
+    Merge remote-tracking branch 'troubadoour/master'
+
+commit 9ced2031af6dd8a9df3b8f17d5c2803c3f21afc6
+Author: troubadoour <trobador@riseup.net>
+Date:   Sat Feb 7 18:56:31 2015 +0000
+
+    use QPushButton instead of StandardButton ot be able ot set "No" button default.
+    increase window width (600), window fixed size.
+
+commit 66f6a8a93e38fc7160d542b762f9422706830fec
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Feb 6 18:01:24 2015 +0000
+
+    generic_gui_tool changed window width from 500 to 590 as per https://phabricator.whonix.org/T123
+
+commit f35866fa78c3bb9b3122c28e0eec931e4dcc791d
+Merge: 79ed595 3dcb535
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Feb 4 21:15:36 2015 +0000
+
+    Merge remote-tracking branch 'troubadoour/master'
+
+commit 3dcb535b12475680455557fdcbdf4fe084764788
+Author: troubadoour <trobador@riseup.net>
+Date:   Wed Feb 4 20:25:39 2015 +0000
+
+    copy text from window
+
+commit 6bf980ae0edd21d46eae6b34fa7f45888daa61b7
+Author: troubadoour <trobador@riseup.net>
+Date:   Wed Feb 4 19:44:44 2015 +0000
+
+    back to QTextBrowser
+
+commit 79ed59595a012ec35d2d7c4fb9b2589afb3f0f51
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Feb 4 00:56:26 2015 +0000
+
+    bumped changelog version
+
 commit 734706a017dd8421012f79e63125b0f323b6292e
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Wed Feb 4 00:44:55 2015 +0000
