@@ -1,3 +1,34 @@
+commit 93e9f26322c2f20da86b60384b29ec353969500a
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 2 18:41:19 2015 +0000
+
+    added genmkfile to Build-Depends
+
+commit 5aedcd26976b683d52f8df8966b7239c9ad2648e
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 2 17:24:40 2015 +0000
+
+    updated makefile generic to version 1.5
+
+commit 89f4741500e4519e6f17c0d79b429be5000f2ca7
+Merge: a94b5b6 07cfe95
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Mar 24 21:06:07 2015 +0000
+
+    Merge remote-tracking branch 'troubadoour/master'
+
+commit 07cfe95051b95b40d89cb69d0d6ed22c204efe25
+Author: troubadoour <trobador@riseup.net>
+Date:   Tue Mar 24 20:36:12 2015 +0000
+
+    increase window width (+ 20 pixels)
+
+commit a94b5b6ea3822d66682d202b3c47705dc5bf8abe
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Mar 24 17:36:36 2015 +0000
+
+    bumped changelog version
+
 commit 20d661d0338306b74dcb6e6f8c138650e019a0f7
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Tue Mar 24 17:26:41 2015 +0000
