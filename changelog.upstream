@@ -1,3 +1,15 @@
+commit ff50e3c286fea6663f6d45906411177080f9a1bd
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed May 13 14:37:37 2015 +0000
+
+    ported to systemd - https://phabricator.whonix.org/T106
+
+commit b4d9c7da5bb9337363faa0b37b20b62b10c1bf3d
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 30 17:56:39 2015 +0000
+
+    bumped changelog version
+
 commit 7fe9f6674ab604e00db13270b6f6b9229989676d
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Tue Apr 28 13:43:19 2015 +0000
