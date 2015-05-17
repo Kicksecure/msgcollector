@@ -1,3 +1,9 @@
+msgcollector (3:1.5-1) unstable; urgency=low
+
+  * New upstream version (local package).
+
+ -- Patrick Schleizer <adrelanos@riseup.net>  Sun, 17 May 2015 11:02:39 +0000
+
 msgcollector (3:1.4-1) unstable; urgency=low
 
   * New upstream version (local package).
