@@ -3,13 +3,13 @@
 ## See the file COPYING for copying conditions.
 
 [Unit]
-Description = msgcollector
-Documentation = https://github.com/Whonix/msgcollector
+Description=msgcollector
+Documentation=https://github.com/Whonix/msgcollector
 
 [Service]
-Type = oneshot
-RemainAfterExit = yes
-ExecStart = /usr/lib/msgcollector/msgdispatcher_init
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/lib/msgcollector/msgdispatcher_init
 
 [Install]
 WantedBy=multi-user.target
