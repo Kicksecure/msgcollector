@@ -5,6 +5,8 @@
 [Unit]
 Description=msgcollector
 Documentation=https://github.com/Whonix/msgcollector
+Before=graphical.target
+Before=getty.target
 
 [Service]
 Type=oneshot
