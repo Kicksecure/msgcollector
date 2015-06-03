@@ -1,3 +1,21 @@
+commit 8e01daa680b6cc4d1d01770198af962d1e313cf2
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat May 30 14:44:45 2015 +0000
+
+    implemented --progressbarxprogresstxtexisting; fix
+
+commit ab24bd261d8ac2027f6a3ad85da4b4a3d416b044
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat May 30 13:29:57 2015 +0000
+
+    systemd unit: added 'Before=graphical.target' and 'Before=getty.target' - https://phabricator.whonix.org/T106
+
+commit c28f1fec45f18b33b3bba7e12c97aa9708adbec9
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed May 20 15:44:29 2015 +0000
+
+    bumped changelog version
+
 commit 6640b8f8816df633af8d339769127d4912cf6ba4
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Wed May 20 15:44:17 2015 +0000
