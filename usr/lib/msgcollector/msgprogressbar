@@ -234,7 +234,8 @@ start_progress_bar() {
       --title="$progressbartitlex" \
       --auto-kill \
       --auto-close \
-      --progress $progress_txt_file_progress \
+      --progress \
+      --percentage "$progress_txt_file_progress" \
       --text "$progressbarx" \
       < "$fifo" & zenity_progress_pid="$!"
 
