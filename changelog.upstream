@@ -1,3 +1,27 @@
+commit 8f089985cb53f8bb8b4bac0013c287aaa677f075
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jun 12 16:49:20 2015 +0000
+
+    increased MinimumSize so first line of gpg output is not needlessy line broken into two - https://www.whonix.org/forum/index.php/topic,261.150.html
+
+commit 91dbd64684a801fe4196918e05bf7780484eb6f5
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jun 12 16:45:22 2015 +0000
+
+    comment
+
+commit 874decca03b937c1587aa1287f1c64f5e0de10ed
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jun 12 16:43:24 2015 +0000
+
+    fix
+
+commit 189d6f3789c8ac9ea62c00cc147a64e53f9a4949
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Jun 9 12:54:39 2015 +0000
+
+    bumped changelog version
+
 commit bc26aee153a5a939a621ac198b11a445e2b74a38
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Tue Jun 9 12:39:33 2015 +0000
