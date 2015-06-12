@@ -218,6 +218,10 @@ start_progress_bar() {
       exit 1
    fi
 
+   if [ ! "$progress_txt_file_progress" = "" ]; then
+      percentage_maybe_add="--percentage $progress_txt_file_progress"
+   fi
+
    ## Clean up eventual old progress bar.
    rm --force "$fifo"
 
@@ -235,7 +239,7 @@ start_progress_bar() {
       --auto-kill \
       --auto-close \
       --progress \
-      --percentage "$progress_txt_file_progress" \
+      $percentage_maybe_add \
       --text "$progressbarx" \
       < "$fifo" & zenity_progress_pid="$!"
 
