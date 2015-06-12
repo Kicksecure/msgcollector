@@ -211,6 +211,7 @@ start_progress_bar() {
 
    ## Sanity test for $progress_txt_file_progress, because we use it without
    ## quotes as argument for zenity below.
+   ## Also matches $when progress_txt_file_progress is unset.
    if [[ "$progress_txt_file_progress" != *[!0-9]* ]]; then
       true "'$progress_txt_file_progress' is strictly numeric."
    else
