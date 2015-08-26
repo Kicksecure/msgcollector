@@ -1,3 +1,29 @@
+commit 27fc0a277c4f36e64be42db3ca104b926e2d9b93
+Merge: 11974c6 4702db9
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Aug 26 23:19:13 2015 +0000
+
+    Merge remote-tracking branch 'troubadoour/master'
+
+commit 4702db9c66a8df50437f33d279fb78da75052962
+Author: troubadoour <trobador@riseup.net>
+Date:   Wed Aug 26 19:28:12 2015 +0000
+
+    tb_updater_gui: increase window height in setSize()
+
+commit a06b123f6f8b531623034c6dc53dd4ae801c8795
+Merge: b412c6c 11974c6
+Author: troubadoour <trobador@riseup.net>
+Date:   Wed Aug 26 19:25:07 2015 +0000
+
+    Merge remote-tracking branch 'whonix/master'
+
+commit 11974c6810d0910403af35d46fab2440eedcfdb3
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Aug 25 14:08:12 2015 +0000
+
+    bumped changelog version
+
 commit 793e343acf7350ff5daf40e4a00503c1fb12883e
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Mon Aug 24 17:47:22 2015 +0000
@@ -147,6 +173,12 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Tue Apr 7 17:42:06 2015 +0000
 
     bumped changelog version
+
+commit b412c6cdbec31dd7bf6079b0e554a4e49eab8410
+Author: troubadoour <trobador@riseup.net>
+Date:   Mon Apr 6 19:58:54 2015 +0000
+
+    convert yaml colons '&#58;' to ':' for cli
 
 commit 93e9f26322c2f20da86b60384b29ec353969500a
 Author: Patrick Schleizer <adrelanos@riseup.net>
