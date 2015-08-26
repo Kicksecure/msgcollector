@@ -6,11 +6,11 @@ Source: msgcollector
 Section: misc
 Priority: optional
 Maintainer: Patrick Schleizer <adrelanos@riseup.net>
-Build-Depends: debhelper (>= 9), faketime, genmkfile, config-package-dev
+Build-Depends: debhelper (>= 9), faketime, genmkfile, config-package-dev, dh-systemd
 Homepage: https://www.whonix.org
 Vcs-Browser: https://github.com/Whonix/msgcollector
 Vcs-Git: https://github.com/Whonix/msgcollector.git
-Standards-Version: 3.9.4
+Standards-Version: 3.9.6
 
 Package: msgcollector
 Architecture: all

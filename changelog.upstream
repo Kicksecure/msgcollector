@@ -1,3 +1,184 @@
+commit 793e343acf7350ff5daf40e4a00503c1fb12883e
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Aug 24 17:47:22 2015 +0000
+
+    bumped changelog version
+
+commit 2364d69b31530584bb66ab4ceedcda001a454148
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Aug 15 01:40:47 2015 +0200
+
+    fix
+
+commit 775e4a300b5e20fedc878fb3429e2ce6f2fcded9
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Aug 15 01:21:01 2015 +0200
+
+    output
+
+commit 434f6c8697e5ae32d9eaa0792bea90fc292b8307
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jun 12 17:03:29 2015 +0000
+
+    bumped changelog version
+
+commit 8f089985cb53f8bb8b4bac0013c287aaa677f075
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jun 12 16:49:20 2015 +0000
+
+    increased MinimumSize so first line of gpg output is not needlessy line broken into two - https://www.whonix.org/forum/index.php/topic,261.150.html
+
+commit 91dbd64684a801fe4196918e05bf7780484eb6f5
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jun 12 16:45:22 2015 +0000
+
+    comment
+
+commit 874decca03b937c1587aa1287f1c64f5e0de10ed
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jun 12 16:43:24 2015 +0000
+
+    fix
+
+commit 189d6f3789c8ac9ea62c00cc147a64e53f9a4949
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Jun 9 12:54:39 2015 +0000
+
+    bumped changelog version
+
+commit bc26aee153a5a939a621ac198b11a445e2b74a38
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Jun 9 12:39:33 2015 +0000
+
+    progress bar initial value fix for Debian jessie
+
+commit 078d98dcb6bcc2c5e308bc96b80ecda2b1d20717
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Jun 3 15:00:02 2015 +0000
+
+    bumped changelog version
+
+commit 8e01daa680b6cc4d1d01770198af962d1e313cf2
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat May 30 14:44:45 2015 +0000
+
+    implemented --progressbarxprogresstxtexisting; fix
+
+commit ab24bd261d8ac2027f6a3ad85da4b4a3d416b044
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat May 30 13:29:57 2015 +0000
+
+    systemd unit: added 'Before=graphical.target' and 'Before=getty.target' - https://phabricator.whonix.org/T106
+
+commit c28f1fec45f18b33b3bba7e12c97aa9708adbec9
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed May 20 15:44:29 2015 +0000
+
+    bumped changelog version
+
+commit 6640b8f8816df633af8d339769127d4912cf6ba4
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed May 20 15:44:17 2015 +0000
+
+    systemd unit: workaround/fix, removed spaces, likely bug in 'deb-systemd-helper' that prevents enabling the service by default - https://phabricator.whonix.org/T316
+
+commit e2b2646f04cd7fd8873e51dfe27c3c9461c3853a
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed May 20 15:37:58 2015 +0000
+
+    bumped changelog version
+
+commit 4503b5e9f92a0af8e473f2ff5dbc8a0001c0de92
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed May 20 15:37:40 2015 +0000
+
+    systemd unit: workaround/fix, removed spaces from 'WantedBy = ', likely bug in 'deb-systemd-helper' that prevents enabling the service by default - https://phabricator.whonix.org/T316
+
+commit ca0cdfd34ac2fdb8d1e8714ec5e2f1e82eb4e71c
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun May 17 11:02:48 2015 +0000
+
+    bumped changelog version
+
+commit 8132e8a8ffaeede8557f9482ff64464c5c998296
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun May 17 11:00:15 2015 +0000
+
+    fix
+
+commit a708e9180eb22038aad68e5fb0990a4122eb9daa
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun May 17 10:54:07 2015 +0000
+
+    fix, lib/systemd/msgcollector.service -> lib/systemd/system/msgcollector.service - https://phabricator.whonix.org/T106
+
+commit 3e43140d6bb0cb8557da51f78195e582f962e46e
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri May 15 20:27:54 2015 +0000
+
+    bumped changelog version
+
+commit ff50e3c286fea6663f6d45906411177080f9a1bd
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed May 13 14:37:37 2015 +0000
+
+    ported to systemd - https://phabricator.whonix.org/T106
+
+commit b4d9c7da5bb9337363faa0b37b20b62b10c1bf3d
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 30 17:56:39 2015 +0000
+
+    bumped changelog version
+
+commit 7fe9f6674ab604e00db13270b6f6b9229989676d
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Apr 28 13:43:19 2015 +0000
+
+    added debian/source/lintian-overrides with debian-watch-may-check-gpg-signature to fix lintian warning - https://phabricator.whonix.org/T277
+
+commit e023ba307ebd10b3db81b0af99dcab7eba5e5f61
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Apr 26 23:16:08 2015 +0000
+
+    packaging, bumped Standards-Version from 3.9.4 to 3.9.6 for jessie support
+
+commit c543e7c3f83476f66c57aac83ec54f49a7356c43
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Apr 7 17:42:06 2015 +0000
+
+    bumped changelog version
+
+commit 93e9f26322c2f20da86b60384b29ec353969500a
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 2 18:41:19 2015 +0000
+
+    added genmkfile to Build-Depends
+
+commit 5aedcd26976b683d52f8df8966b7239c9ad2648e
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 2 17:24:40 2015 +0000
+
+    updated makefile generic to version 1.5
+
+commit 89f4741500e4519e6f17c0d79b429be5000f2ca7
+Merge: a94b5b6 07cfe95
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Mar 24 21:06:07 2015 +0000
+
+    Merge remote-tracking branch 'troubadoour/master'
+
+commit 07cfe95051b95b40d89cb69d0d6ed22c204efe25
+Author: troubadoour <trobador@riseup.net>
+Date:   Tue Mar 24 20:36:12 2015 +0000
+
+    increase window width (+ 20 pixels)
+
+commit a94b5b6ea3822d66682d202b3c47705dc5bf8abe
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Mar 24 17:36:36 2015 +0000
+
+    bumped changelog version
+
 commit 20d661d0338306b74dcb6e6f8c138650e019a0f7
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Tue Mar 24 17:26:41 2015 +0000

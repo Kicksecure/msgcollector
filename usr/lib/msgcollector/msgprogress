@@ -130,7 +130,8 @@ progress_bar() {
          fi
       fi
    fi
-   progress_bar
+   ## XXX
+   #progress_bar
    return 0
 }
 

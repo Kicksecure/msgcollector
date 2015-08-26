@@ -171,6 +171,10 @@ parse_cmd_options() {
                progressbarxrunning="1"
                shift
                ;;
+           --progressbarxprogresstxtexisting)
+               progressbarxprogresstxtexisting="1"
+               shift
+               ;;
            --animate)
                animate="1"
                shift
@@ -641,6 +645,16 @@ return_status() {
          else
             exit 1
          fi
+      else
+         exit 1
+      fi
+   fi
+   ## }}
+
+   ## {{ --progressbarxprogresstxtexisting
+   if [ "$progressbarxprogresstxtexisting" = "1" ]; then
+      if [ -f "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progresstxt" ]; then
+         exit 0
       else
          exit 1
       fi

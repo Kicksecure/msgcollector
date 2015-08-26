@@ -60,7 +60,7 @@ class GuiMessage(QtGui.QDialog):
         self.gridLayout.addWidget(self.label, 0, 0)
 
         self.text = QtGui.QTextBrowser(self)
-        self.text.setMinimumSize(530, 0)
+        self.text.setMinimumSize(535, 0)
         self.text.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.text.setFrameShape(QtGui.QFrame.NoFrame)
         self.text.setTextInteractionFlags(QtCore.Qt.LinksAccessibleByMouse|QtCore.Qt.TextSelectableByMouse)
