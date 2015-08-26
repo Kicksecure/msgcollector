@@ -126,7 +126,7 @@ class GuiMessage(QtGui.QDialog):
     def setSize(self):
         ## Size is returned
         window_height = (self.label.size().height() + self.text.document().size().height()
-                        + self.version_group.size().height() + 60)
+                        + self.version_group.size().height() + 100)
         maximum_height = QtGui.QDesktopWidget().availableGeometry().height() - 60
         if window_height <= maximum_height:
             self.resize(500, window_height)
