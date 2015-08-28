@@ -349,6 +349,15 @@ pretty_type_x() {
    fi
 }
 
+write_typecli_to_file() {
+   # $1 - type
+   # $2 - file
+   if [ "$onlyecho" = "1" ]; then
+      return 0
+   fi
+   echo "$1" > "$2"
+}
+
 collector() {
    trap "error_handler" ERR
 
@@ -415,20 +424,22 @@ collector() {
    if [ "$old_typecli" = "info" ]; then
       if [ "$typecli" = "error" ]; then
          ## Upgrade from info to error.
-         echo "error" > "/var/run/msgcollector/$who_ami/${identifier}.typecli"
+         write_typecli_to_file "error" "/var/run/msgcollector/$who_ami/${identifier}.typecli"
       elif [ "$typecli" = "warning" ]; then
          ## Upgrade from info to warning.
-         echo "warning" > "/var/run/msgcollector/$who_ami/${identifier}.typecli"
+         write_typecli_to_file "warning" "/var/run/msgcollector/$who_ami/${identifier}.typecli"
       fi
    elif [ "$old_typecli" = "warning" ]; then
       if [ "$typecli" = "error" ]; then
          ## Upgrade from warning to error.
-         echo "error" > "/var/run/msgcollector/$who_ami/${identifier}.typecli"
+         write_typecli_to_file "error" "/var/run/msgcollector/$who_ami/${identifier}.typecli"
       fi
    elif [ "$old_typecli" = "error" ]; then
       true
    else
-      echo "$typecli" > "/var/run/msgcollector/$who_ami/${identifier}.typecli"
+      if [ ! "$typecli" = "" ]; then
+         write_typecli_to_file "$typecli" "/var/run/msgcollector/$who_ami/${identifier}.typecli"
+      fi
    fi
    ## }}
 
