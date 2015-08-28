@@ -67,8 +67,7 @@ output_func_cli() {
       return "$?"
    fi
    true "Skipping $FUNCNAME."
-   ## TODO
-   echo "${1+"$@"}"
+   output_func --onlyecho ${1+"$@"}
 }
 
 output_func() {
