@@ -58,17 +58,17 @@ $error_text"
 
    local command_v_output_exit_code
    command_v_output_exit_code="0"
-   command -v "$output" >/dev/null || { command_v_output_exit_code="$?" ; true; };
+   command -v "$output_x" >/dev/null || { command_v_output_exit_code="$?" ; true; };
    ## Check if $output command has been already defined. This is not the case,
    ## when the script is terminated very early.
    if [ "$command_v_output_exit_code" = "0" ]; then
       if [ "$TITLE" = "" ]; then
          TITLE="No TITLE defined yet."
       fi
-      $output ${output_opts[@]} --titlex "$TITLE"
-      $output ${output_opts[@]} --titlecli "$TITLE"
-      $output ${output_opts[@]} --messagex --typex "error" --message "$MSG"
-      $output ${output_opts[@]} --messagecli --typecli "error" --message "$MSG"
+      $output_x ${output_opts[@]} --titlex "$TITLE"
+      $output_cli ${output_opts[@]} --titlecli "$TITLE"
+      $output_x ${output_opts[@]} --messagex --typex "error" --message "$MSG"
+      $output_cli ${output_opts[@]} --messagecli --typecli "error" --message "$MSG"
    else
       local stripped_msg
       stripped_msg="$(/usr/lib/msgcollector/striphtml "$MSG")"
