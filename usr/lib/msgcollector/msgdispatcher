@@ -233,17 +233,23 @@ passive_popup_tool() {
    time="$1"
    text="$2"
 
+   ## Use $identifier as short title.
+   ## notify-send timeout in milliseconds.
+
+   if command -v "qubesdb-read" >/dev/null 2>&1 ; then
+      if command -v "notify-send" >/dev/null 2>&1 ; then
+         notify-send --expire-time "${time}000" "$identifier" "$text"
+         return 0
+      fi
+   fi
+
    ## check if kdialog, notify-send or no passive popup tool is installed
    ## - that is not the case for CLI Custom-Workstation users
    ## - that may not be the case for Gnome users
-   if [ ! "$(command -v "kdialog")" = "" ] ; then
-      ## Use $identifier as short title.
+   if command -v "kdialog" >/dev/null 2>&1 ; then
       kdialog --title "$identifier" --passivepopup "$text" "$time"
-   elif [ ! "$(command -v "notify-send")" = "" ] ; then
-      ## Use $identifier as short title.
-      notify-send --expire-time "$time" "$identifier" "$text"
-   else
-      true
+   elif command -v "notify-send" >/dev/null 2>&1 ; then
+      notify-send --expire-time "${time}000" "$identifier" "$text"
    fi
 }
 ## }}
