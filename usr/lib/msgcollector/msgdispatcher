@@ -229,16 +229,22 @@ write_own_pid() {
 passive_popup_tool() {
    trap "error_handler" ERR
 
-   local time text
+   local time title text
    time="$1"
-   text="$2"
+   title="$2"
+   text="$3"
 
-   ## Use $identifier as short title.
+   ## Fallback.
+   ## notify-send does not work if $title is unset.
+   if [ "$title" = "" ]; then
+      title="$identifier"
+   fi
+
    ## notify-send timeout in milliseconds.
 
    if command -v "qubesdb-read" >/dev/null 2>&1 ; then
       if command -v "notify-send" >/dev/null 2>&1 ; then
-         notify-send --expire-time "${time}000" "$identifier" "$text"
+         notify-send --expire-time "${time}000" "$title" "$text"
          return 0
       fi
    fi
@@ -247,9 +253,9 @@ passive_popup_tool() {
    ## - that is not the case for CLI Custom-Workstation users
    ## - that may not be the case for Gnome users
    if command -v "kdialog" >/dev/null 2>&1 ; then
-      kdialog --title "$identifier" --passivepopup "$text" "$time"
+      kdialog --title "$title" --passivepopup "$text" "$time"
    elif command -v "notify-send" >/dev/null 2>&1 ; then
-      notify-send --expire-time "${time}000" "$identifier" "$text"
+      notify-send --expire-time "${time}000" "$title" "$text"
    fi
 }
 ## }}
@@ -307,7 +313,7 @@ dispatch_x_active() {
 dispatch_x_passive() {
    trap "error_handler" ERR
 
-   passive_popup_tool "20" "$msg"
+   passive_popup_tool "20" "$title" "$msg"
 }
 
 inotifywait_setup() {
@@ -417,9 +423,9 @@ msgdispatcher_handler() {
             if [ -f "/var/run/msgcollector/$who_ami/${identifier}.forceactive" ]; then
                ## TODO: --forceactive not yet implemented.
                #dispatch_x_active "$type" "$msg"
-               dispatch_x_passive "$type" "$msg"
+               dispatch_x_passive "$type" "$title" "$msg"
             else
-               dispatch_x_passive "$type" "$msg"
+               dispatch_x_passive "$type" "$title" "$msg"
             fi
             rm --force "/var/run/msgcollector/$who_ami/${identifier}.forceactive"
             rm --force "/var/run/msgcollector/$who_ami/${identifier}.passivepopupqueuex.done"
