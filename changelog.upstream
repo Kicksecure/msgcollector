@@ -1,3 +1,66 @@
+commit 76892afce5f88240687b8eda11e337740ec48260
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Oct 19 16:57:15 2015 +0000
+
+    use title instead of identifier for passive popups
+    
+    This allows to show passive popups such as
+    
+     [sys-whonix]
+     Connected to Tor.
+    
+    in Qubes.
+
+commit 87d0d8fa4f494a77dcf16b2a62e0eea82db6fc79
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Oct 8 18:02:19 2015 +0000
+
+    - use notify-send in Qubes by default, because that looks better in Qubes than kdialog (thanks to @marmarek for the suggestion) - https://github.com/QubesOS/qubes-issues/issues/889#issuecomment-146583491
+    - fixed usage of notify-send, it uses milliseconds rather than seconds (thanks to @marmarek for the suggestion)
+    - refactoring
+
+commit 70affd09d211eb8e595b3096499a19527dc59463
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Sep 26 00:33:18 2015 +0000
+
+    added missing dependencies libgnome2-bin and gvfs, those are required to make links from msgdispatcher_dispatch_x clickable (libgnome2-bin contains gnome-open, that is used by python qt; gnome-open depends on gvfs)
+
+commit 5c283624abce997f105abce8cef79a6fc09bc642
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Sep 4 12:36:14 2015 +0000
+
+    fix
+
+commit dc7600c7c71bd73c4b331986f11a5f6a3be24b8e
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Aug 31 15:35:03 2015 +0000
+
+    refactoring
+
+commit 7f34fd21a57c5accd41b8146dba81bc387295e31
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Aug 28 15:52:51 2015 +0000
+
+    fix
+
+commit d7d8d5b74b6706dc06228bd6a6a4d9d4ce1614e2
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Aug 28 15:39:32 2015 +0000
+
+    fix
+
+commit e8ec8af80bb7acd5297692cd375545839db48f40
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Aug 28 15:29:20 2015 +0000
+
+    fix, don't collect msgcollector x / cli messages if msgdispatcher x / cli is not running
+
+commit ad3530e875e54e527ccb3b75ac6317bdb8c462d7
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Aug 26 23:31:58 2015 +0000
+
+    bumped changelog version
+
 commit 27fc0a277c4f36e64be42db3ca104b926e2d9b93
 Merge: 11974c6 4702db9
 Author: Patrick Schleizer <adrelanos@riseup.net>
