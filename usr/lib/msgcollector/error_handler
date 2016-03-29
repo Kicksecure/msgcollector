@@ -18,7 +18,7 @@ $BASH_COMMAND"
 $error_text"
    fi
 
-   if [ -d /usr/share/whonix ]; then
+   if [ -f /usr/share/whonix/marker ]; then
       local MSG="<p>###############################################################################
 <br></br>## $SCRIPTNAME script bug.
 <br></br>## No panic. Nothing is broken. Just some rare condition has been hit.
