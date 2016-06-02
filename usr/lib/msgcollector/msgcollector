@@ -261,6 +261,10 @@ preparation() {
 colors() {
    trap "error_handler" ERR
 
+   if [ "$TERM" = "" ]; then
+      return 0
+   fi
+
 ## The checks [[ -t 2 ]] and [[ $TERM != *-m ]] have been deactivated, because
 ## at the time msgcollector gets its first messages, there might be no
 ## terminal. We need those colors anyway, because they get stored in the files.
