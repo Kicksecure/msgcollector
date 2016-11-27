@@ -386,7 +386,7 @@ msgdispatcher_handler() {
    true "PROCESSING file_name: $file_name"
    file_extension="${file_name##*.}"
    if [ ! "$file_extension" = "done" ]; then
-      continue
+      return 0
    fi
 
    ## Remove ".done".
@@ -411,7 +411,7 @@ msgdispatcher_handler() {
             ## Not always using rm, without if to prevent forking.
             rm --force "/var/run/msgcollector/$who_ami/${identifier}.messagex.done"
          fi
-         continue
+         return 0
       fi
       if [ "$file_name" = "/var/run/msgcollector/$who_ami/${identifier}.passivepopupqueuex.done" ]; then
          if [ -f "/var/run/msgcollector/$who_ami/${identifier}.passivepopupqueuex" ]; then
@@ -434,7 +434,7 @@ msgdispatcher_handler() {
          else
             rm --force "/var/run/msgcollector/$who_ami/${identifier}.passivepopupqueuex.done"
          fi
-         continue
+         return 0
       fi
 
       last_two="${file_name#*.*.}"
@@ -467,7 +467,7 @@ msgdispatcher_handler() {
          else
             rm --force "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbarx.done"
          fi
-         continue
+         return 0
       fi
 
    elif [ "$cli" = "1" ]; then
@@ -481,7 +481,7 @@ msgdispatcher_handler() {
          else
             rm --force "/var/run/msgcollector/$who_ami/${identifier}.waitmessagecli.done"
          fi
-         continue
+         return 0
       fi
       if [ "$file_name" = "/var/run/msgcollector/$who_ami/${identifier}.messagecli.done" ]; then
          if [ -f "/var/run/msgcollector/$who_ami/${identifier}.messagecli" ]; then
@@ -493,7 +493,7 @@ msgdispatcher_handler() {
          else
             rm --force "/var/run/msgcollector/$who_ami/${identifier}.messagecli.done"
          fi
-         continue
+         return 0
       fi
    else
       exit 1
