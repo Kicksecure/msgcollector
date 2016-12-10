@@ -1,3 +1,53 @@
+commit e281eb9e2a2e732770796aebae40cd1a3bcae35a
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Nov 27 21:27:39 2016 +0100
+
+    use return rather than continue
+    
+    for Debian stretch / newer bash version compatibility
+
+commit 5bae0f60e5bc5b591696e188935257fb54c56595
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Nov 21 17:42:15 2016 +0000
+
+    readme
+
+commit bdd05e4d2161e637df99c245c9d03f6ba26d8e4b
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Aug 26 01:34:23 2016 +0000
+
+    depend on procps for `ps`
+
+commit a9c2c1219b70a69128c96b4f94c82099ab9db5aa
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Aug 25 18:40:01 2016 +0000
+
+    add support msgprogressbar when running under a different user account
+    
+    https://phabricator.whonix.org/T533
+
+commit 64add9551b6f823308a89a23afce603f824f38fd
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Aug 25 02:17:55 2016 +0000
+
+    fix run detection when running under different user
+    
+    https://phabricator.whonix.org/T533
+
+commit 1a3e3b122436aaa3215bc36b2ab5292743b0f44a
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Jun 2 11:52:07 2016 +0000
+
+    do not use tput if variable TERM is empty
+    
+    https://phabricator.whonix.org/T505
+
+commit d4e422c98723382914115018857392f139210574
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 7 22:54:38 2016 +0000
+
+    bumped changelog version
+
 commit 5e5b32c40f1f2a63f6efc1bcdc14befd938e168d
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Tue Mar 29 22:45:30 2016 +0000
