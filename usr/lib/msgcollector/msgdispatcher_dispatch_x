@@ -85,6 +85,9 @@ class Ui_Dialog(object):
 
 if __name__ == "__main__":
     import sys
+    import signal
+
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
 
     syntax_details = """
 msgdispatcher_dispatch_x requires 4 manadatory and 1 optional arguments
