@@ -85,6 +85,20 @@ class Ui_Dialog(object):
 
 if __name__ == "__main__":
     import sys
+    import signal
+
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
+
+    syntax_details = """
+msgdispatcher_dispatch_x requires 4 manadatory and 1 optional arguments
+    1) Message Type = info|warning|error
+    2) Title of the message box
+    3) Message in the message box
+    4) Position of the message (Value 0 or more)
+    5) Icon to be used (optional)
+"""
+    if len(sys.argv) < 5:
+       sys.exit("'msgdispatcher_dispatch_x'. Invalid number of options {}".format(syntax_details))  
     app = QtGui.QApplication(sys.argv)
     Dialog = QtGui.QDialog()
 
@@ -101,7 +115,9 @@ if __name__ == "__main__":
     title = str(sys.argv[2])
     msg = str(sys.argv[3])
     pos = str(sys.argv[4])
-    icon = str(sys.argv[5])
+    icon = "/path/to/optional/icon"
+    if len(sys.argv) == 6:
+        icon = str(sys.argv[5])
 
     ui = Ui_Dialog()
     ui.setupUi(Dialog)
