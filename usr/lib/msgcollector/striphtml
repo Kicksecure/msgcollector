@@ -1,11 +1,11 @@
-#!/usr/bin/python
+#!/usr/bin/python3 -u
 
 def strip():
     ## Strip html
     stripped_message=re.sub('<[^<]+?>', '', html)
     ## Retrieve the "escaped" colons used in yaml text.
     message = re.sub('&#58;', ':', stripped_message)
-    print message
+    print(message)
 
 if __name__=='__main__':
     import sys,  re
