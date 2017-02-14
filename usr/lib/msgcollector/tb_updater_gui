@@ -1,8 +1,10 @@
-#!/usr/bin/python
+#!/usr/bin/python3 -u
 # -*- coding: utf-8 -*-
 
 import sys
-from PyQt4 import QtCore, QtGui
+from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 import signal
 signal.signal(signal.SIGINT, signal.SIG_DFL)
@@ -12,7 +14,7 @@ signal.signal(signal.SIGINT, signal.SIG_DFL)
 #except AttributeError:
     #_fromUtf8 = lambda s: s
 
-class GuiMessage(QtGui.QDialog):
+class GuiMessage(QtWidgets.QDialog):
     def __init__(self):
         super(GuiMessage, self).__init__()
 
@@ -28,23 +30,23 @@ class GuiMessage(QtGui.QDialog):
         except (IndexError) as e:
             sys.exit('Arguments parsing error')
 
-        self.layout = QtGui.QGridLayout(self)
-        self.i_label = QtGui.QLabel(self)
-        self.label = QtGui.QLabel(self)
-        self.version_group = QtGui.QGroupBox(self)
-        self.text = QtGui.QTextBrowser(self)
-        self.button_box = QtGui.QDialogButtonBox(self)
+        self.layout = QtWidgets.QGridLayout(self)
+        self.i_label = QtWidgets.QLabel(self)
+        self.label = QtWidgets.QLabel(self)
+        self.version_group = QtWidgets.QGroupBox(self)
+        self.text = QtWidgets.QTextBrowser(self)
+        self.button_box = QtWidgets.QDialogButtonBox(self)
 
         self.setup_ui()
 
     def setup_ui(self):
-        itype = "/usr/share/icons/oxygen/64x64/status/dialog-information.png"
+        itype = "/usr/share/icons/oxygen/base/64x64/status/dialog-information.png"
 
         if self.itype == "warning":
-            itype = "/usr/share/icons/oxygen/128x128/status/dialog-warning.png"
+            itype = "/usr/share/icons/oxygen/base/128x128/status/dialog-warning.png"
 
         elif self.itype == "error":
-            itype = "/usr/share/icons/oxygen/128x128/status/dialog-error.png"
+            itype = "/usr/share/icons/oxygen/base/128x128/status/dialog-error.png"
 
         versions = self.online_versions.split(',')
 
@@ -64,10 +66,11 @@ class GuiMessage(QtGui.QDialog):
         palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Base, brush)
         self.setPalette(palette)
 
-        self.setWindowIcon(QtGui.QIcon("/usr/share/icons/anon-icon-pack/whonix.ico"))
+        self.setWindowIcon(QIcon("/usr/share/icons/anon-icon-pack/whonix.ico"))
         self.setWindowTitle(self.title)
 
-        self.i_label.setPixmap(QtGui.QPixmap(itype))
+        image = QtGui.QImage(itype)
+        self.i_label.setPixmap(QPixmap.fromImage(image))
         self.i_label.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.label.setText('<p><b>Download confirmation</b></p>\
                             </p>Curently installed version: %s <p/>' % self.installed_version)
@@ -79,7 +82,7 @@ class GuiMessage(QtGui.QDialog):
 
         i = 0
         for version in versions:
-            self.version = QtGui.QRadioButton(self.version_group)
+            self.version = QtWidgets.QRadioButton(self.version_group)
             if i == 0:
                 self.version.setChecked(True)
             self.version.Name = version
@@ -89,25 +92,25 @@ class GuiMessage(QtGui.QDialog):
 
         self.text.setMinimumSize(530, 0)
         self.text.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
-        self.text.setFrameShape(QtGui.QFrame.NoFrame)
+        self.text.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.text.setTextInteractionFlags(QtCore.Qt.LinksAccessibleByMouse|QtCore.Qt.TextSelectableByMouse)
         self.text.setOpenExternalLinks(True)
         self.text.setText(message)
 
         if self.button == 'yesno':
-            self.button_box.setStandardButtons(QtGui.QDialogButtonBox.Yes|QtGui.QDialogButtonBox.No)
+            self.button_box.setStandardButtons(QtWidgets.QDialogButtonBox.Yes|QtWidgets.QDialogButtonBox.No)
 
-            self.yes_button = self.button_box.button(QtGui.QDialogButtonBox.Yes)
+            self.yes_button = self.button_box.button(QtWidgets.QDialogButtonBox.Yes)
             self.yes_button.clicked.connect(self.yes_pressed)
 
-            self.no_button = self.button_box.button(QtGui.QDialogButtonBox.No)
+            self.no_button = self.button_box.button(QtWidgets.QDialogButtonBox.No)
             self.no_button.setAutoDefault(True)
             self.no_button.setDefault(True)
             self.no_button.clicked.connect(self.reject)
 
         elif self.button == 'ok':
-            self.button_box.setStandardButtons(QtGui.QDialogButtonBox.Ok)
-            self.ok_button = self.button_box.button(QtGui.QDialogButtonBox.Ok)
+            self.button_box.setStandardButtons(QtWidgets.QDialogButtonBox.Ok)
+            self.ok_button = self.button_box.button(QtWidgets.QDialogButtonBox.Ok)
             self.ok_button.clicked.connect(self.accept)
 
         self.layout.addWidget(self.i_label, 0, 0, 0, 1)
@@ -123,16 +126,16 @@ class GuiMessage(QtGui.QDialog):
         self.exec_()
 
     def reject(self):
-        print '65536'
+        print("65536")
         sys.exit()
 
     def setSize(self):
         ## Size is returned
         window_height = (self.label.size().height() + self.text.document().size().height()
                         + self.version_group.size().height() + 100)
-        maximum_height = QtGui.QDesktopWidget().availableGeometry().height() - 60
+        maximum_height = QtWidgets.QDesktopWidget().availableGeometry().height() - 100
         if window_height <= maximum_height:
-            self.resize(500, window_height)
+            self.resize(800, window_height)
             self.center()
             if self.button == 'yesno':
                 self.no_button.setFocus()
@@ -140,7 +143,7 @@ class GuiMessage(QtGui.QDialog):
                 self.ok_button.setFocus()
 
         else:
-            self.resize(500, maximum_height)
+            self.resize(800, maximum_height)
             self.center()
             if self.button == 'yesno':
                 self.no_button.setFocus()
@@ -149,22 +152,22 @@ class GuiMessage(QtGui.QDialog):
 
     def center(self):
        frame_geometry = self.frameGeometry()
-       center_point = QtGui.QDesktopWidget().availableGeometry().center()
+       center_point = QtWidgets.QDesktopWidget().availableGeometry().center()
        frame_geometry.moveCenter(center_point)
        self.move(frame_geometry.topLeft())
 
     def yes_pressed(self):
-        for version in self.version_group.findChildren(QtGui.QRadioButton):
+        for version in self.version_group.findChildren(QtWidgets.QRadioButton):
             if version.isChecked():
-                print version.Name
+                print(version.Name)
         sys.exit()
 
     def no_pressed(self):
-        print '65536'
+        print("65536")
         sys.exit()
 
 def main():
-    app = QtGui.QApplication(sys.argv)
+    app = QtWidgets.QApplication(sys.argv)
     message = GuiMessage()
     sys.exit()
 

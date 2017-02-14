@@ -1,8 +1,9 @@
-#!/usr/bin/python
+#!/usr/bin/python3 -u
 # -*- coding: utf-8 -*-
 
 import sys
-from PyQt4 import QtCore, QtGui
+from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtGui import QIcon, QPixmap
 
 import signal
 signal.signal(signal.SIGINT, signal.SIG_DFL)
@@ -12,7 +13,7 @@ try:
 except AttributeError:
     _fromUtf8 = lambda s: s
 
-class GuiMessage(QtGui.QDialog):
+class GuiMessage(QtWidgets.QDialog):
     def __init__(self):
         super(GuiMessage, self).__init__()
         self.setup_ui()
@@ -28,17 +29,17 @@ class GuiMessage(QtGui.QDialog):
         except (IndexError) as e:
             sys.exit('Arguments parsing error')
 
-        itype = "/usr/share/icons/oxygen/64x64/status/dialog-information.png"
+        itype = "/usr/share/icons/oxygen/base/64x64/status/dialog-information.png"
 
         if str(sys.argv[1]) == "warning":
-            itype = "/usr/share/icons/oxygen/64x64/status/dialog-warning.png"
+            itype = "/usr/share/icons/oxygen/base/64x64/status/dialog-warning.png"
 
         elif str(sys.argv[1]) == "error":
-            itype = "/usr/share/icons/oxygen/64x64/status/dialog-error.png"
+            itype = "/usr/share/icons/oxygen/base/64x64/status/dialog-error.png"
 
         message = message + '<p>' + question + '</p>'
 
-        self.gridLayout = QtGui.QGridLayout(self)
+        self.gridLayout = QtWidgets.QGridLayout(self)
 
         # We use QTextBrowser with a white background.
         # Set a default (transparent) background.
@@ -54,38 +55,41 @@ class GuiMessage(QtGui.QDialog):
         palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Base, brush)
         self.setPalette(palette)
 
-        self.setWindowIcon(QtGui.QIcon("/usr/share/icons/anon-icon-pack/whonix.ico"))
+        self.setWindowIcon(QIcon("/usr/share/icons/anon-icon-pack/whonix.ico"))
         self.setWindowTitle(title)
 
-        self.label = QtGui.QLabel(self)
-        self.label.setPixmap(QtGui.QPixmap(itype))
+        self.label = QtWidgets.QLabel(self)
+        image = QtGui.QImage(itype)
+        self.label.setPixmap(QPixmap.fromImage(image))
+        #self.Info_Icon.setPixmap(QPixmap.fromImage(image))
+
         self.label.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.gridLayout.addWidget(self.label, 0, 0)
 
-        self.text = QtGui.QTextBrowser(self)
+        self.text = QtWidgets.QTextBrowser(self)
         self.text.setMinimumSize(535, 0)
         self.text.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
-        self.text.setFrameShape(QtGui.QFrame.NoFrame)
+        self.text.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.text.setTextInteractionFlags(QtCore.Qt.LinksAccessibleByMouse|QtCore.Qt.TextSelectableByMouse)
         self.text.setOpenExternalLinks(True)
         self.text.setText(message)
         self.gridLayout.addWidget(self.text, 0, 1)
 
-        self.buttonBox = QtGui.QDialogButtonBox(self)
+        self.buttonBox = QtWidgets.QDialogButtonBox(self)
         if self.button == 'yesno':
-            self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Yes|QtGui.QDialogButtonBox.No)
+            self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Yes|QtWidgets.QDialogButtonBox.No)
 
-            self.yes_button = self.buttonBox.button(QtGui.QDialogButtonBox.Yes)
+            self.yes_button = self.buttonBox.button(QtWidgets.QDialogButtonBox.Yes)
             self.yes_button.clicked.connect(self.yes_pressed)
 
-            self.no_button = self.buttonBox.button(QtGui.QDialogButtonBox.No)
+            self.no_button = self.buttonBox.button(QtWidgets.QDialogButtonBox.No)
             self.no_button.setAutoDefault(True)
             self.no_button.setDefault(True)
             self.no_button.clicked.connect(self.reject)
 
         elif self.button == 'ok':
-            self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Ok)
-            self.ok_button = self.buttonBox.button(QtGui.QDialogButtonBox.Ok)
+            self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Ok)
+            self.ok_button = self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok)
             self.ok_button.clicked.connect(self.accept)
 
         self.gridLayout.addWidget(self.buttonBox, 1, 1)
@@ -98,7 +102,7 @@ class GuiMessage(QtGui.QDialog):
     def setSize(self):
         ## Size is returned
         messageHeight = self.text.document().size().height()
-        maximumHeight = QtGui.QDesktopWidget().availableGeometry().height() - 60
+        maximumHeight = QtWidgets.QDesktopWidget().availableGeometry().height() - 60
         if messageHeight <= maximumHeight:
             self.resize(620, messageHeight + 60)
             self.center()
@@ -117,20 +121,20 @@ class GuiMessage(QtGui.QDialog):
 
     def center(self):
        frameGm = self.frameGeometry()
-       centerPoint = QtGui.QDesktopWidget().availableGeometry().center()
+       centerPoint = QtWidgets.QDesktopWidget().availableGeometry().center()
        frameGm.moveCenter(centerPoint)
        self.move(frameGm.topLeft())
 
     def yes_pressed(self):
-        print '16384'
+        print("16384")
         sys.exit()
 
     def reject(self):
-        print '65536'
+        print("65536")
         sys.exit()
 
 def main():
-    app = QtGui.QApplication(sys.argv)
+    app = QtWidgets.QApplication(sys.argv)
     message = GuiMessage()
     sys.exit()
 

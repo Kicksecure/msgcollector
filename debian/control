@@ -14,7 +14,7 @@ Standards-Version: 3.9.8
 
 Package: msgcollector
 Architecture: all
-Depends: wmctrl, python, python-qt4, zenity, libnotify-bin | kde-baseapps-bin,
+Depends: wmctrl, python3, python3-pyqt5, zenity, libnotify-bin | kde-baseapps-bin,
  sudo, acl, x11-utils, inotify-tools, libgnome2-bin, gvfs, procps, ${misc:Depends}
 Provides: ${diverted-files}
 Conflicts: ${diverted-files}

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3 -u
 
 ## Copyright (C) 2014 troubadour <trobador@riseup.net>
 ## Copyright (C) 2014 Patrick Schleizer <adrelanos@riseup.net>
@@ -7,4 +7,4 @@
 import sys
 in_ = sys.argv[1]
 out = '<br />\n'.join(in_.split('\n'))
-print out
+print(out)
