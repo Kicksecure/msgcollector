@@ -104,7 +104,7 @@ output_wait_for_window() {
 
    trap "error_handler" ERR
 
-   local title=""$@""
+   local title="$@"
 
    sleep .5 &
    wait "$!" || true
@@ -161,7 +161,7 @@ output_wmctrl_move_window_to_left_top() {
       return 0
    fi
 
-   local title=""$@""
+   local title="$@"
 
    output_wait_for_window "$title"
 
@@ -181,7 +181,7 @@ output_wmctrl_maximize_window() {
       return 0
    fi
 
-   local title=""$@""
+   local title="$@"
 
    output_wait_for_window "$title"
 

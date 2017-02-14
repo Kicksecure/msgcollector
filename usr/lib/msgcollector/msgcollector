@@ -52,7 +52,7 @@ exit_code: $exit_code
 
 trap "error_handler" ERR
 
-my_command_line_parameters=""$@""
+my_command_line_parameters="$@"
 
 parse_cmd_options() {
    trap "error_handler" ERR
@@ -776,7 +776,7 @@ forgetwaitcli() {
 }
 
 ## Debugging.
-#echo "$BASH_SOURCE "$@"
+#echo "$BASH_SOURCE $@
 #" >> "/home/user/msgcollector"
 
 parse_cmd_options "$@"
