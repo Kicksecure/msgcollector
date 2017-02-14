@@ -135,7 +135,7 @@ progress_bar() {
    return 0
 }
 
-parse_cmd_options ${1+"$@"}
+parse_cmd_options "$@"
 
 if [ "$progress" = "" ]; then
    error "Variable progress does not exist"
