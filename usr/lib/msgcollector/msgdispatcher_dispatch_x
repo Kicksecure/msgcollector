@@ -94,7 +94,7 @@ if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal.SIG_DFL)
 
     syntax_details = """
-msgdispatcher_dispatch_x requires 4 manadatory and 1 optional arguments
+msgdispatcher_dispatch_x requires 4 mandatory and 1 optional arguments
     1) Message Type = info|warning|error
     2) Title of the message box
     3) Message in the message box
