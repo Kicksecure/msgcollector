@@ -29,13 +29,13 @@ class GuiMessage(QtWidgets.QDialog):
         except (IndexError) as e:
             sys.exit('Arguments parsing error')
 
-        itype = "/usr/share/icons/oxygen/64x64/status/dialog-information.png"
+        itype = "/usr/share/icons/oxygen/base/64x64/status/dialog-information.png"
 
         if str(sys.argv[1]) == "warning":
-            itype = "/usr/share/icons/oxygen/64x64/status/dialog-warning.png"
+            itype = "/usr/share/icons/oxygen/base/64x64/status/dialog-warning.png"
 
         elif str(sys.argv[1]) == "error":
-            itype = "/usr/share/icons/oxygen/64x64/status/dialog-error.png"
+            itype = "/usr/share/icons/oxygen/base/64x64/status/dialog-error.png"
 
         message = message + '<p>' + question + '</p>'
 

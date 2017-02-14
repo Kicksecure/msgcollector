@@ -40,13 +40,13 @@ class GuiMessage(QtWidgets.QDialog):
         self.setup_ui()
 
     def setup_ui(self):
-        itype = "/usr/share/icons/oxygen/64x64/status/dialog-information.png"
+        itype = "/usr/share/icons/oxygen/base/64x64/status/dialog-information.png"
 
         if self.itype == "warning":
-            itype = "/usr/share/icons/oxygen/128x128/status/dialog-warning.png"
+            itype = "/usr/share/icons/oxygen/base/128x128/status/dialog-warning.png"
 
         elif self.itype == "error":
-            itype = "/usr/share/icons/oxygen/128x128/status/dialog-error.png"
+            itype = "/usr/share/icons/oxygen/base/128x128/status/dialog-error.png"
 
         versions = self.online_versions.split(',')
 
@@ -60,8 +60,7 @@ class GuiMessage(QtWidgets.QDialog):
         palette.setBrush(QtGui.QPalette.Active, QtGui.QPalette.Base, brush)
         brush = QtGui.QBrush(QtGui.QColor(255, 255, 255, 0))
         brush.setStyle(QtCore.Qt.SolidPattern)
-        ## TODO
-        #palette.setBrush(QtGui.Inactive, QtGui.QPalette.Base, brush)
+        palette.setBrush(QtGui.QPalette.Inactive, QtGui.QPalette.Base, brush)
         brush = QtGui.QBrush(QtGui.QColor(244, 244, 244))
         brush.setStyle(QtCore.Qt.SolidPattern)
         palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Base, brush)
@@ -134,9 +133,9 @@ class GuiMessage(QtWidgets.QDialog):
         ## Size is returned
         window_height = (self.label.size().height() + self.text.document().size().height()
                         + self.version_group.size().height() + 100)
-        maximum_height = QtWidgets.QDesktopWidget().availableGeometry().height() - 60
+        maximum_height = QtWidgets.QDesktopWidget().availableGeometry().height() - 100
         if window_height <= maximum_height:
-            self.resize(500, window_height)
+            self.resize(800, window_height)
             self.center()
             if self.button == 'yesno':
                 self.no_button.setFocus()
@@ -144,7 +143,7 @@ class GuiMessage(QtWidgets.QDialog):
                 self.ok_button.setFocus()
 
         else:
-            self.resize(500, maximum_height)
+            self.resize(800, maximum_height)
             self.center()
             if self.button == 'yesno':
                 self.no_button.setFocus()

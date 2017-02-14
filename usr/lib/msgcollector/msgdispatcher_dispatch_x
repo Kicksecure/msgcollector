@@ -1,12 +1,9 @@
 #!/usr/bin/python3 -u
 # -*- coding: utf-8 -*-
 
-## TODO:
-## - fix title bar icon
-## - fix symbol inside window for info, warning or error
-
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import QObject, pyqtSignal
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -62,9 +59,8 @@ class Ui_Dialog(object):
         self.gridLayout.addWidget(self.buttonBox, 1, 1, 1, 1)
 
         self.retranslateUi(Dialog)
-        ## TODO: fix OK button
-        #QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("accepted()")), Dialog.accept)
-        #QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("rejected()")), Dialog.reject)
+        self.buttonBox.accepted.connect(Dialog.accept)
+        self.buttonBox.rejected.connect(Dialog.reject)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):
@@ -111,11 +107,11 @@ msgdispatcher_dispatch_x requires 4 manadatory and 1 optional arguments
     Dialog = QtWidgets.QDialog()
 
     if str(sys.argv[1]) == "info":
-        itype = "/usr/share/icons/oxygen/64x64/status/dialog-information.png"
+        itype = "/usr/share/icons/oxygen/base/64x64/status/dialog-information.png"
     elif str(sys.argv[1]) == "warning":
-        itype = "/usr/share/icons/oxygen/128x128/status/dialog-warning.png"
+        itype = "/usr/share/icons/oxygen/base/128x128/status/dialog-warning.png"
     elif str(sys.argv[1]) == "error":
-        itype = "/usr/share/icons/oxygen/128x128/status/dialog-error.png"
+        itype = "/usr/share/icons/oxygen/base/128x128/status/dialog-error.png"
     else:
         itype =""
         sys.exit("'msgdispatcher_dispatch_x'. Information type not recognized: %s" % str(sys.argv[1]))
@@ -123,7 +119,7 @@ msgdispatcher_dispatch_x requires 4 manadatory and 1 optional arguments
     title = str(sys.argv[2])
     msg = str(sys.argv[3])
     pos = str(sys.argv[4])
-    icon = "/path/to/optional/icon"
+    icon = "/usr/share/icons/anon-icon-pack/whonix.ico"
     if len(sys.argv) == 6:
         icon = str(sys.argv[5])
 
@@ -131,4 +127,3 @@ msgdispatcher_dispatch_x requires 4 manadatory and 1 optional arguments
     ui.setupUi(Dialog)
     Dialog.show()
     sys.exit(app.exec_())
-
