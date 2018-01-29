@@ -1,7 +1,7 @@
 #!/usr/bin/python3 -u
 
 ## Copyright (C) 2014 troubadour <trobador@riseup.net>
-## Copyright (C) 2014 - 2018 Patrick Schleizer <adrelanos@riseup.net>
+## Copyright (C) 2014 - 2018 ENCRYPTED SUPPORT LP <adrelanos@riseup.net>
 ## See the file COPYING for copying conditions.
 
 import sys
