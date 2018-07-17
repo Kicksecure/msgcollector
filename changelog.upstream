@@ -1,3 +1,19 @@
+commit fd77a329ece8200ac61b8878f80df39a25ab5c05
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Jul 17 11:58:43 2018 +0000
+
+    fix 'Connected to Tor.' message missing in Qubes-Whonix 14
+    
+    depend on mate-notification-daemon
+    
+    https://github.com/QubesOS/qubes-issues/issues/4098
+
+commit 791cb203b3f95631ca3470d6d1e714e9b1b61d75
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Feb 1 15:09:23 2018 +0000
+
+    bumped changelog version
+
 commit 0cd05b75b712d799c2aed15dedabf1b15a01f962
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Mon Jan 29 15:50:31 2018 +0000
