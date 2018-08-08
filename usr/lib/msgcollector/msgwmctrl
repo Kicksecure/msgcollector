@@ -32,12 +32,24 @@ fallbacks() {
       }
    fi
 
-   if [ "$DISPLAY" = "" ]; then
-      ## No X server running.
+   if [ "$(command -v "xwininfo")" = "" ] || [ "$DISPLAY" = "" ]; then
+      ## xwininfo (package x11-utils) is not installed or no X server running.
+      xwininfo() {
+         ## dummy
+         true
+      }
+   fi
+
+   if [ "$(command -v "kdialog")" = "" ] || [ "$DISPLAY" = "" ]; then
+      ## kdialog is not installed or no X server running.
       kdialog() {
          ## dummy
          true
       }
+   fi
+
+   if [ "$(command -v "notify-send")" = "" ] || [ "$DISPLAY" = "" ]; then
+      ## notify-send is not installed or no X server running.
       notify-send() {
          ## dummy
          true
