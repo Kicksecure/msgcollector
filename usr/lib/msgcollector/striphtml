@@ -1,5 +1,8 @@
 #!/usr/bin/python3 -u
 
+## Copyright (C) 2014 troubadour <trobador@riseup.net>
+## Copyright (C) 2014 - 2018 ENCRYPTED SUPPORT LP <adrelanos@riseup.net>
+
 def strip():
     ## Strip html
     stripped_message=re.sub('<[^<]+?>', '', html)
