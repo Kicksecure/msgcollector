@@ -1,3 +1,35 @@
+commit 0953ed5e01e1931f23e92a4ff43e061c951ade47
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Aug 9 15:37:26 2018 +0000
+
+    sudoers.d asterix hardening
+    
+    https://github.com/QubesOS/qubes-issues/issues/2852
+
+commit 3afeff22beb7ca790135d62ec98033dae10ca7f6
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Aug 9 03:46:50 2018 +0800
+
+    split into msgcollector and msgcollector-gui for better cli-only support
+
+commit 62e4540eca88c4381cc525bfcba6332ef335a066
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Aug 9 03:39:49 2018 +0800
+
+    copyright
+
+commit eb72bcb5d3b77a8db6e671b1d64e5657e33292de
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Aug 9 03:36:37 2018 +0800
+
+    more defensive in case gui packages are not installed
+
+commit af37775497e200d5767b7e0365dc74da53ce0334
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Jul 17 12:00:21 2018 +0000
+
+    bumped changelog version
+
 commit fd77a329ece8200ac61b8878f80df39a25ab5c05
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Tue Jul 17 11:58:43 2018 +0000
