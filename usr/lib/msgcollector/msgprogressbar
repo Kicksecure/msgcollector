@@ -110,7 +110,7 @@ cleanup_self() {
    trap "error_handler" ERR
 
    true "$0 $FUNCNAME: killing zenity_progress_pid $zenity_progress_pid..."
-   kill -sigterm "$zenity_progress_pid" >/dev/null 2>/dev/null || true
+   kill -s sigterm "$zenity_progress_pid" >/dev/null 2>/dev/null || true
    rm --force "$fifo"
    rm --force "$progress_txt_file"
    rm --force "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.zenityprogresspid"

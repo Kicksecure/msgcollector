@@ -18,7 +18,7 @@ if [ -f "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.parentpi
 
    if [ "$ps__p_exit_code" = "0" ]; then
       true "$output_signal_caught caught. Sending signal sigusr2 to $parentpid."
-      kill -sigusr2 "$parentpid"
+      kill -s sigusr2 "$parentpid"
    else
       true "$output_signal_caught caught. Not sending signal sigusr2 to parentpid $parentpid, because it is already terminated."
    fi

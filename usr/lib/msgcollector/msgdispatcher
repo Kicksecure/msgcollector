@@ -58,7 +58,7 @@ ex_funct() {
    true "$FUNCNAME: Signal $SIGNAL_TYPE received. Cleaning up..."
 
    if [ ! "$inotifywait_subshell_pid" = "" ]; then
-      kill -sigterm "$inotifywait_subshell_pid" || true
+      kill -s sigterm "$inotifywait_subshell_pid" || true
    fi
 
    if [ -f "$pid_file" ]; then
@@ -319,7 +319,7 @@ inotifywait_setup() {
    trap "error_handler" ERR
 
    if [ ! "$inotifywait_subshell_pid" = "" ]; then
-      kill -sigterm "$inotifywait_subshell_pid" || true
+      kill -s sigterm "$inotifywait_subshell_pid" || true
    fi
 
    rm --force "$inotifywait_subshell_fifo"
@@ -344,7 +344,7 @@ inotifywait_setup() {
          trap "error_handler" ERR
          true "$FUNCNAME: signal SIGTERM received. Cleaning up..."
          if [ ! "$inotifywait_pid" = "" ]; then
-            kill -sigterm "$inotifywait_pid"
+            kill -s sigterm "$inotifywait_pid"
          fi
          rm --force "$inotifywait_success_file"
          true "$FUNCNAME: signal SIGTERM received. Exiting."
