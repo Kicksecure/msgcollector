@@ -26,7 +26,7 @@ Package: msgcollector-gui
 Architecture: all
 Depends: msgcollector, wmctrl, python3-pyqt5, zenity,
  libnotify-bin | kde-baseapps-bin, mate-notification-daemon, x11-utils,
- libgnome2-bin, ${misc:Depends}
+ ${misc:Depends}
 Provides: ${diverted-files}
 Conflicts: ${diverted-files}
 Description: Notification System for X
