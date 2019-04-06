@@ -1,3 +1,39 @@
+commit e173b4c77e132adc0b63c2bbf29c121071146bb0
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Apr 5 18:13:31 2019 -0400
+
+    remove dependency on libgnome2-bin since unavailable in Debian buster
+
+commit 4ee02ecbd2893bfcf06d4a0dd2a93329d053a56d
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Apr 5 14:05:42 2019 -0400
+
+    port to debian buster
+
+commit 9eb44e1070e1b338f0842525a9c45352dbcdd0eb
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 4 05:55:51 2019 -0400
+
+    port to debian buster
+
+commit 3368283aff6d5176b53f807736b558a05ad4d64a
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 4 05:51:04 2019 -0400
+
+    port to debian buster
+
+commit 473a5b7f82d1fd97474435cb942883552e7d66ce
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Apr 3 18:05:54 2019 -0400
+
+    readme
+
+commit 843882071e3834927fa08edf3ead270d300a4c39
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Mar 29 09:57:06 2019 +0000
+
+    bumped changelog version
+
 commit cbef83207c20b4b07b382086bc540943a18c43be
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Fri Mar 29 09:03:16 2019 +0000
