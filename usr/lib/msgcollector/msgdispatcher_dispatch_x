@@ -20,7 +20,7 @@ class Ui_Dialog(object):
         Dialog.setSizePolicy(sizePolicy)
         Dialog.setWindowIcon(QIcon(icon))
         if pos == "1":
-            Dialog.move(0,  0)
+            Dialog.move(0, 0)
 
         self.gridLayout = QtWidgets.QGridLayout(Dialog)
 
