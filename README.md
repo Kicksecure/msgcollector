@@ -9,7 +9,7 @@ Package: msgcollector-gui
 Architecture: all
 Depends: msgcollector, wmctrl, python3-pyqt5, zenity,
 libnotify-bin | kde-baseapps-bin, mate-notification-daemon, x11-utils,
-libgnome2-bin, ${misc:Depends}
+${misc:Depends}
 Provides: ${diverted-files}
 Conflicts: ${diverted-files}
 Description: Notification System for X
@@ -29,7 +29,7 @@ sudo apt-key --keyring /etc/apt/trusted.gpg.d/whonix.gpg adv --keyserver hkp://i
 3\. Add Whonix's APT repository.
 
 ```
-echo "deb http://deb.whonix.org buster main" | sudo tee /etc/apt/sources.list.d/whonix.list
+echo "deb http://deb.whonix.org buster main contrib non-free" | sudo tee /etc/apt/sources.list.d/whonix.list
 ```
 
 4\. Update your package lists.
@@ -53,6 +53,6 @@ Replace `apparmor-profile-torbrowser` with the actual name of this package with 
 * [Free Forum Support](https://forums.whonix.org)
 * [Professional Support](https://www.whonix.org/wiki/Professional_Support)
 
-## Payments ##
+## Donate ##
 
-`msgcollector` requires [payments](https://www.whonix.org/wiki/Payments) to stay alive!
+`msgcollector` requires [donations](https://www.whonix.org/wiki/Donate) to stay alive!
