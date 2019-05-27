@@ -4,6 +4,8 @@
 ## See the file COPYING for copying conditions.
 
 error_handler() {
+   bash_command_backup="$BASH_COMMAND"
+
    local exit_code="$?"
    BUG="1"
 
@@ -11,7 +13,7 @@ error_handler() {
    error_text="$1"
    if [ "$error_text" = "" ]; then
       error_cause="$FUNCNAME signal ERR detected with BASH_COMMAND:
-$BASH_COMMAND"
+$bash_command_backup"
    else
       error_cause="$FUNCNAME called with error_text:
 $error_text"
