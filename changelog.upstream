@@ -1,3 +1,15 @@
+commit c24b8912ba6914cde96272c9c5331253fb7681fb
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon May 27 18:36:41 2019 -0400
+
+    improve output of error handler
+
+commit ca2db39aa1b3cb45fce72f29dc874bbfcf33bd3a
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri May 24 20:44:24 2019 +0000
+
+    bumped changelog version
+
 commit 516b76d7903fe2b19a6309a10ac09626de62dc2b
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Fri May 24 12:29:06 2019 -0400
