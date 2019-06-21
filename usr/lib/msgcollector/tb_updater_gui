@@ -76,11 +76,11 @@ class GuiMessage(QtWidgets.QDialog):
         self.i_label.setPixmap(QPixmap.fromImage(image))
         self.i_label.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.label.setText('<p><b>Download confirmation</b></p>\
-                            </p>Curently installed version: %s <p/>' % self.installed_version)
+                            </p>Currently installed version: <code>%s</code> <p/>' % self.installed_version)
         self.label.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.label.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
 
-        self.version_group.setTitle('Online versions')
+        self.version_group.setTitle('Online versions:')
         self.version_group.setMinimumSize(QtCore.QSize(0, 20 + (len(versions) * 20) + 10))
 
         i = 0
