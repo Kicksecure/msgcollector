@@ -1,3 +1,15 @@
+commit 981774232f42be8cd3f2be00372205c164546106
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Jun 23 13:10:17 2019 +0000
+
+    implement --typeclistatus (not working with echoonly)
+
+commit 6bf5c47cc8bc5c19013c77309792f4c68fe1bbd7
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jun 21 03:31:18 2019 +0000
+
+    bumped changelog version
+
 commit b0bd1cd9a62e417b2b559ad2e1ed555030560362
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Thu Jun 20 23:10:46 2019 -0400
