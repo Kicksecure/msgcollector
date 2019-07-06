@@ -385,8 +385,6 @@ collector() {
       mkdir -p "/var/run/msgcollector/$who_ami"
    fi
 
-   echo "$0: who_ami: $who_ami"
-
    ## {{ --identifier
    if [ "${identifier}" = "" ]; then
       echo "$BASH_SOURCE ERROR: variable identifier is empty."
