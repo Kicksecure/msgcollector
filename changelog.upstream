@@ -1,3 +1,23 @@
+commit 7cb6c9b12120bf2e407c6798bd8d0cd31d483054
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Jul 6 13:49:11 2019 +0000
+
+    disable debugging
+
+commit e26b6393b3f8479a286e529049098e2f762d8f2d
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Jul 6 13:48:03 2019 +0000
+
+    permission hardening
+    
+    https://forums.whonix.org/t/msgcollector-security-hardening/7625
+
+commit 1ec20f9fe5fa3caac34bef64d7c9ff0c7f4f7b6e
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Jun 27 07:25:51 2019 +0000
+
+    bumped changelog version
+
 commit 4b3288f3e3f0c1af9637039b2cd5a232ede77f1f
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Thu Jun 27 07:21:39 2019 +0000
