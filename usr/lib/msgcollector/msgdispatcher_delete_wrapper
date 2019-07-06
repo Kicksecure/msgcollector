@@ -1,0 +1,21 @@
+#!/bin/bash -r
+
+## Copyright (C) 2019 - 2019 ENCRYPTED SUPPORT LP <adrelanos@riseup.net>
+## See the file COPYING for copying conditions.
+
+set -e
+
+check() {
+   if ! [[ "$1" =~ ^[0-9a-zA-Z_-]+$ ]]; then
+      echo "Invalid character!" >&2
+      exit 1
+   fi
+}
+
+check "${msgdisptacher_username}"
+check "${msgdispatcher_identifier}"
+check "${msgdispatcher_appendix}"
+
+file_name="/var/run/msgcollector/${msgdisptacher_username}/${msgdispatcher_identifier}.${msgdispatcher_appendix}"
+
+rm -f "$file_name"

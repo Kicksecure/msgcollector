@@ -18,14 +18,16 @@ msgdispatcher_pid_check() {
       error "$FUNCNAME neither cli nor x is set to 1."
    fi
 
-   [[ -f "$pid_file" ]] || return 4
+   [[ -f "$pid_file" ]] || return 0
 
-   pid="$(cat "$pid_file")" || return 5
+   return 1
 
+   ## hidepid=2 broke this
+   #pid="$(cat "$pid_file")" || return 5
    ## `kill` does not work if running under a different user account then set
    ## in variable `who_ami`, therefore using `ps`.
    #kill -0 "$pid" >/dev/null 2>&1 || return 6
-   ps -p "$pid" >/dev/null 2>&1 || return 6
+   #ps -p "$pid" >/dev/null 2>&1 || return 6
 }
 
 msgdispatcher_run_check() {

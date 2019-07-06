@@ -26,7 +26,7 @@ error_handler() {
 <br></br>## Please report this bug!
 <br></br>##
 <br></br>## who_ami: $who_ami
-<br></br>## identifier: $identifier
+<br></br>## msgdispatcher_identifier: $msgdispatcher_identifier
 <br></br>## error_text: $error_text
 <br></br>## last exit_code: $exit_code
 <br></br>###############################################################################</p>"
@@ -143,9 +143,7 @@ preparation() {
    ## Sanity test.
    command -v flock >/dev/null 2>/dev/null
 
-   if [ "$who_ami" = "" ]; then
-      who_ami="$(whoami)"
-   fi
+   who_ami="$(whoami)"
 
    if [ "$cli" = "1" ]; then
       pid_file="/var/run/msgcollector/$who_ami/msgdispatcher_pidcli"
@@ -167,11 +165,13 @@ preparation() {
       #rm --force "$inotifywait_success_file"
    #fi
 
-   inotifywait_folder="/var/run/msgcollector/$who_ami"
+   inotifywait_folder="/var/run/msgcollector"
 
    if [ ! -d "/var/run/msgcollector/$who_ami" ]; then
-      mkdir --mode o+rwx --parents "/var/run/msgcollector/$who_ami"
+      mkdir --parents "/var/run/msgcollector/$who_ami"
    fi
+
+   delete_wrapper="/usr/lib/msgcollector/msgdispatcher_delete_wrapper"
 }
 
 write_own_pid() {
@@ -236,7 +236,7 @@ passive_popup_tool() {
    ## Fallback.
    ## notify-send does not work if $title is unset.
    if [ "$title" = "" ]; then
-      title="$identifier"
+      title="$msgdispatcher_identifier"
    fi
 
    ## notify-send timeout in milliseconds.
@@ -265,9 +265,9 @@ dispatch_cli() {
    local msg
    msg="$1"
 
-   if [ -f "/var/run/msgcollector/$who_ami/${identifier}.parenttty" ]; then
+   if [ -f "/var/run/msgcollector/$who_ami/${msgdispatcher_identifier}.parenttty" ]; then
       local parenttty
-      parenttty="$(cat "/var/run/msgcollector/$who_ami/${identifier}.parenttty")"
+      parenttty="$(cat "/var/run/msgcollector/$who_ami/${msgdispatcher_identifier}.parenttty")"
       if [ "$parenttty" = "/dev/tty1" ]; then
          ## When for example whonixcheck was run in tty1, then messages were
          ## already echoed by msgcollector. No need to dispatch them again.
@@ -282,17 +282,21 @@ dispatch_cli() {
 dispatch_x_active() {
    trap "error_handler" ERR
 
-   if [ -f "/var/run/msgcollector/$who_ami/${identifier}.lefttop" ]; then
+   if [ -f "/var/run/msgcollector/$who_ami/${msgdispatcher_identifier}.lefttop" ]; then
       local lefttop
       lefttop="1"
    fi
 
    local icon
-   if [ -f "/var/run/msgcollector/$who_ami/${identifier}.icon" ]; then
-      icon="$(cat "/var/run/msgcollector/$who_ami/${identifier}.icon")"
+   if [ -f "/var/run/msgcollector/$who_ami/${msgdispatcher_identifier}.icon" ]; then
+      icon="$(cat "/var/run/msgcollector/$who_ami/${msgdispatcher_identifier}.icon")"
    else
       ## Fallback.
-      icon="/usr/share/icons/anon-icon-pack/whonix.ico"
+      if [ -f "/usr/share/icons/anon-icon-pack/whonix.ico" ]; then
+         icon="/usr/share/icons/anon-icon-pack/whonix.ico"
+      else
+         icon=""
+      fi
    fi
 
    ## Fallback.
@@ -374,8 +378,10 @@ parse_existing_files() {
    sleep "2" &
    wait "$!"
 
-   for file_name in "$inotifywait_folder/"*; do
-      msgdispatcher_handler
+   for folder_name in "$inotifywait_folder/"*; do
+      for file_name in "$folder_name/"*; do
+         msgdispatcher_handler
+      done
    done
 }
 
@@ -383,114 +389,117 @@ msgdispatcher_handler() {
    trap "error_handler" ERR
 
    true "PROCESSING file_name: $file_name"
-   file_extension="${file_name##*.}"
+   file_extension="${file_name#*_}"
    if [ ! "$file_extension" = "done" ]; then
       return 0
    fi
 
-   ## Remove ".done".
+   arrIN=(${file_name//// })
+   msgdisptacher_username="${arrIN[3]}"
+
+   ## Remove "_done".
    temp_item="${file_name%%.*}"
-   ## Remove "/var/run/msgcollector/$who_ami/".
-   identifier="${temp_item##*/}"
+   ## Remove "/var/run/msgcollector/$msgdisptacher_username/".
+   msgdispatcher_identifier="${temp_item##*/}"
 
    if [ "$x" = "1" ]; then
-      if [ "$file_name" = "/var/run/msgcollector/$who_ami/${identifier}.messagex.done" ]; then
-         if [ -f "/var/run/msgcollector/$who_ami/${identifier}.messagex" ]; then
-            msg="$(cat "/var/run/msgcollector/$who_ami/${identifier}.messagex")"
-            title="$(cat "/var/run/msgcollector/$who_ami/${identifier}.titlex")"
-            type="$(cat "/var/run/msgcollector/$who_ami/${identifier}.typex")"
+      if [ "$file_name" = "/var/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}.messagex_done" ]; then
+         if [ -f "/var/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}.messagex" ]; then
+            msg="$(cat "/var/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}.messagex")"
+            title="$(cat "/var/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}.titlex")"
+            type="$(cat "/var/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}.typex")"
             dispatch_x_active "$type" "$msg"
-            rm --force "/var/run/msgcollector/$who_ami/${identifier}.messagex.done"
-            rm --force "/var/run/msgcollector/$who_ami/${identifier}.titlex"
-            rm --force "/var/run/msgcollector/$who_ami/${identifier}.messagex"
-            rm --force "/var/run/msgcollector/$who_ami/${identifier}.lefttop"
-            rm --force "/var/run/msgcollector/$who_ami/${identifier}.typex"
+            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="messagex_done" "$delete_wrapper"
+            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="titlex" "$delete_wrapper"
+            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="messagex" "$delete_wrapper"
+            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="lefttop" "$delete_wrapper"
+            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="typex" "$delete_wrapper"
          else
             ## Not using rm outside the if, to prevent race conditions.
             ## Not always using rm, without if to prevent forking.
-            rm --force "/var/run/msgcollector/$who_ami/${identifier}.messagex.done"
+            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="messagex_done" "$delete_wrapper"
          fi
          return 0
       fi
-      if [ "$file_name" = "/var/run/msgcollector/$who_ami/${identifier}.passivepopupqueuex.done" ]; then
-         if [ -f "/var/run/msgcollector/$who_ami/${identifier}.passivepopupqueuex" ]; then
-            msg="$(cat "/var/run/msgcollector/$who_ami/${identifier}.passivepopupqueuex")"
-            title="$(cat "/var/run/msgcollector/$who_ami/${identifier}.passivepopupqueuextitle")"
-            ## TODO: do not use ".typex" to avoid conflicts with "messagex.done".
-            #type="$(cat "/var/run/msgcollector/$who_ami/${identifier}.typex")"
+      if [ "$file_name" = "/var/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}.passivepopupqueuex_done" ]; then
+         if [ -f "/var/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}.passivepopupqueuex" ]; then
+            msg="$(cat "/var/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}.passivepopupqueuex")"
+            title="$(cat "/var/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}.passivepopupqueuextitle")"
+            ## TODO: do not use ".typex" to avoid conflicts with "messagex_done".
+            #type="$(cat "/var/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}.typex")"
             type="info"
-            if [ -f "/var/run/msgcollector/$who_ami/${identifier}.forceactive" ]; then
+            if [ -f "/var/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}.forceactive" ]; then
                ## TODO: --forceactive not yet implemented.
                #dispatch_x_active "$type" "$msg"
                dispatch_x_passive "$type" "$title" "$msg"
             else
                dispatch_x_passive "$type" "$title" "$msg"
             fi
-            rm --force "/var/run/msgcollector/$who_ami/${identifier}.forceactive"
-            rm --force "/var/run/msgcollector/$who_ami/${identifier}.passivepopupqueuex.done"
-            rm --force "/var/run/msgcollector/$who_ami/${identifier}.passivepopupqueuex"
-            rm --force "/var/run/msgcollector/$who_ami/${identifier}.passivepopupqueuextitle"
+            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="forceactive" "$delete_wrapper"
+            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="passivepopupqueuex_done" "$delete_wrapper"
+            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="passivepopupqueuex" "$delete_wrapper"
+            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="passivepopupqueuextitle" "$delete_wrapper"
          else
-            rm --force "/var/run/msgcollector/$who_ami/${identifier}.passivepopupqueuex.done"
+            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="passivepopupqueuex_done" "$delete_wrapper"
          fi
          return 0
       fi
 
       last_two="${file_name#*.*.}"
-      if [ "$last_two" = "progressbarx.done" ]; then
+      if [ "$last_two" = "progressbarx_done" ]; then
          first_two="${file_name%.*.*}"
          progressbaridx=${first_two##*.}
-         if [ -f "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbarx" ]; then
-            if [ -f "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbarx.animate" ]; then
-               rm --force "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbarx.animate"
+         if [ -f "/var/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}.${progressbaridx}.progressbarx" ]; then
+            if [ -f "/var/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}.${progressbaridx}.progressbarx.animate" ]; then
+               sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="${progressbaridx}.progressbarx.animate" "$delete_wrapper"
                animate="--animate"
             else
                unset animate
             fi
-            if [ -f "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbartitlex" ]; then
+            if [ -f "/var/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}.${progressbaridx}.progressbartitlex" ]; then
                local progressbartitlex
-               progressbartitlex="$(cat "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbartitlex")"
+               progressbartitlex="$(cat "/var/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}.${progressbaridx}.progressbartitlex")"
             fi
-            if [ -f "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbarx" ]; then
-               progressbarx="$(cat "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbarx")"
+            if [ -f "/var/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}.${progressbaridx}.progressbarx" ]; then
+               progressbarx="$(cat "/var/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}.${progressbaridx}.progressbarx")"
             fi
             if [ "$verbose" = "1" ]; then
-               bash -x /usr/lib/msgcollector/msgprogressbar --identifier "$identifier" --whoami "$who_ami" --progressbaridx "${progressbaridx}" --progressbartitlex "$progressbartitlex" --progressbarx "$progressbarx" --verbose $animate
+               bash -x /usr/lib/msgcollector/msgprogressbar --msgdispatcher_identifier "$msgdispatcher_identifier" --whoami "$msgdisptacher_username" --progressbaridx "${progressbaridx}" --progressbartitlex "$progressbartitlex" --progressbarx "$progressbarx" --verbose $animate
             else
-               /usr/lib/msgcollector/msgprogressbar --identifier "$identifier" --whoami "$who_ami" --progressbaridx "${progressbaridx}" --progressbartitlex "$progressbartitlex" --progressbarx "$progressbarx" $animate &
+               /usr/lib/msgcollector/msgprogressbar --msgdispatcher_identifier "$msgdispatcher_identifier" --whoami "$msgdisptacher_username" --progressbaridx "${progressbaridx}" --progressbartitlex "$progressbartitlex" --progressbarx "$progressbarx" $animate &
             fi
             unset animate
-            rm --force "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbarx.done"
-            rm --force "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbartitlex"
-            rm --force "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbarx"
+            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="${progressbaridx}.progressbarx_done" "$delete_wrapper"
+            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="${progressbaridx}.progressbartitlex" "$delete_wrapper"
+            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="${progressbaridx}.progressbarx" "$delete_wrapper"
          else
-            rm --force "/var/run/msgcollector/$who_ami/${identifier}.${progressbaridx}.progressbarx.done"
+            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="${progressbaridx}.progressbarx_done" "$delete_wrapper"
          fi
          return 0
       fi
 
    elif [ "$cli" = "1" ]; then
-      if [ "$file_name" = "/var/run/msgcollector/$who_ami/${identifier}.waitmessagecli.done" ]; then
-         if [ -f "/var/run/msgcollector/$who_ami/${identifier}.waitmessagecli" ]; then
-            msg="$(cat "/var/run/msgcollector/$who_ami/${identifier}.waitmessagecli")"
-            type="$(cat "/var/run/msgcollector/$who_ami/${identifier}.typecli")"
+      if [ "$file_name" = "/var/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}.waitmessagecli_done" ]; then
+         if [ -f "/var/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}.waitmessagecli" ]; then
+            msg="$(cat "/var/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}.waitmessagecli")"
+            type="$(cat "/var/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}.typecli")"
             dispatch_cli "$msg"
-            rm --force "/var/run/msgcollector/$who_ami/${identifier}.waitmessagecli.done"
-            rm --force "/var/run/msgcollector/$who_ami/${identifier}.waitmessagecli"
+            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="waitmessagecli_done" "$delete_wrapper"
+            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="waitmessagecli" "$delete_wrapper"
          else
-            rm --force "/var/run/msgcollector/$who_ami/${identifier}.waitmessagecli.done"
+            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="waitmessagecli_done" "$delete_wrapper"
          fi
          return 0
       fi
-      if [ "$file_name" = "/var/run/msgcollector/$who_ami/${identifier}.messagecli.done" ]; then
-         if [ -f "/var/run/msgcollector/$who_ami/${identifier}.messagecli" ]; then
-            msg="$(cat "/var/run/msgcollector/$who_ami/${identifier}.messagecli")"
-            type="$(cat "/var/run/msgcollector/$who_ami/${identifier}.typecli")"
+      if [ "$file_name" = "/var/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}.messagecli_done" ]; then
+         if [ -f "/var/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}.messagecli" ]; then
+            msg="$(cat "/var/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}.messagecli")"
+            type="$(cat "/var/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}.typecli")"
             dispatch_cli "$msg"
-            rm --force "/var/run/msgcollector/$who_ami/${identifier}.messagecli.done"
-            rm --force "/var/run/msgcollector/$who_ami/${identifier}.messagecli"
+            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="messagecli_done" "$delete_wrapper"
+            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="messagecli" "$delete_wrapper"
          else
-            rm --force "/var/run/msgcollector/$who_ami/${identifier}.messagecli.done"
+            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="messagecli_done" "$delete_wrapper"
          fi
          return 0
       fi
@@ -504,7 +513,7 @@ inotifywait_loop() {
 
    true "$scriptname $FUNCNAME (pid: $$): Starting loop."
 
-   local identifier temp_item last_two first_two progressbaridx
+   local msgdispatcher_identifier temp_item last_two first_two progressbaridx
 
    while read -r file_name; do
       msgdispatcher_handler

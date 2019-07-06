@@ -1,0 +1,15 @@
+## Copyright (C) 2019 - 2019 ENCRYPTED SUPPORT LP <adrelanos@riseup.net>
+## See the file COPYING for copying conditions.
+
+## Do not use sudo!
+#systemctl --user enable usertest
+#systemctl --user status usertest
+
+[Unit]
+Description=Foo User Unit
+
+[Service]
+ExecStart=/bin/true
+
+[Install]
+WantedBy=default.target
