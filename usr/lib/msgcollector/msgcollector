@@ -62,8 +62,6 @@ parse_cmd_options() {
    ## Thanks to:
    ## http://mywiki.wooledge.org/BashFAQ/035
 
-   who_ami=$(whoami)
-
    while true; do
        case $1 in
            --verbose)
@@ -265,8 +263,7 @@ preparation() {
    #umask 006
 
    if [ "$who_ami" = "" ]; then
-      echo "$0: ERROR: who_ami not set!"
-      exit 1
+      who_ami=$(whoami)
    fi
 
 #    if [ ! -d "/var/run/msgcollector/$who_ami" ]; then
