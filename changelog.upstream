@@ -1,3 +1,39 @@
+commit 612efc90edbd03b63227690979cd67dd562bfcbd
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Jul 6 16:01:13 2019 +0000
+
+    file name / permission fixes
+
+commit b1b9188485c7fb70c5829262cd5fe8dd06b06663
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Jul 6 15:54:14 2019 +0000
+
+    path fixes
+
+commit 6e34de12715076d03eb61ce6e26d571005a34a8b
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Jul 6 15:12:35 2019 +0000
+
+    fix, update file names for msgdispatcher_delete_wrapper compatibility
+
+commit 5175b4a63e3fcb31b920852edbb0bbf250a90ad6
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Jul 6 15:04:34 2019 +0000
+
+    debugging
+
+commit 5b3b2c51e7eda055aace2a9725610c70d7fcc167
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Jul 6 14:34:44 2019 +0000
+
+    disable debugging
+
+commit e9161898a85018fb235fe7619c5e2d81459abf90
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Jul 6 13:52:07 2019 +0000
+
+    bumped changelog version
+
 commit 7cb6c9b12120bf2e407c6798bd8d0cd31d483054
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Sat Jul 6 13:49:11 2019 +0000
