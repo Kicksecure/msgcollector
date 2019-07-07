@@ -21,6 +21,7 @@ file_name="/var/run/msgcollector/${msgdisptacher_username}/${msgdispatcher_ident
 
 if [ -f "$file_name" ]; then
    echo "$0: exists: $file_name"
+   rm -f "$file_name"
 else
    echo "$0: does not exist: $file_name"
 fi
