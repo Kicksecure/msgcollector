@@ -592,8 +592,9 @@ collector() {
       message="$(/usr/lib/msgcollector/striphtml "$message")"
       write_to_file="/var/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_progressbarx"
       append_to_file
+
       ## Cannot run from msgdispatcher due to user mismatch permission issues.
-      /usr/lib/msgcollector/msgprogressbar --identifier "${identifier}" --whoami "$who_ami" --progressbaridx "${progressbaridx}" --progressbartitlex "$progressbartitlex" --message "$message" $animate &
+      /usr/lib/msgcollector/msgprogressbar --identifier "${identifier}" --whoami "$who_ami" --progressbaridx "${progressbaridx}" --progressbartitlex "$progressbartitlex" --message "$message" $animate & disown
    fi
    ## }}
 }
