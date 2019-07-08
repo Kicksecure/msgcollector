@@ -527,7 +527,13 @@ collector() {
 
    ## {{ --passivepopupqueuex
    if [ "$passivepopupqueuex" = "1" ]; then
+      if [ "$message" = "" ]; then
+         message="message was empty."
+      fi
       message="$(/usr/lib/msgcollector/striphtml "$message")"
+      if [ "$message" = "" ]; then
+         message="message was empty after striphtml."
+      fi
       write_to_file="/var/run/msgcollector/$who_ami/${identifier}_passivepopupqueuex"
       append_to_file
    fi
