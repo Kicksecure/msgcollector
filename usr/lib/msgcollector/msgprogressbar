@@ -104,6 +104,8 @@ preparation() {
 
    fifo="/var/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_fifo"
    progress_txt_file="/var/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_progresstxt"
+   parent_pid_file="/var/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_parentpid"
+   zenity_progress_pid_file="/var/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_zenityprogresspid"
 }
 
 cleanup_self() {
@@ -113,8 +115,8 @@ cleanup_self() {
    kill -s sigterm "$zenity_progress_pid" >/dev/null 2>/dev/null || true
    rm --force "$fifo"
    rm --force "$progress_txt_file"
-   rm --force "/var/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_zenityprogresspid"
-   rm --force "/var/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_parentpid"
+   rm --force "$zenity_progress_pid_file"
+   rm --force "$parent_pid_file"
 }
 
 output_ex() {
@@ -126,11 +128,11 @@ output_ex() {
    ## Debugging.
    #echo "progress: $progress | caller: $PPID | $caller | killing $zenity_progress_pid" >> /home/user/progresslog
 
-   if [ -f "/var/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_parentpid" ]; then
+   if [ -f "$parent_pid_file" ]; then
       "/usr/lib/msgcollector/msgprogressbar_kill_helper" "$who_ami" "${identifier}" "${progressbaridx}"
    else
       true "$output_signal_caught caught. Not killing parentpid $parentpid, \
-because /var/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_parentpid does not exist."
+because $parent_pid_file does not exist."
    fi
 
    cleanup_self
@@ -233,7 +235,7 @@ start_progress_bar() {
 
    exec 3>"$fifo"
 
-   echo "$zenity_progress_pid" > "/var/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_zenityprogresspid"
+   echo "$zenity_progress_pid" > "$zenity_progress_pid_file"
 
    if [ "$lefttop" = "1" ]; then
       ## set progressbar variable to 1, so the progress bar window will not be
