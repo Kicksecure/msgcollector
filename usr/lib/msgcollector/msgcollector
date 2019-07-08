@@ -564,21 +564,6 @@ collector() {
    fi
    ## }}
 
-   ## {{ --progressbarx
-   if [ "$progressbarx" = "1" ]; then
-      if [ "${progressbaridx}" = "" ]; then
-         error "Variable progressbaridx is empty."
-         exit 4
-      fi
-      echo "$parentpid" > "/var/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_parentpid"
-      message="$(/usr/lib/msgcollector/striphtml "$message")"
-      write_to_file="/var/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_progressbarx"
-      append_to_file
-      ## Cannot run from msgdispatcher due to user mismatch permission issues.
-      /usr/lib/msgcollector/msgprogressbar --identifier "${identifier}" --whoami "$who_ami" --progressbaridx "${progressbaridx}" --progressbartitlex "$progressbartitlex" --progressbarx "$progressbarx" $animate &
-   fi
-   ## }}
-
    ## {{ --forceactive
    if [ "$forceactive" = "1" ]; then
       touch "/var/run/msgcollector/$who_ami/${identifier}_forceactive"
@@ -594,6 +579,21 @@ collector() {
    ## {{ --parenttty
    if [ ! -z "$parenttty" ]; then
       echo "$parenttty" > "/var/run/msgcollector/$who_ami/${identifier}_parenttty"
+   fi
+   ## }}
+
+   ## {{ --progressbarx
+   if [ "$progressbarx" = "1" ]; then
+      if [ "${progressbaridx}" = "" ]; then
+         error "Variable progressbaridx is empty."
+         exit 4
+      fi
+      echo "$parentpid" > "/var/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_parentpid"
+      message="$(/usr/lib/msgcollector/striphtml "$message")"
+      write_to_file="/var/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_progressbarx"
+      append_to_file
+      ## Cannot run from msgdispatcher due to user mismatch permission issues.
+      /usr/lib/msgcollector/msgprogressbar --identifier "${identifier}" --whoami "$who_ami" --progressbaridx "${progressbaridx}" --progressbartitlex "$progressbartitlex" --message "$message" $animate &
    fi
    ## }}
 }
