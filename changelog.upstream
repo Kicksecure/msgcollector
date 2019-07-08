@@ -1,3 +1,21 @@
+commit 09cf1c62775ec4910bd299aa9549e482c12d1b4d
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jul 8 00:22:14 2019 +0000
+
+    better debugging if --passivepopupqueuex is being used and --message is empty
+
+commit bb0e2b32f1eb3632cf220538934e4632e8d8bb2d
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Jul 7 23:16:09 2019 +0000
+
+    actually delete
+
+commit 156995e38eaa12623990a2bbff73657f470ad9ff
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Jul 7 08:37:43 2019 +0000
+
+    bumped changelog version
+
 commit 612efc90edbd03b63227690979cd67dd562bfcbd
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Sat Jul 6 16:01:13 2019 +0000
