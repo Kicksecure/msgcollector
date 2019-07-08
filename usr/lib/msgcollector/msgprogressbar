@@ -212,6 +212,9 @@ start_progress_bar() {
 
    mkfifo "$fifo"
 
+   ## sanity test
+   test -p "$fifo"
+
    ## Do not use < > inside zenity progress messages, zenity will mess that up.
    ## zenity --auto-kill will result in zenity sending a sighup signal upon
    ## pressing of cancel button.

@@ -467,8 +467,15 @@ msgdispatcher_handler() {
             if [ -f "/var/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_${progressbaridx}_progressbarx" ]; then
                progressbarx="$(cat "/var/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_${progressbaridx}_progressbarx")"
             fi
+            ## TODO: parentpid
             if [ "$verbose" = "1" ]; then
-               bash -x /usr/lib/msgcollector/msgprogressbar --identifier "$msgdispatcher_identifier" --whoami "$msgdisptacher_username" --progressbaridx "${progressbaridx}" --progressbartitlex "$progressbartitlex" --progressbarx "$progressbarx" --verbose $animate
+               echo "running: /usr/lib/msgcollector/msgprogressbar --identifier $msgdispatcher_identifier --whoami $msgdisptacher_username --progressbaridx ${progressbaridx} --progressbartitlex $progressbartitlex --progressbarx $progressbarx --verbose $animate"
+               if [ "$vverbose" = "1" ]; then
+                  extra_bash="bash -x"
+               else
+                  extra_bash=""
+               fi
+               $extra_bash /usr/lib/msgcollector/msgprogressbar --identifier "$msgdispatcher_identifier" --whoami "$msgdisptacher_username" --progressbaridx "${progressbaridx}" --progressbartitlex "$progressbartitlex" --progressbarx "$progressbarx" --verbose $animate
             else
                /usr/lib/msgcollector/msgprogressbar --identifier "$msgdispatcher_identifier" --whoami "$msgdisptacher_username" --progressbaridx "${progressbaridx}" --progressbartitlex "$progressbartitlex" --progressbarx "$progressbarx" $animate &
             fi
