@@ -184,6 +184,12 @@ start_progress_bar() {
       display=":0"
    fi
 
+   if [ -f "$parent_pid_file" ]; then
+      true "parent_pid_file $parent_pid_file exists."
+   else
+      true "parent_pid_file $parent_pid_file does not exist."
+   fi
+
    if [ -f "$progress_txt_file" ]; then
       ## Sometimes there is a race condition preventing the progressbar
       ## being closed. Let's use this alternative approach.

@@ -130,10 +130,10 @@ progress_bar() {
             true "ps_p_exit_code was not 0, was $ps_p_exit_code"
          fi
       else
-         true "does not exist: /var/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_zenityprogresspid"
+         true "zenityprogresspid does not exist: /var/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_zenityprogresspid"
       fi
    else
-      true "does not exist: /var/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_fifo"
+      true "fifo does not exist: /var/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_fifo"
    fi
    ## XXX
    #progress_bar
