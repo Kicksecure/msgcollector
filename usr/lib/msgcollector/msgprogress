@@ -140,9 +140,7 @@ progress_bar() {
    return 0
 }
 
-if [ "$who_ami" = "" ]; then
-   who_ami=$(whoami)
-fi
+who_ami=$(whoami)
 
 parse_cmd_options "$@"
 

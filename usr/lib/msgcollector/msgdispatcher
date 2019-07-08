@@ -445,49 +445,38 @@ msgdispatcher_handler() {
          return 0
       fi
 
-      last_two="${file_name#*_*_}"
-      if [ "$last_two" = "progressbarx_done" ]; then
-         first_two="${file_name%_*_*}"
-         ## first_two example:
-         ## /var/run/msgcollector/whonixcheck/whonixcheck_2b3916d6-3b3f-4490-bc85-b97da494a55d
-         progressbaridx=${first_two#*_}
-         ## progressbaridx example:
-         ## 2b3916d6-3b3f-4490-bc85-b97da494a55d
-         if [ -f "/var/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_${progressbaridx}_progressbarx" ]; then
-            if [ -f "/var/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_${progressbaridx}_progressbarx_animate" ]; then
-               sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="${progressbaridx}_progressbarx_animate" "$delete_wrapper"
-               animate="--animate"
-            else
-               unset animate
-            fi
-            if [ -f "/var/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_${progressbaridx}_progressbartitlex" ]; then
-               local progressbartitlex
-               progressbartitlex="$(cat "/var/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_${progressbaridx}_progressbartitlex")"
-            fi
-            if [ -f "/var/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_${progressbaridx}_progressbarx" ]; then
-               progressbarx="$(cat "/var/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_${progressbaridx}_progressbarx")"
-            fi
-            ## TODO: parentpid
-            if [ "$verbose" = "1" ]; then
-               echo "running: /usr/lib/msgcollector/msgprogressbar --identifier $msgdispatcher_identifier --whoami $msgdisptacher_username --progressbaridx ${progressbaridx} --progressbartitlex $progressbartitlex --progressbarx $progressbarx --verbose $animate"
-               if [ "$vverbose" = "1" ]; then
-                  extra_bash="bash -x"
-               else
-                  extra_bash=""
-               fi
-               $extra_bash /usr/lib/msgcollector/msgprogressbar --identifier "$msgdispatcher_identifier" --whoami "$msgdisptacher_username" --progressbaridx "${progressbaridx}" --progressbartitlex "$progressbartitlex" --progressbarx "$progressbarx" --verbose $animate
-            else
-               /usr/lib/msgcollector/msgprogressbar --identifier "$msgdispatcher_identifier" --whoami "$msgdisptacher_username" --progressbaridx "${progressbaridx}" --progressbartitlex "$progressbartitlex" --progressbarx "$progressbarx" $animate &
-            fi
-            unset animate
-            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="${progressbaridx}_progressbarx_done" "$delete_wrapper"
-            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="${progressbaridx}_progressbartitlex" "$delete_wrapper"
-            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="${progressbaridx}_progressbarx" "$delete_wrapper"
-         else
-            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="${progressbaridx}_progressbarx_done" "$delete_wrapper"
-         fi
-         return 0
-      fi
+#       last_two="${file_name#*_*_}"
+#       if [ "$last_two" = "progressbarx_done" ]; then
+#          first_two="${file_name%_*_*}"
+#          ## first_two example:
+#          ## /var/run/msgcollector/whonixcheck/whonixcheck_2b3916d6-3b3f-4490-bc85-b97da494a55d
+#          progressbaridx=${first_two#*_}
+#          ## progressbaridx example:
+#          ## 2b3916d6-3b3f-4490-bc85-b97da494a55d
+#          if [ -f "/var/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_${progressbaridx}_progressbarx" ]; then
+#             if [ -f "/var/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_${progressbaridx}_progressbarx_animate" ]; then
+#                sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="${progressbaridx}_progressbarx_animate" "$delete_wrapper"
+#                animate="--animate"
+#             else
+#                unset animate
+#             fi
+#             if [ -f "/var/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_${progressbaridx}_progressbartitlex" ]; then
+#                local progressbartitlex
+#                progressbartitlex="$(cat "/var/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_${progressbaridx}_progressbartitlex")"
+#             fi
+#             if [ -f "/var/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_${progressbaridx}_progressbarx" ]; then
+#                progressbarx="$(cat "/var/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_${progressbaridx}_progressbarx")"
+#             fi
+#
+#             unset animate
+#             sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="${progressbaridx}_progressbarx_done" "$delete_wrapper"
+#             sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="${progressbaridx}_progressbartitlex" "$delete_wrapper"
+#             sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="${progressbaridx}_progressbarx" "$delete_wrapper"
+#          else
+#             sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="${progressbaridx}_progressbarx_done" "$delete_wrapper"
+#          fi
+#          return 0
+#       fi
 
    elif [ "$cli" = "1" ]; then
       if [ "$file_name" = "/var/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_waitmessagecli_done" ]; then
