@@ -1,3 +1,19 @@
+commit 3397300e8b39f842937bdf4c1ab4d6821ec8dbdf
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jul 8 23:04:23 2019 +0000
+
+    add sudoers exception
+    
+    allow running /usr/lib/msgcollector/msgdispatcher_delete_wrapper
+    
+    without root
+
+commit d99b842161deec2c8e92cf3ef44a24ce0c0fecb9
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jul 8 17:55:59 2019 +0000
+
+    bumped changelog version
+
 commit 9a1fd2fb60ab612eb7068f6296cd437d5511e9fe
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Mon Jul 8 17:55:45 2019 +0000
