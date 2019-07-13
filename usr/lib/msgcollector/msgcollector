@@ -16,7 +16,9 @@ error_handler() {
    local ps_p_parentpid
 
    if [ ! "$parentpid" = "" ]; then
-      ps_p_parentpid="$(ps -p "$parentpid")" || true
+      if [ ! "$parentpid" = "0000000000" ]; then
+         ps_p_parentpid="$(ps -p "$parentpid")" || true
+      fi
    fi
 
    local msg="\
