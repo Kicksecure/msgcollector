@@ -1,3 +1,33 @@
+commit 7bcb550b9ccb720904b4e82aba6b5946df9ad8e2
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Jul 13 20:01:16 2019 +0000
+
+    improve error handler
+
+commit f6407f994a57dcd5d4d442f21bf743cfcf4ca291
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Jul 13 19:59:22 2019 +0000
+
+    improve error handler
+
+commit 1f47d6b9a7243e79b7d00e780a9e34e86a8c3ba5
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Jul 13 19:56:10 2019 +0000
+
+    refactoring
+
+commit bec4f13b9ad9fe2777b2f950f7da5783189c7d12
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Jul 13 19:55:37 2019 +0000
+
+    improve error handler
+
+commit 5280ddb65a97eb0fcce9ab60359504a002702265
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Jul 11 07:15:32 2019 +0000
+
+    bumped changelog version
+
 commit 3397300e8b39f842937bdf4c1ab4d6821ec8dbdf
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Mon Jul 8 23:04:23 2019 +0000
