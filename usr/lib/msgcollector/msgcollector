@@ -31,6 +31,7 @@ error_handler() {
 ##
 ## scriptname: $scriptname
 ## my_command_line_parameters: $my_command_line_parameters
+## write_to_file: $write_to_file
 ## parentpid: $parentpid
 ## ps_p_parentpid: $ps_p_parentpid
 ## my_pstree: $my_pstree
@@ -44,7 +45,7 @@ error_handler() {
    home_var=~/
 
    if ! test -w ~/ ; then
-      echo "$scriptname: not writeable home_var: $home_var" >&2
+      echo "$scriptname: skipping log to ~/.msgcollector/msgdispatcher-error.log since not writeable home_var: $home_var" >&2
       exit 1
    fi
 
