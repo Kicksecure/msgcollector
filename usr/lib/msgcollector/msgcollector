@@ -40,6 +40,14 @@ error_handler() {
 "
    echo "$msg" >&2
 
+   local home_var
+   home_var=~/
+
+   if ! test -w ~/ ; then
+      echo "$scriptname: not writeable home_var: $home_var" >&2
+      exit 1
+   fi
+
    if [ ! -d ~/".msgcollector" ]; then
       mkdir --parents ~/".msgcollector"
    fi
