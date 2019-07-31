@@ -102,14 +102,14 @@ preparation() {
       who_ami="$(whoami)"
    fi
 
-#    if [ ! -d "/var/run/msgcollector/$who_ami" ]; then
-#       mkdir --mode o+rwx --parents "/var/run/msgcollector/$who_ami"
+#    if [ ! -d "/run/msgcollector/$who_ami" ]; then
+#       mkdir --mode o+rwx --parents "/run/msgcollector/$who_ami"
 #    fi
 
-   fifo="/var/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_fifo"
-   progress_txt_file="/var/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_progresstxt"
-   parent_pid_file="/var/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_parentpid"
-   zenity_progress_pid_file="/var/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_zenityprogresspid"
+   fifo="/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_fifo"
+   progress_txt_file="/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_progresstxt"
+   parent_pid_file="/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_parentpid"
+   zenity_progress_pid_file="/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_zenityprogresspid"
 }
 
 cleanup_self() {
@@ -170,9 +170,9 @@ start_progress_bar() {
       progressbartitlex="Variable progressbartitlex does not exist. Please report this bug!"
    fi
 
-   if [ -f "/var/run/msgcollector/$who_ami/${identifier}_icon" ]; then
+   if [ -f "/run/msgcollector/$who_ami/${identifier}_icon" ]; then
       local icon
-      icon="$(cat "/var/run/msgcollector/$who_ami/${identifier}_icon")"
+      icon="$(cat "/run/msgcollector/$who_ami/${identifier}_icon")"
    fi
 
    if [ "$icon" = "" ]; then
@@ -180,7 +180,7 @@ start_progress_bar() {
       local icon="/usr/share/icons/anon-icon-pack/whonix.ico"
    fi
 
-   if [ -f "/var/run/msgcollector/$who_ami/${identifier}_lefttop" ]; then
+   if [ -f "/run/msgcollector/$who_ami/${identifier}_lefttop" ]; then
       local lefttop="1"
    fi
 

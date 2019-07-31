@@ -13,7 +13,7 @@ loop_protection() {
 }
 
 ## {{ In case /etc/init.d/msgcollector has not started yet, i.e. has not
-##    created "/var/run/msgcollector" yet, wait a bit.
+##    created "/run/msgcollector" yet, wait a bit.
 maybe_wait() {
    trap "error_handler" ERR
 
@@ -24,8 +24,8 @@ maybe_wait() {
 
    loop_protection
 
-   if [ ! -d "/var/run/msgcollector" ]; then
-      true "Waiting for /var/run/msgcollector..."
+   if [ ! -d "/run/msgcollector" ]; then
+      true "Waiting for /run/msgcollector..."
       sleep 2 &
       wait "$!"
       maybe_wait

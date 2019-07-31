@@ -17,7 +17,7 @@ check "${msgdisptacher_username}"
 check "${msgdispatcher_identifier}"
 check "${msgdispatcher_appendix}"
 
-file_name="/var/run/msgcollector/${msgdisptacher_username}/${msgdispatcher_identifier}_${msgdispatcher_appendix}"
+file_name="/run/msgcollector/${msgdisptacher_username}/${msgdispatcher_identifier}_${msgdispatcher_appendix}"
 
 if [ -f "$file_name" ]; then
    true "$0: exists: $file_name"

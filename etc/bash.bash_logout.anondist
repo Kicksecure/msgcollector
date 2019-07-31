@@ -11,8 +11,8 @@ if [ ! "$(tty)" = "/dev/tty1" ]; then
    true
 else
    who_ami="$(whoami)"
-   if [ -f "/var/run/msgcollector/$who_ami/msgdispatcher_pidcli" ]; then
-      pid="$(cat "/var/run/msgcollector/$who_ami/msgdispatcher_pidcli")"
+   if [ -f "/run/msgcollector/$who_ami/msgdispatcher_pidcli" ]; then
+      pid="$(cat "/run/msgcollector/$who_ami/msgdispatcher_pidcli")"
       if [ ! "$pid" = "" ]; then
          kill -s sigterm "$pid"
       fi

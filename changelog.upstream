@@ -1301,7 +1301,7 @@ commit 9268ba3cecb4e0c131f2e302082a6ae8133728b4
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Sun Nov 2 06:13:34 2014 +0000
 
-    refactoring, fewer leftover files in /var/run/msgcollector
+    refactoring, fewer leftover files in /run/msgcollector
 
 commit ec7d51b6b7e649da4a0b9f810e557c2b0b5b4de8
 Author: Patrick Schleizer <adrelanos@riseup.net>
@@ -1422,7 +1422,7 @@ commit 0939d584da1d663e75fd3a2f37f686067230ab3f
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Fri Oct 17 01:20:18 2014 +0000
 
-    make sure /var/run/msgcollector is mounted in RAM by mounting it as 10 MB big tmpfs
+    make sure /run/msgcollector is mounted in RAM by mounting it as 10 MB big tmpfs
 
 commit 2a6fda11cc60ad22a18f8b47760ccd67b8deead5
 Author: Patrick Schleizer <adrelanos@riseup.net>
@@ -1452,7 +1452,7 @@ commit a5cd0849b0b6cab1ceec18ab0af4b58d0ddde2c9
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Thu Sep 18 16:11:37 2014 +0000
 
-    msgcollector: clean up obsolete /var/run/msgcollector/user/*.progresstxt files; refactoring; comments
+    msgcollector: clean up obsolete /run/msgcollector/user/*.progresstxt files; refactoring; comments
 
 commit 57b9cf565e7d6faf28b883f9a135d14301342700
 Author: Patrick Schleizer <adrelanos@riseup.net>
@@ -2153,7 +2153,7 @@ Date:   Wed May 21 12:25:53 2014 +0000
     Added the python script 'msgdispatcher_dispatch_X'
     to replace the zenity popup at the completion of
     timesync and whonixcheck.
-    Will have to rename '/var/run/msgcollector/${identifier}.lefttop'
+    Will have to rename '/run/msgcollector/${identifier}.lefttop'
     as the the window move to bootomright in case whonixcheck and
     timesync popups might overlap.
 

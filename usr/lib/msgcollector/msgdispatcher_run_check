@@ -11,9 +11,9 @@ msgdispatcher_pid_check() {
    fi
 
    if [ "cli" = "$1" ]; then
-      pid_file="/var/run/msgcollector/$who_ami/msgdispatcher_pidcli"
+      pid_file="/run/msgcollector/$who_ami/msgdispatcher_pidcli"
    elif [ "x" = "$1" ]; then
-      pid_file="/var/run/msgcollector/$who_ami/msgdispatcher_pidx"
+      pid_file="/run/msgcollector/$who_ami/msgdispatcher_pidx"
    else
       error "$FUNCNAME neither cli nor x is set to 1."
    fi

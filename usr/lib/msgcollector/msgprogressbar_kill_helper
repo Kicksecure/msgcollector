@@ -9,8 +9,8 @@ who_ami="$1"
 identifier="$2"
 progressbaridx="$3"
 
-if [ -f "/var/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_parentpid" ]; then
-   parentpid="$(cat "/var/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_parentpid")"
+if [ -f "/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_parentpid" ]; then
+   parentpid="$(cat "/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_parentpid")"
 
    ## Check if still running.
    ps__p_exit_code="0"

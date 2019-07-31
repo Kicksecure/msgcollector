@@ -271,17 +271,17 @@ preparation() {
    trap "error_handler" ERR
 
    ## TODO: msgdispatcher cannot read the file.
-   ## cat: /var/run/msgcollector/whonixcheck/whonixcheck.messagex: Permission denied
+   ## cat: /run/msgcollector/whonixcheck/whonixcheck.messagex: Permission denied
    ## user running msgdispatcher (user "user") would need to be member of a group
-   ## which may read access all of folder /var/run/msgcollector.
+   ## which may read access all of folder /run/msgcollector.
    #umask 006
 
    if [ "$who_ami" = "" ]; then
       who_ami=$(whoami)
    fi
 
-#    if [ ! -d "/var/run/msgcollector/$who_ami" ]; then
-#       mkdir --mode o+rwx --parents "/var/run/msgcollector/$who_ami"
+#    if [ ! -d "/run/msgcollector/$who_ami" ]; then
+#       mkdir --mode o+rwx --parents "/run/msgcollector/$who_ami"
 #    fi
 }
 
@@ -392,8 +392,8 @@ write_typecli_to_file() {
 collector() {
    trap "error_handler" ERR
 
-   if [ ! -d "/var/run/msgcollector/$who_ami" ]; then
-      mkdir -p "/var/run/msgcollector/$who_ami"
+   if [ ! -d "/run/msgcollector/$who_ami" ]; then
+      mkdir -p "/run/msgcollector/$who_ami"
    fi
 
    ## {{ --identifier
@@ -405,7 +405,7 @@ collector() {
 
    ## {{ --icon
    if [ ! "$icon" = "" ]; then
-      echo "$icon" > "/var/run/msgcollector/$who_ami/${identifier}_icon"
+      echo "$icon" > "/run/msgcollector/$who_ami/${identifier}_icon"
    fi
    ## }}
 
@@ -418,7 +418,7 @@ collector() {
       parentpid="0000000000"
    fi
    ## Not at this point to avoid useless files.
-   #echo "$parentpid" > "/var/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_parentpid"
+   #echo "$parentpid" > "/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_parentpid"
    ## }}
 
    ## {{ --titlecli
@@ -426,94 +426,94 @@ collector() {
       ## variable $titlecli exists
       ## TODO
       true "TODO: --titlecli not yet implemented in msgdispatcher"
-      #echo "$titlecli" > "/var/run/msgcollector/$who_ami/${identifier}_titlecli"
+      #echo "$titlecli" > "/run/msgcollector/$who_ami/${identifier}_titlecli"
    fi
    ## }}
 
    ## {{ --titlex
    if [ ! -z "$titlex" ]; then
       ## variable $titlex exists
-      echo "$titlex" > "/var/run/msgcollector/$who_ami/${identifier}_titlex"
+      echo "$titlex" > "/run/msgcollector/$who_ami/${identifier}_titlex"
    fi
    ## }}
 
    ## {{ --passivepopupqueuextitle
    if [ ! -z "$passivepopupqueuextitle" ]; then
       ## variable $passivepopupqueuextitle exists
-      echo "$passivepopupqueuextitle" > "/var/run/msgcollector/$who_ami/${identifier}_passivepopupqueuextitle"
+      echo "$passivepopupqueuextitle" > "/run/msgcollector/$who_ami/${identifier}_passivepopupqueuextitle"
    fi
    ## }}
 
    ## {{ --progressbartitlex
    if [ ! -z "$progressbartitlex" ]; then
       ## variable $progressbartitlex exists
-      echo "$progressbartitlex" > "/var/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_progressbartitlex"
+      echo "$progressbartitlex" > "/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_progressbartitlex"
    fi
    ## }}
 
    ## {{ --typecli
-   if [ -f "/var/run/msgcollector/$who_ami/${identifier}_typecli" ]; then
-      old_typecli="$(cat "/var/run/msgcollector/$who_ami/${identifier}_typecli")"
+   if [ -f "/run/msgcollector/$who_ami/${identifier}_typecli" ]; then
+      old_typecli="$(cat "/run/msgcollector/$who_ami/${identifier}_typecli")"
    fi
 
    if [ "$old_typecli" = "info" ]; then
       if [ "$typecli" = "error" ]; then
          ## Upgrade from info to error.
-         write_typecli_to_file "error" "/var/run/msgcollector/$who_ami/${identifier}_typecli"
+         write_typecli_to_file "error" "/run/msgcollector/$who_ami/${identifier}_typecli"
       elif [ "$typecli" = "warning" ]; then
          ## Upgrade from info to warning.
-         write_typecli_to_file "warning" "/var/run/msgcollector/$who_ami/${identifier}_typecli"
+         write_typecli_to_file "warning" "/run/msgcollector/$who_ami/${identifier}_typecli"
       fi
    elif [ "$old_typecli" = "warning" ]; then
       if [ "$typecli" = "error" ]; then
          ## Upgrade from warning to error.
-         write_typecli_to_file "error" "/var/run/msgcollector/$who_ami/${identifier}_typecli"
+         write_typecli_to_file "error" "/run/msgcollector/$who_ami/${identifier}_typecli"
       fi
    elif [ "$old_typecli" = "error" ]; then
       true
    else
       if [ ! "$typecli" = "" ]; then
-         write_typecli_to_file "$typecli" "/var/run/msgcollector/$who_ami/${identifier}_typecli"
+         write_typecli_to_file "$typecli" "/run/msgcollector/$who_ami/${identifier}_typecli"
       fi
    fi
    ## }}
 
    ## {{ --typex
-   if [ -f "/var/run/msgcollector/$who_ami/${identifier}_typex" ]; then
-      old_typex="$(cat "/var/run/msgcollector/$who_ami/${identifier}_typex")"
+   if [ -f "/run/msgcollector/$who_ami/${identifier}_typex" ]; then
+      old_typex="$(cat "/run/msgcollector/$who_ami/${identifier}_typex")"
    fi
 
    if [ "$old_typex" = "info" ]; then
       if [ "$typex" = "error" ]; then
          ## Upgrade from info to error.
-         echo "error" > "/var/run/msgcollector/$who_ami/${identifier}_typex"
+         echo "error" > "/run/msgcollector/$who_ami/${identifier}_typex"
       elif [ "$typex" = "warning" ]; then
          ## Upgrade from info to warning.
-         echo "warning" > "/var/run/msgcollector/$who_ami/${identifier}_typex"
+         echo "warning" > "/run/msgcollector/$who_ami/${identifier}_typex"
       fi
    elif [ "$old_typex" = "warning" ]; then
       if [ "$typex" = "error" ]; then
          ## Upgrade from warning to error.
-         echo "error" > "/var/run/msgcollector/$who_ami/${identifier}_typex"
+         echo "error" > "/run/msgcollector/$who_ami/${identifier}_typex"
       fi
    elif [ "$old_typex" = "error" ]; then
       true
    else
-      echo "$typex" > "/var/run/msgcollector/$who_ami/${identifier}_typex"
+      echo "$typex" > "/run/msgcollector/$who_ami/${identifier}_typex"
    fi
    ## }}
 
    ## {{ --messagex
    if [ "$messagex" = "1" ]; then
       pretty_type_x "$typex"
-      write_to_file="/var/run/msgcollector/$who_ami/${identifier}_messagex"
+      write_to_file="/run/msgcollector/$who_ami/${identifier}_messagex"
       append_to_file
    fi
    ## }}
 
    ## {{ --messagecli
    if [ "$messagecli" = "1" ]; then
-      write_to_file="/var/run/msgcollector/$who_ami/${identifier}_messagecli"
+      write_to_file="/run/msgcollector/$who_ami/${identifier}_messagecli"
       if [ ! -z "$message" ]; then
          ## variable $message exists
          message="$(/usr/lib/msgcollector/striphtml "$message")"
@@ -527,7 +527,7 @@ collector() {
 
    ## {{ --waitmessagecli
    if [ "$waitmessagecli" = "1" ]; then
-      write_to_file="/var/run/msgcollector/$who_ami/${identifier}_waitmessagecli"
+      write_to_file="/run/msgcollector/$who_ami/${identifier}_waitmessagecli"
       if [ ! -z "$message" ]; then
          ## variable $message exists
          message="$(/usr/lib/msgcollector/striphtml "$message")"
@@ -548,14 +548,14 @@ collector() {
       if [ "$message" = "" ]; then
          message="message was empty after striphtml."
       fi
-      write_to_file="/var/run/msgcollector/$who_ami/${identifier}_passivepopupqueuex"
+      write_to_file="/run/msgcollector/$who_ami/${identifier}_passivepopupqueuex"
       append_to_file
    fi
    ## }}
 
    ## {{ --animate
    if [ "$animate" = "1" ]; then
-      touch "/var/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_progressbarx_animate"
+      touch "/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_progressbarx_animate"
    fi
 
    ## {{ --progressx
@@ -580,19 +580,19 @@ collector() {
 
    ## {{ --forceactive
    if [ "$forceactive" = "1" ]; then
-      touch "/var/run/msgcollector/$who_ami/${identifier}_forceactive"
+      touch "/run/msgcollector/$who_ami/${identifier}_forceactive"
    fi
    ## }}
 
    ## {{ --lefttop
    if [ "$lefttop" = "1" ]; then
-      touch "/var/run/msgcollector/$who_ami/${identifier}_lefttop"
+      touch "/run/msgcollector/$who_ami/${identifier}_lefttop"
    fi
    ## }}
 
    ## {{ --parenttty
    if [ ! -z "$parenttty" ]; then
-      echo "$parenttty" > "/var/run/msgcollector/$who_ami/${identifier}_parenttty"
+      echo "$parenttty" > "/run/msgcollector/$who_ami/${identifier}_parenttty"
    fi
    ## }}
 
@@ -602,9 +602,9 @@ collector() {
          error "Variable progressbaridx is empty."
          exit 4
       fi
-      echo "$parentpid" > "/var/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_parentpid"
+      echo "$parentpid" > "/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_parentpid"
       message="$(/usr/lib/msgcollector/striphtml "$message")"
-      write_to_file="/var/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_progressbarx"
+      write_to_file="/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_progressbarx"
       append_to_file
 
       ## Cannot run from msgdispatcher due to user mismatch permission issues.
@@ -656,28 +656,28 @@ return_status() {
 
    ## {{ --messagex
    if [ "$messagex" = "1" ]; then
-      write_to_file="/var/run/msgcollector/$who_ami/${identifier}_messagex"
+      write_to_file="/run/msgcollector/$who_ami/${identifier}_messagex"
       return_status_file
    fi
    ## }}
 
    ## {{ --messagecli
    if [ "$messagecli" = "1" ]; then
-      write_to_file="/var/run/msgcollector/$who_ami/${identifier}_messagecli"
+      write_to_file="/run/msgcollector/$who_ami/${identifier}_messagecli"
       return_status_file
    fi
    ## }}
 
    ## {{ --waitmessagecli
    if [ "$waitmessagecli" = "1" ]; then
-      write_to_file="/var/run/msgcollector/$who_ami/${identifier}_waitmessagecli"
+      write_to_file="/run/msgcollector/$who_ami/${identifier}_waitmessagecli"
       return_status_file
    fi
    ## }}
 
    ## {{ --passivepopupqueuex
    if [ "$passivepopupqueuex" = "1" ]; then
-      write_to_file="/var/run/msgcollector/$who_ami/${identifier}_passivepopupqueuex"
+      write_to_file="/run/msgcollector/$who_ami/${identifier}_passivepopupqueuex"
       return_status_file
    fi
    ## }}
@@ -688,17 +688,17 @@ return_status() {
          error "Variable progressbaridx is empty."
          exit 4
       fi
-      write_to_file="/var/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_progressbarx"
+      write_to_file="/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_progressbarx"
       return_status_file
    fi
    ## }}
 
    ## {{ --progressbarxrunning
    if [ "$progressbarxrunning" = "1" ]; then
-      if [ -f "/var/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_zenityprogresspid" ]; then
+      if [ -f "/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_zenityprogresspid" ]; then
          local pid
          ## || true to prevent race condition
-         zenity_progress_pid="$(cat "/var/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_zenityprogresspid")" || true
+         zenity_progress_pid="$(cat "/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_zenityprogresspid")" || true
          ## Check if still running.
          local ps__p_exit_code
          ps__p_exit_code="0"
@@ -716,7 +716,7 @@ return_status() {
 
    ## {{ --progressbarxprogresstxtexisting
    if [ "$progressbarxprogresstxtexisting" = "1" ]; then
-      if [ -f "/var/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_progresstxt" ]; then
+      if [ -f "/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_progresstxt" ]; then
          exit 0
       else
          exit 1
@@ -726,7 +726,7 @@ return_status() {
 
    ## {{ --typexstatus
    if [ "$typex_chosen" = "1" ]; then
-      write_to_file="/var/run/msgcollector/$who_ami/${identifier}_typex"
+      write_to_file="/run/msgcollector/$who_ami/${identifier}_typex"
       if [ -f "$write_to_file" ]; then
          local TYPE
          TYPE="$(cat "$write_to_file")"
@@ -738,7 +738,7 @@ return_status() {
 
    ## {{ --typeclistatus
    if [ "$typecli_chosen" = "1" ]; then
-      write_to_file="/var/run/msgcollector/$who_ami/${identifier}_typecli"
+      write_to_file="/run/msgcollector/$who_ami/${identifier}_typecli"
       if [ -f "$write_to_file" ]; then
          local TYPE
          TYPE="$(cat "$write_to_file")"
@@ -772,33 +772,33 @@ forget() {
    #/usr/lib/msgcollector/msgprogress --identifier "$identifier" --whoami "$who_ami" --progress "100" & disown
 
    local file_list=(
-      "/var/run/msgcollector/$who_ami/${identifier}_icon"
-      "/var/run/msgcollector/$who_ami/${identifier}_titlecli"
-      "/var/run/msgcollector/$who_ami/${identifier}_titlex"
-      "/var/run/msgcollector/$who_ami/${identifier}_passivepopupqueuextitle"
-      "/var/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_progressbartitlex"
-      "/var/run/msgcollector/$who_ami/${identifier}_typecli"
-      "/var/run/msgcollector/$who_ami/${identifier}_typex"
-      "/var/run/msgcollector/$who_ami/${identifier}_progressbarx_done"
-      "/var/run/msgcollector/$who_ami/${identifier}_progressbarx"
-      "/var/run/msgcollector/$who_ami/${identifier}_passivepopupqueuex_done"
-      "/var/run/msgcollector/$who_ami/${identifier}_passivepopupqueuex"
-      "/var/run/msgcollector/$who_ami/${identifier}_messagex_done"
-      "/var/run/msgcollector/$who_ami/${identifier}_messagex"
-      "/var/run/msgcollector/$who_ami/${identifier}_waitmessagecli_done"
-      "/var/run/msgcollector/$who_ami/${identifier}_waitmessagecli"
-      "/var/run/msgcollector/$who_ami/${identifier}_messagecli_done"
-      "/var/run/msgcollector/$who_ami/${identifier}_messagecli"
-      "/var/run/msgcollector/$who_ami/${identifier}_forceactive"
-      "/var/run/msgcollector/$who_ami/${identifier}_lefttop"
-      "/var/run/msgcollector/$who_ami/${identifier}_parenttty"
+      "/run/msgcollector/$who_ami/${identifier}_icon"
+      "/run/msgcollector/$who_ami/${identifier}_titlecli"
+      "/run/msgcollector/$who_ami/${identifier}_titlex"
+      "/run/msgcollector/$who_ami/${identifier}_passivepopupqueuextitle"
+      "/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_progressbartitlex"
+      "/run/msgcollector/$who_ami/${identifier}_typecli"
+      "/run/msgcollector/$who_ami/${identifier}_typex"
+      "/run/msgcollector/$who_ami/${identifier}_progressbarx_done"
+      "/run/msgcollector/$who_ami/${identifier}_progressbarx"
+      "/run/msgcollector/$who_ami/${identifier}_passivepopupqueuex_done"
+      "/run/msgcollector/$who_ami/${identifier}_passivepopupqueuex"
+      "/run/msgcollector/$who_ami/${identifier}_messagex_done"
+      "/run/msgcollector/$who_ami/${identifier}_messagex"
+      "/run/msgcollector/$who_ami/${identifier}_waitmessagecli_done"
+      "/run/msgcollector/$who_ami/${identifier}_waitmessagecli"
+      "/run/msgcollector/$who_ami/${identifier}_messagecli_done"
+      "/run/msgcollector/$who_ami/${identifier}_messagecli"
+      "/run/msgcollector/$who_ami/${identifier}_forceactive"
+      "/run/msgcollector/$who_ami/${identifier}_lefttop"
+      "/run/msgcollector/$who_ami/${identifier}_parenttty"
    )
 
    ## Better not deleting
-   ## "/var/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_parentpid"
-   ## "/var/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_fifo"
-   ## "/var/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_progresstxt"
-   ## "/var/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_zenityprogresspid"
+   ## "/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_parentpid"
+   ## "/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_fifo"
+   ## "/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_progresstxt"
+   ## "/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_zenityprogresspid"
    ## because that could confuse /usr/lib/msgcollector/msgprogress.
 
    local file_name
@@ -814,8 +814,8 @@ forgetwaitcli() {
    trap "error_handler" ERR
 
    local file_list=(
-      "/var/run/msgcollector/$who_ami/${identifier}_waitmessagecli_done"
-      "/var/run/msgcollector/$who_ami/${identifier}_waitmessagecli"
+      "/run/msgcollector/$who_ami/${identifier}_waitmessagecli_done"
+      "/run/msgcollector/$who_ami/${identifier}_waitmessagecli"
    )
 
    local file_name
