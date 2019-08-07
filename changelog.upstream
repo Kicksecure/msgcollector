@@ -1,3 +1,17 @@
+commit 87a8fa35a8a0ec2d7f5f9d689b22e059fd0cb23b
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Aug 7 06:15:59 2019 +0000
+
+    fix gui notification
+    
+    thanks to @TNTBOMBOM for the bug report
+
+commit 1223ad62f741f2ae00840966c1764a2e1d1a08f8
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Aug 1 11:56:41 2019 +0000
+
+    bumped changelog version
+
 commit a7a4620a1a5bb7187a415cb9640d9d34f632e4d6
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Thu Aug 1 11:13:40 2019 +0000
