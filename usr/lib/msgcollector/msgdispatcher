@@ -395,7 +395,7 @@ msgdispatcher_handler() {
    fi
 
    arrIN=(${file_name//// })
-   msgdisptacher_username="${arrIN[3]}"
+   msgdisptacher_username="${arrIN[2]}"
 
    ## Remove "_done".
    temp_item="${file_name%%_*}"
