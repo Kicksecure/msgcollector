@@ -5,7 +5,7 @@
 
 set -e
 
-umask 006
+umask ug=rw,o=r
 
 DONE_FILE="/run/msgcollector/init_done"
 SIZE="10M"

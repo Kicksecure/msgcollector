@@ -140,6 +140,8 @@ progress_bar() {
    return 0
 }
 
+umask ug=rw,o=r
+
 who_ami=$(whoami)
 
 parse_cmd_options "$@"

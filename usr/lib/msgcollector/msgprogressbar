@@ -99,6 +99,8 @@ parse_cmd_options() {
 preparation() {
    trap "error_handler" ERR
 
+   umask ug=rw,o=r
+
    if [ "$who_ami" = "" ]; then
       who_ami="$(whoami)"
    fi

@@ -143,6 +143,8 @@ preparation() {
    ## Sanity test.
    command -v flock >/dev/null 2>/dev/null
 
+   umask ug=rw,o=r
+
    who_ami="$(whoami)"
 
    if [ "$cli" = "1" ]; then
