@@ -1,3 +1,9 @@
+msgcollector (3:5.8-1) unstable; urgency=medium
+
+  * New upstream version (local package).
+
+ -- Patrick Schleizer <adrelanos@riseup.net>  Sat, 10 Aug 2019 11:36:25 +0000
+
 msgcollector (3:5.7-1) unstable; urgency=medium
 
   * New upstream version (local package).
