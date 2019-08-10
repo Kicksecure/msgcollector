@@ -5,9 +5,21 @@
 
 set -e
 
+check() {
+   if ! [[ "$1" =~ ^[0-9a-zA-Z_-]+$ ]]; then
+      echo "Invalid character!" >&2
+      echo "\$1: $1" >&2
+      exit 1
+   fi
+}
+
 who_ami="$1"
 identifier="$2"
 progressbaridx="$3"
+
+check "$who_ami"
+check "$identifier"
+check "$progressbaridx"
 
 if [ -f "/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_parentpid" ]; then
    parentpid="$(cat "/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_parentpid")"
