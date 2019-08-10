@@ -280,9 +280,9 @@ preparation() {
       who_ami=$(whoami)
    fi
 
-#    if [ ! -d "/run/msgcollector/$who_ami" ]; then
-#       mkdir --mode o+rwx --parents "/run/msgcollector/$who_ami"
-#    fi
+   if [ ! -d "/run/msgcollector/$who_ami" ]; then
+      mkdir --parents --mode ugo+rwx "/run/msgcollector/$who_ami"
+   fi
 }
 
 colors() {
@@ -391,10 +391,6 @@ write_typecli_to_file() {
 
 collector() {
    trap "error_handler" ERR
-
-   if [ ! -d "/run/msgcollector/$who_ami" ]; then
-      mkdir -p "/run/msgcollector/$who_ami"
-   fi
 
    ## {{ --identifier
    if [ "${identifier}" = "" ]; then

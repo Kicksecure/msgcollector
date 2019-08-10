@@ -105,9 +105,9 @@ preparation() {
       who_ami="$(whoami)"
    fi
 
-#    if [ ! -d "/run/msgcollector/$who_ami" ]; then
-#       mkdir --mode o+rwx --parents "/run/msgcollector/$who_ami"
-#    fi
+   if [ ! -d "/run/msgcollector/$who_ami" ]; then
+      mkdir --parents--mode ugo+rwx "/run/msgcollector/$who_ami"
+   fi
 
    fifo="/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_fifo"
    progress_txt_file="/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_progresstxt"

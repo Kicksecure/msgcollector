@@ -170,7 +170,7 @@ preparation() {
    inotifywait_folder="/run/msgcollector"
 
    if [ ! -d "/run/msgcollector/$who_ami" ]; then
-      mkdir --parents "/run/msgcollector/$who_ami"
+      mkdir --parents --mode ugo+rwx "/run/msgcollector/$who_ami"
    fi
 
    delete_wrapper="/usr/lib/msgcollector/msgdispatcher_delete_wrapper"
