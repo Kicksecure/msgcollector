@@ -7,6 +7,7 @@
 #exec >  >(tee -a "/home/user/msgprogressbarlog")
 #exec 2> >(tee -a "/home/user/msgprogressbarlog" >&2)
 
+set -e
 set -o pipefail
 
 scriptname="$(basename "$BASH_SOURCE")"
