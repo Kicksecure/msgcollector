@@ -135,6 +135,14 @@ parse_cmd_options() {
                ;;
        esac
    done
+
+   if [ "$cli" = "1" ]; then
+      return 0
+   fi
+   if [ "$x" = "1" ]; then
+      return 0
+   fi
+   echo "$0 ERROR: needs to be started with either --x or --cli." >&2
 }
 
 preparation() {
