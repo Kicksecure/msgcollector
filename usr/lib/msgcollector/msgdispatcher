@@ -143,9 +143,13 @@ preparation() {
    ## Sanity test.
    command -v flock >/dev/null 2>/dev/null
 
+   who_ami="$(whoami)"
+
    umask ug=rw,o=r
 
-   who_ami="$(whoami)"
+   if [ ! -d "/run/msgcollector/$who_ami" ]; then
+      mkdir --parents --mode ugo+rwx "/run/msgcollector/$who_ami"
+   fi
 
    if [ "$cli" = "1" ]; then
       pid_file="/run/msgcollector/$who_ami/msgdispatcher_pidcli"
@@ -168,11 +172,6 @@ preparation() {
    #fi
 
    inotifywait_folder="/run/msgcollector"
-
-   if [ ! -d "/run/msgcollector/$who_ami" ]; then
-      mkdir --parents --mode ugo+rwx "/run/msgcollector/$who_ami"
-   fi
-
    delete_wrapper="/usr/lib/msgcollector/msgdispatcher_delete_wrapper"
 }
 

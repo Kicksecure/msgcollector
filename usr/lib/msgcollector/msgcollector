@@ -270,15 +270,15 @@ parse_cmd_options() {
 preparation() {
    trap "error_handler" ERR
 
+   if [ "$who_ami" = "" ]; then
+      who_ami=$(whoami)
+   fi
+
    ## msgdispatcher needs to be able to read the file. Otherwise:
    ## cat: /run/msgcollector/whonixcheck/whonixcheck.messagex: Permission denied
    ## user running msgdispatcher (user "user") would need to be member of a group
    ## which may read access all of folder /run/msgcollector.
    umask ug=rw,o=r
-
-   if [ "$who_ami" = "" ]; then
-      who_ami=$(whoami)
-   fi
 
    if [ ! -d "/run/msgcollector/$who_ami" ]; then
       mkdir --parents --mode ugo+rwx "/run/msgcollector/$who_ami"

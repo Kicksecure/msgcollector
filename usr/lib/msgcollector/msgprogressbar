@@ -99,11 +99,11 @@ parse_cmd_options() {
 preparation() {
    trap "error_handler" ERR
 
-   umask ug=rw,o=r
-
    if [ "$who_ami" = "" ]; then
       who_ami="$(whoami)"
    fi
+
+   umask ug=rw,o=r
 
    if [ ! -d "/run/msgcollector/$who_ami" ]; then
       mkdir --parents--mode ugo+rwx "/run/msgcollector/$who_ami"
