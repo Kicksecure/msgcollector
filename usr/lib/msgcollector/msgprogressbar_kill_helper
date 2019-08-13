@@ -24,6 +24,15 @@ check "$progressbaridx"
 if [ -f "/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_parentpid" ]; then
    parentpid="$(cat "/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_parentpid")"
 
+   true "parentpid: '$parentpid'"
+
+   if [[ ! "$parentpid" == *[!0-9]* ]]; then
+      true "parentpid is strictly numeric, ok."
+   else
+      true "parentpid is not strictly numeric, exit."
+      exit 0
+   fi
+
    ## Check if still running.
    ps__p_exit_code="0"
    ps -p "$parentpid" >/dev/null 2>/dev/null || { ps__p_exit_code="$?"; true; };
