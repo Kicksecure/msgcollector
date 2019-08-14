@@ -21,26 +21,28 @@ check "$who_ami"
 check "$identifier"
 check "$progressbaridx"
 
-if [ -f "/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_parentpid" ]; then
-   parentpid="$(cat "/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_parentpid")"
+if [ ! -f "/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_parentpid" ]; then
+   exit 0
+fi
 
-   true "parentpid: '$parentpid'"
+parentpid="$(cat "/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_parentpid")"
 
-   if [[ ! "$parentpid" == *[!0-9]* ]]; then
-      true "parentpid is strictly numeric, ok."
-   else
-      true "parentpid is not strictly numeric, exit."
-      exit 0
-   fi
+true "parentpid: '$parentpid'"
 
-   ## Check if still running.
-   ps__p_exit_code="0"
-   ps -p "$parentpid" >/dev/null 2>/dev/null || { ps__p_exit_code="$?"; true; };
+if [[ ! "$parentpid" == *[!0-9]* ]]; then
+   true "parentpid is strictly numeric, ok."
+else
+   true "parentpid is not strictly numeric, exit."
+   exit 0
+fi
 
-   if [ "$ps__p_exit_code" = "0" ]; then
-      true "Sending signal sigusr2 to $parentpid."
-      kill -s sigusr2 "$parentpid"
-   else
-      true "Not sending signal sigusr2 to parentpid $parentpid, because it is already terminated."
-   fi
+## Check if still running.
+ps__p_exit_code="0"
+ps -p "$parentpid" >/dev/null 2>/dev/null || { ps__p_exit_code="$?"; true; };
+
+if [ "$ps__p_exit_code" = "0" ]; then
+   true "Sending signal sigusr2 to $parentpid."
+   kill -s sigusr2 "$parentpid"
+else
+   true "Not sending signal sigusr2 to parentpid $parentpid, because it is already terminated."
 fi
