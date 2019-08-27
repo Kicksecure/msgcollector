@@ -5,22 +5,17 @@
 
 set -e
 
-umask ug=rw,o=r
+umask ug=rw,o=r || exit 2
 
 DONE_FILE="/run/msgcollector/init_done"
 SIZE="10M"
 
-mkdir --parents /run/msgcollector || exit 2
+mkdir --parents /run/msgcollector || exit 3
 
 if [ ! -f "$DONE_FILE" ]; then
-   ## ramfs does not support ACL (setfacl).
-   mount -t tmpfs -o size="$SIZE" none /run/msgcollector || exit 3
+    mount -t tmpfs -o size="$SIZE",nosuid,nodev,noexec none /run/msgcollector || exit 4
+else
+    mount -t tmpfs -o size="$SIZE",nosuid,nodev,noexec,remount none /run/msgcollector || exit 5
 fi
 
-#setfacl --recursive --default --set u::rw /run/msgcollector || exit 4
-
-#chmod --recursive g+rwx /run/msgcollector || exit 5
-
-#chmod --recursive o+rwx /run/msgcollector || exit 6
-
-touch "$DONE_FILE" || exit 7
+touch "$DONE_FILE" || exit 6
