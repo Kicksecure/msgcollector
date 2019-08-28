@@ -1,3 +1,17 @@
+commit 337c336106fe4c2aa057089a575675de10f72517
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Aug 27 14:18:09 2019 -0400
+
+    /run/msgcollector add mount options nosuid,nodev,noexec
+    
+    https://forums.whonix.org/t/re-mount-home-and-other-with-noexec-and-nosuid-among-other-useful-mount-options-for-better-security/7707
+
+commit 62a50e4de68b3fc0521aeab163969fc90348682c
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Aug 14 00:19:54 2019 +0000
+
+    bumped changelog version
+
 commit 38368ae5d1286670775e491afa0b82b50f50d40b
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Wed Aug 14 00:18:10 2019 +0000
