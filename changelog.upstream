@@ -1,3 +1,21 @@
+commit 699311b03c15782d5c610dcb5b3e20d728e12b3a
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Sep 6 12:46:56 2019 +0000
+
+    clean up duplicate variables
+
+commit 3b29acd0d00411f8f1ea314b3c8714997d169b3a
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Sep 6 12:38:30 2019 +0000
+
+    improve error_handler
+
+commit e24c5a2547e2ba32d6720e2bc85fcaf07f5bcc6e
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Aug 28 11:11:24 2019 +0000
+
+    bumped changelog version
+
 commit 337c336106fe4c2aa057089a575675de10f72517
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Tue Aug 27 14:18:09 2019 -0400
