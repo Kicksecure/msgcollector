@@ -26,7 +26,12 @@ error_handler() {
 <br></br>## Please report this bug!
 <br></br>##
 <br></br>## who_ami: $who_ami
+<br></br>##
+<br></br>## msgdisptacher_username: $msgdisptacher_username
 <br></br>## msgdispatcher_identifier: $msgdispatcher_identifier
+<br></br>## msgdispatcher_appendix: $msgdispatcher_appendix
+<br></br>## delete_wrapper: $delete_wrapper
+<br></br>##
 <br></br>## error_text: $error_text
 <br></br>## last exit_code: $exit_code
 <br></br>###############################################################################</p>"
