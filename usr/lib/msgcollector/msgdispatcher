@@ -423,10 +423,10 @@ msgdispatcher_handler() {
             title="$(cat "/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_titlex")"
             type="$(cat "/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_typex")"
             dispatch_x_active "$type" "$msg"
-            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="messagex_done" "$delete_wrapper"
-            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="titlex" "$delete_wrapper"
-            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="messagex" "$delete_wrapper"
-            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="lefttop" "$delete_wrapper"
+            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="messagex_done" "$delete_wrapper"
+            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="titlex" "$delete_wrapper"
+            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="messagex" "$delete_wrapper"
+            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="lefttop" "$delete_wrapper"
             sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="typex" "$delete_wrapper"
          else
             ## Not using rm outside the if, to prevent race conditions.
