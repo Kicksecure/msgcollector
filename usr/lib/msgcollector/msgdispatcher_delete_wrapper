@@ -9,7 +9,7 @@ check() {
    if ! [[ "$1" =~ ^[0-9a-zA-Z_-]+$ ]]; then
       echo "Invalid character!" >&2
       echo "\$1: $1" >&2
-      exit 1
+      exit 200
    fi
 }
 
