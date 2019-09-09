@@ -1,0 +1,67 @@
+#!/usr/bin/python3 -u
+
+## Copyright (C) 2014 troubadour <trobador@riseup.net>
+## Copyright (C) 2014 - 2019 ENCRYPTED SUPPORT LP <adrelanos@riseup.net>
+## See the file COPYING for copying conditions.
+
+## Usage:
+## /usr/lib/msgcollector/one-time-popup status-file title message
+
+import sys
+import os
+from PyQt5 import QtCore, QtWidgets
+
+status_file = sys.argv[1]
+title = sys.argv[2]
+message = sys.argv[3]
+
+
+if os.path.exists(status_file):
+    sys.exit()
+
+
+class Notice(QtWidgets.QDialog):
+    def __init__(self):
+        super(Notice, self).__init__()
+        self.initUI()
+
+    def initUI(self):
+        cb = QtWidgets.QCheckBox('Do not show this message again.', self)
+        cb.move(25, 230)
+        cb.stateChanged.connect(self.checkState)
+
+        OKbtn = QtWidgets.QPushButton('OK', self)
+        OKbtn.clicked.connect(QtCore.QCoreApplication.instance().quit)
+        OKbtn.resize(OKbtn.sizeHint())
+        OKbtn.move(270, 260)
+
+        lb = QtWidgets.QLabel(message, self)
+        lb.setGeometry(0, 0, 550, 190) ## window vsize -110.
+        lb.setWordWrap(True)
+        lb.move(25, 20)
+
+        self.resize(600, 300)
+        #self.center()
+        self.setWindowTitle(title)
+        self.show()
+
+    def checkState(self, state):
+        f = open(status_file, "w")
+        f.write(str(state))
+        f.close()
+
+    def center(self):
+        self.resize(False)
+        qr = self.frameGeometry()
+        cp = QtWidgets.QDesktopWidget().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
+
+
+def main():
+    app = QtWidgets.QApplication(sys.argv)
+    ex = Notice()
+    sys.exit(app.exec_())
+
+if __name__ == '__main__':
+    main()
