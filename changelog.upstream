@@ -1,3 +1,21 @@
+commit a8aaa56545b86596c1c1c9cce72ca3fb13e5a370
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Sep 9 11:47:34 2019 +0000
+
+    change exit code for easier debugging
+
+commit 2610e66d6095b2f798531bcfef13025f69039504
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Sep 9 10:06:54 2019 +0000
+
+    remove no longer needed dependency acl
+
+commit acb856755f9e735fdaa194979f82c205fc820a38
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Sep 6 13:04:19 2019 +0000
+
+    bumped changelog version
+
 commit 699311b03c15782d5c610dcb5b3e20d728e12b3a
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Fri Sep 6 12:46:56 2019 +0000
