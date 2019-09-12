@@ -1,3 +1,23 @@
+commit 74254269a2483a7b8f3064569262c945bb44f675
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Sep 9 13:46:21 2019 +0000
+
+    comment
+
+commit 1579d548f337754b2445b76367b09888fb4037d0
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Sep 9 13:38:43 2019 +0000
+
+    Do not show this message again. - Generic One Time Popup
+    
+    /usr/lib/msgcollector/one-time-popup
+
+commit 724adc24d32e2613396fdb74c53a8b1095a37851
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Sep 9 12:09:43 2019 +0000
+
+    bumped changelog version
+
 commit a8aaa56545b86596c1c1c9cce72ca3fb13e5a370
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Mon Sep 9 11:47:34 2019 +0000
