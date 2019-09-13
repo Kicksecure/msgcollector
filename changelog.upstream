@@ -1,3 +1,15 @@
+commit eab265e6697e40d2ad11d0dfda80039e6f2ae4a1
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Sep 13 13:28:02 2019 +0000
+
+    remove no longer required dependency gvfs
+
+commit 303989205b6e61c44e8d6939beb67c16bb04325c
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Sep 12 12:49:30 2019 +0000
+
+    bumped changelog version
+
 commit 74254269a2483a7b8f3064569262c945bb44f675
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Mon Sep 9 13:46:21 2019 +0000
