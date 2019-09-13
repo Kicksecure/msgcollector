@@ -13,7 +13,7 @@ Standards-Version: 4.3.0
 
 Package: msgcollector
 Architecture: all
-Depends: python3, sudo, inotify-tools, gvfs, procps, ${misc:Depends}
+Depends: python3, sudo, inotify-tools, procps, ${misc:Depends}
 Provides: ${diverted-files}
 Conflicts: ${diverted-files}
 Description: Notification System for Terminal
