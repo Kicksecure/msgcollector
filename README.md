@@ -4,20 +4,6 @@ Collects messages by applications using this system and dispatches them in
 terminal.
 
 For gui support also install package msgcollector-gui.
-
-Package: msgcollector-gui
-Architecture: all
-Depends: msgcollector, wmctrl, python3-pyqt5, zenity,
-libnotify-bin | kde-baseapps-bin, mate-notification-daemon, x11-utils,
-${misc:Depends}
-Provides: ${diverted-files}
-Conflicts: ${diverted-files}
-Description: Notification System for X
-# Notification System for X #
-
-Collects messages by applications using this system and dispatches them in X.
-
-A metapackage that installs required dependencies for X support.
 ## How to install `msgcollector` using apt-get ##
 
 1\. Download [Whonix's Signing Key]().
