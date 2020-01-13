@@ -30,6 +30,8 @@ error_handler() {
 ## Please report this bug!
 ##
 ## scriptname: $scriptname
+## identifier: $identifier
+## who_ami: $who_ami
 ## my_command_line_parameters: $my_command_line_parameters
 ## write_to_file: $write_to_file
 ## parentpid: $parentpid
@@ -55,6 +57,8 @@ error_handler() {
 
    echo "\
 scriptname: $scriptname
+identifier: $identifier
+who_ami: $who_ami
 my_command_line_parameters: $my_command_line_parameters
 parentpid: $parentpid
 ps_p_parentpid: $ps_p_parentpid
