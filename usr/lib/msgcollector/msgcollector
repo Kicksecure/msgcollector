@@ -452,54 +452,58 @@ collector() {
    ## }}
 
    ## {{ --typecli
-   if [ -f "/run/msgcollector/$who_ami/${identifier}_typecli" ]; then
-      old_typecli="$(cat "/run/msgcollector/$who_ami/${identifier}_typecli")"
-   fi
+   if [ "$messagecli" = "1" ]; then
+      if [ -f "/run/msgcollector/$who_ami/${identifier}_typecli" ]; then
+         old_typecli="$(cat "/run/msgcollector/$who_ami/${identifier}_typecli")"
+      fi
 
-   if [ "$old_typecli" = "info" ]; then
-      if [ "$typecli" = "error" ]; then
-         ## Upgrade from info to error.
-         write_typecli_to_file "error" "/run/msgcollector/$who_ami/${identifier}_typecli"
-      elif [ "$typecli" = "warning" ]; then
-         ## Upgrade from info to warning.
-         write_typecli_to_file "warning" "/run/msgcollector/$who_ami/${identifier}_typecli"
-      fi
-   elif [ "$old_typecli" = "warning" ]; then
-      if [ "$typecli" = "error" ]; then
-         ## Upgrade from warning to error.
-         write_typecli_to_file "error" "/run/msgcollector/$who_ami/${identifier}_typecli"
-      fi
-   elif [ "$old_typecli" = "error" ]; then
-      true
-   else
-      if [ ! "$typecli" = "" ]; then
-         write_typecli_to_file "$typecli" "/run/msgcollector/$who_ami/${identifier}_typecli"
+      if [ "$old_typecli" = "info" ]; then
+         if [ "$typecli" = "error" ]; then
+            ## Upgrade from info to error.
+            write_typecli_to_file "error" "/run/msgcollector/$who_ami/${identifier}_typecli"
+         elif [ "$typecli" = "warning" ]; then
+            ## Upgrade from info to warning.
+            write_typecli_to_file "warning" "/run/msgcollector/$who_ami/${identifier}_typecli"
+         fi
+      elif [ "$old_typecli" = "warning" ]; then
+         if [ "$typecli" = "error" ]; then
+            ## Upgrade from warning to error.
+            write_typecli_to_file "error" "/run/msgcollector/$who_ami/${identifier}_typecli"
+         fi
+      elif [ "$old_typecli" = "error" ]; then
+         true
+      else
+         if [ ! "$typecli" = "" ]; then
+            write_typecli_to_file "$typecli" "/run/msgcollector/$who_ami/${identifier}_typecli"
+         fi
       fi
    fi
    ## }}
 
    ## {{ --typex
-   if [ -f "/run/msgcollector/$who_ami/${identifier}_typex" ]; then
-      old_typex="$(cat "/run/msgcollector/$who_ami/${identifier}_typex")"
-   fi
+   if [ "$messagex" = "1" ]; then
+      if [ -f "/run/msgcollector/$who_ami/${identifier}_typex" ]; then
+         old_typex="$(cat "/run/msgcollector/$who_ami/${identifier}_typex")"
+      fi
 
-   if [ "$old_typex" = "info" ]; then
-      if [ "$typex" = "error" ]; then
-         ## Upgrade from info to error.
-         echo "error" > "/run/msgcollector/$who_ami/${identifier}_typex"
-      elif [ "$typex" = "warning" ]; then
-         ## Upgrade from info to warning.
-         echo "warning" > "/run/msgcollector/$who_ami/${identifier}_typex"
+      if [ "$old_typex" = "info" ]; then
+         if [ "$typex" = "error" ]; then
+            ## Upgrade from info to error.
+            echo "error" > "/run/msgcollector/$who_ami/${identifier}_typex"
+         elif [ "$typex" = "warning" ]; then
+            ## Upgrade from info to warning.
+            echo "warning" > "/run/msgcollector/$who_ami/${identifier}_typex"
+         fi
+      elif [ "$old_typex" = "warning" ]; then
+         if [ "$typex" = "error" ]; then
+            ## Upgrade from warning to error.
+            echo "error" > "/run/msgcollector/$who_ami/${identifier}_typex"
+         fi
+      elif [ "$old_typex" = "error" ]; then
+         true
+      else
+         echo "$typex" > "/run/msgcollector/$who_ami/${identifier}_typex"
       fi
-   elif [ "$old_typex" = "warning" ]; then
-      if [ "$typex" = "error" ]; then
-         ## Upgrade from warning to error.
-         echo "error" > "/run/msgcollector/$who_ami/${identifier}_typex"
-      fi
-   elif [ "$old_typex" = "error" ]; then
-      true
-   else
-      echo "$typex" > "/run/msgcollector/$who_ami/${identifier}_typex"
    fi
    ## }}
 
