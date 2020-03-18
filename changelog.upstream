@@ -1,3 +1,75 @@
+commit 300efeeb2f4c8e81d5654b6a9f9ee44339dc100f
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Mar 18 08:57:50 2020 -0400
+
+    debugging
+
+commit cc905aa4ec964d2d16b10d0c917ffc6ec5524186
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Mar 18 08:53:39 2020 -0400
+
+    debugging
+
+commit 9d15a068d150a9ca5d02941aadb2b84d29f86d84
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Mar 18 08:51:17 2020 -0400
+
+    debugging
+
+commit 1c644c67d10e0060c709fad7a9a24815fe4f055d
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Mar 18 08:46:17 2020 -0400
+
+    debugging
+
+commit cf0be4c1f786ba8f71002266e47dcf82eab5c68b
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Mar 18 08:44:13 2020 -0400
+
+    debugging
+
+commit 9ce03a1d8d3d937bc6118ac8bfe5aaee95f395d5
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Mar 18 08:42:33 2020 -0400
+
+    debugging
+
+commit 58ecced9fddeadbb7fd0b2dc6fb7093f4026b97c
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Mar 18 08:41:31 2020 -0400
+
+    debugging
+
+commit dfe84695c46f3def28424ce160906548274e7d89
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Mar 18 08:00:39 2020 -0400
+
+    debugging
+
+commit d89d659ccace1abb307eed35e4b67abe72e720ff
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Mar 18 04:42:52 2020 -0400
+
+    debugging
+
+commit cbb1f1ac7cbcb21f31d6a2470b81253715ffebf8
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Mar 18 04:38:23 2020 -0400
+
+    debugging
+
+commit f309799c1284db67fe4130b590cd948b9d3bbb4e
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Mar 18 04:30:56 2020 -0400
+
+    fix
+
+commit e6acd6edebc8d99f8ca6db91f972b94c21c7b200
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Jan 14 09:19:49 2020 -0500
+
+    bumped changelog version
+
 commit 9b8e2b290d5bff9eb2790f8ff4a85b881c3b5c39
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Tue Jan 14 09:11:43 2020 -0500
