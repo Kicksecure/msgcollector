@@ -527,7 +527,7 @@ inotifywait_loop() {
 
    true "$scriptname $FUNCNAME (pid: $$): Starting loop."
 
-   local msgdispatcher_identifier temp_item last_two first_two progressbaridx
+   local temp_item last_two first_two progressbaridx
 
    while read -r file_name; do
       msgdispatcher_handler
