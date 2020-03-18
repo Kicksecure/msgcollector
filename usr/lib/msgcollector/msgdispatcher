@@ -32,6 +32,7 @@ error_handler() {
 <br></br>## msgdispatcher_appendix: '$msgdispatcher_appendix'
 <br></br>## delete_wrapper: '$delete_wrapper'
 <br></br>## msgdispatcher_sudo_wrapper_command: '$msgdispatcher_sudo_wrapper_command'
+<br></br>## output_msgdispatcher_sudo_wrapper: '$output_msgdispatcher_sudo_wrapper'
 <br></br>##
 <br></br>## error_text: '$error_text'
 <br></br>## last_exit_code: '$last_exit_code'
@@ -524,18 +525,19 @@ msgdispatcher_handler() {
 }
 
 msgdispatcher_sudo_log() {
+   trap "error_handler" ERR
    msgdispatcher_sudo_wrapper_command="$@"
    true
 }
 
 msgdispatcher_sudo_wrapper() {
+   trap "error_handler" ERR
+
    msgdispatcher_appendix="$1"
 
    msgdispatcher_sudo_log sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="$msgdispatcher_appendix" "$delete_wrapper"
 
-   ## TODO: catch output
-
-   sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="$msgdispatcher_appendix" "$delete_wrapper"
+   output_msgdispatcher_sudo_wrapper="$(sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="$msgdispatcher_appendix" "$delete_wrapper" 2>&1)"
 
    ## In case above errors, do not additionally error out from this function.
    true
