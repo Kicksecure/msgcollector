@@ -7,9 +7,10 @@ set -e
 
 check() {
    if ! [[ "$2" =~ ^[0-9a-zA-Z_-]+$ ]]; then
-      echo "Invalid character!" >&2
-      echo "\$1 (variable name): '$1'" >&2
-      echo "\$2 (variable content): '$2'" >&2
+      echo "$0:
+\$1 (variable name): '$1'
+\$2 (variable content): '$2'
+Invalid character!" >&2
       exit 200
    fi
 }
