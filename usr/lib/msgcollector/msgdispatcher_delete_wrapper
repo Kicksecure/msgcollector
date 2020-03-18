@@ -21,7 +21,18 @@ file_name="/run/msgcollector/${msgdisptacher_username}/${msgdispatcher_identifie
 
 if [ -f "$file_name" ]; then
    true "$0: exists: $file_name"
-   rm -f "$file_name"
+
+   ## Debugging. Use rm with debugging.
+   rm_exit_code=0
+   rm -f "$file_name" || { rm_exit_code=$? ; true; };
+   if [ "$rm_exit_code" = "0" ]; then
+      true "$0: rm exit code 0, ok"
+   else
+      echo "$0: rm exit code: $rm_exit_code"
+   fi
+   exit_code="$(( exit_code + rm_exit_code ))"
+
+   exit "$exit_code"
 else
    true "$0: does not exist: $file_name"
 fi
