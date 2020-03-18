@@ -17,6 +17,8 @@ error_handler() {
       error_text="$BASH_COMMAND"
    fi
 
+   output_msgdispatcher_sudo_wrapper="$(/usr/lib/msgcollector/br_add "$output_msgdispatcher_sudo_wrapper")" || true
+
    local msg="<p>
 <br></br>$scriptname script bug.
 <br></br>

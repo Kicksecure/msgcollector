@@ -6,16 +6,17 @@
 set -e
 
 check() {
-   if ! [[ "$1" =~ ^[0-9a-zA-Z_-]+$ ]]; then
+   if ! [[ "$2" =~ ^[0-9a-zA-Z_-]+$ ]]; then
       echo "Invalid character!" >&2
-      echo "\$1: $1" >&2
+      echo "\$1 (variable name): $1" >&2
+      echo "\$2 (variable content): $2" >&2
       exit 200
    fi
 }
 
-check "${msgdisptacher_username}"
-check "${msgdispatcher_identifier}"
-check "${msgdispatcher_appendix}"
+check "msgdisptacher_username" "${msgdisptacher_username}"
+check "msgdispatcher_identifier" "${msgdispatcher_identifier}"
+check "msgdispatcher_appendix" "${msgdispatcher_appendix}"
 
 file_name="/run/msgcollector/${msgdisptacher_username}/${msgdispatcher_identifier}_${msgdispatcher_appendix}"
 
