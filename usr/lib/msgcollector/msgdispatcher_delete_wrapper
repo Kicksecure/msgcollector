@@ -28,7 +28,14 @@ if [ -f "$file_name" ]; then
    if [ "$rm_exit_code" = "0" ]; then
       true "$0: rm exit code 0, ok"
    else
-      echo "$0: rm exit code: $rm_exit_code"
+      echo "\
+$0: \
+rm_exit_code: '$rm_exit_code' | \
+file_name: '$file_name' | \
+msgdisptacher_username: '$msgdisptacher_username' | \
+msgdispatcher_identifier: '$msgdispatcher_identifier' | \
+msgdispatcher_appendix: '$msgdispatcher_appendix' \
+"
    fi
    exit_code="$(( exit_code + rm_exit_code ))"
 
