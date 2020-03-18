@@ -19,13 +19,13 @@ error_handler() {
 
    local msg="<p>
 <br></br>$scriptname script bug.
+<br></br>
 <br></br>No panic. Nothing is broken. Just some rare condition has been hit.
 <br></br>Try again later. There is likely a solution for this problem.
 <br></br>Please see Whonix News, Whonix Blog and Whonix User Help Forum.
 <br></br>Please report this bug!
 <br></br>
 <br></br>who_ami: '<code>$who_ami'</code>
-<br></br>
 <br></br>msgdisptacher_username: '<code>$msgdisptacher_username</code>'
 <br></br>msgdispatcher_identifier: '<code>$msgdispatcher_identifier</code>'
 <br></br>msgdispatcher_appendix: '<code>$msgdispatcher_appendix</code>'
