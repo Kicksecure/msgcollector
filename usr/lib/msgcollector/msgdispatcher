@@ -10,7 +10,7 @@ set -o pipefail
 scriptname="$(basename "$BASH_SOURCE")"
 
 error_handler() {
-   local exit_code="$?"
+   local last_exit_code="$?"
    if [ ! "$1" = "" ]; then
       error_text="$1"
    else
@@ -25,15 +25,16 @@ error_handler() {
 <br></br>## Please see Whonix News, Whonix Blog and Whonix User Help Forum.
 <br></br>## Please report this bug!
 <br></br>##
-<br></br>## who_ami: $who_ami
+<br></br>## who_ami: '$who_ami'
 <br></br>##
-<br></br>## msgdisptacher_username: $msgdisptacher_username
-<br></br>## msgdispatcher_identifier: $msgdispatcher_identifier
-<br></br>## msgdispatcher_appendix: $msgdispatcher_appendix
-<br></br>## delete_wrapper: $delete_wrapper
+<br></br>## msgdisptacher_username: '$msgdisptacher_username'
+<br></br>## msgdispatcher_identifier: '$msgdispatcher_identifier'
+<br></br>## msgdispatcher_appendix: '$msgdispatcher_appendix'
+<br></br>## delete_wrapper: '$delete_wrapper'
+<br></br>## msgdispatcher_sudo_wrapper_command: '$msgdispatcher_sudo_wrapper_command'
 <br></br>##
-<br></br>## error_text: $error_text
-<br></br>## last exit_code: $exit_code
+<br></br>## error_text: '$error_text'
+<br></br>## last_exit_code: '$last_exit_code'
 <br></br>###############################################################################</p>"
 
    ## Popup window with the message above.
@@ -423,15 +424,15 @@ msgdispatcher_handler() {
             title="$(cat "/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_titlex")"
             type="$(cat "/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_typex")"
             dispatch_x_active "$type" "$msg"
-            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="messagex_done" "$delete_wrapper"
-            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="titlex" "$delete_wrapper"
-            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="messagex" "$delete_wrapper"
-            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="lefttop" "$delete_wrapper"
-            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="typex" "$delete_wrapper"
+            msgdispatcher_sudo_wrapper "messagex_done"
+            msgdispatcher_sudo_wrapper "titlex"
+            msgdispatcher_sudo_wrapper "messagex"
+            msgdispatcher_sudo_wrapper "lefttop"
+            msgdispatcher_sudo_wrapper "typex"
          else
             ## Not using rm outside the if, to prevent race conditions.
             ## Not always using rm, without if to prevent forking.
-            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="messagex_done" "$delete_wrapper"
+            msgdispatcher_sudo_wrapper "messagex_done"
          fi
          return 0
       fi
@@ -449,12 +450,12 @@ msgdispatcher_handler() {
             else
                dispatch_x_passive "$type" "$title" "$msg"
             fi
-            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="forceactive" "$delete_wrapper"
-            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="passivepopupqueuex_done" "$delete_wrapper"
-            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="passivepopupqueuex" "$delete_wrapper"
-            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="passivepopupqueuextitle" "$delete_wrapper"
+            msgdispatcher_sudo_wrapper "forceactive"
+            msgdispatcher_sudo_wrapper "passivepopupqueuex_done"
+            msgdispatcher_sudo_wrapper "passivepopupqueuex"
+            msgdispatcher_sudo_wrapper "passivepopupqueuextitle"
          else
-            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="passivepopupqueuex_done" "$delete_wrapper"
+            msgdispatcher_sudo_wrapper "passivepopupqueuex_done"
          fi
          return 0
       fi
@@ -469,7 +470,7 @@ msgdispatcher_handler() {
 #          ## 2b3916d6-3b3f-4490-bc85-b97da494a55d
 #          if [ -f "/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_${progressbaridx}_progressbarx" ]; then
 #             if [ -f "/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_${progressbaridx}_progressbarx_animate" ]; then
-#                sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="${progressbaridx}_progressbarx_animate" "$delete_wrapper"
+#                msgdispatcher_sudo_wrapper "${progressbaridx}_progressbarx_animate"
 #                animate="--animate"
 #             else
 #                unset animate
@@ -483,11 +484,11 @@ msgdispatcher_handler() {
 #             fi
 #
 #             unset animate
-#             sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="${progressbaridx}_progressbarx_done" "$delete_wrapper"
-#             sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="${progressbaridx}_progressbartitlex" "$delete_wrapper"
-#             sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="${progressbaridx}_progressbarx" "$delete_wrapper"
+#             msgdispatcher_sudo_wrapper "${progressbaridx}_progressbarx_done"
+#             msgdispatcher_sudo_wrapper "${progressbaridx}_progressbartitlex"
+#             msgdispatcher_sudo_wrapper "${progressbaridx}_progressbarx"
 #          else
-#             sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="${progressbaridx}_progressbarx_done" "$delete_wrapper"
+#             msgdispatcher_sudo_wrapper "${progressbaridx}_progressbarx_done"
 #          fi
 #          return 0
 #       fi
@@ -498,10 +499,10 @@ msgdispatcher_handler() {
             msg="$(cat "/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_waitmessagecli")"
             type="$(cat "/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_typecli")"
             dispatch_cli "$msg"
-            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="waitmessagecli_done" "$delete_wrapper"
-            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="waitmessagecli" "$delete_wrapper"
+            msgdispatcher_sudo_wrapper "waitmessagecli_done"
+            msgdispatcher_sudo_wrapper "waitmessagecli"
          else
-            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="waitmessagecli_done" "$delete_wrapper"
+            msgdispatcher_sudo_wrapper "waitmessagecli_done"
          fi
          return 0
       fi
@@ -510,16 +511,34 @@ msgdispatcher_handler() {
             msg="$(cat "/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_messagecli")"
             type="$(cat "/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_typecli")"
             dispatch_cli "$msg"
-            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="messagecli_done" "$delete_wrapper"
-            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="messagecli" "$delete_wrapper"
+            msgdispatcher_sudo_wrapper "messagecli_done"
+            msgdispatcher_sudo_wrapper "messagecli"
          else
-            sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="messagecli_done" "$delete_wrapper"
+            msgdispatcher_sudo_wrapper "messagecli_done"
          fi
          return 0
       fi
    else
       exit 1
    fi
+}
+
+msgdispatcher_sudo_log() {
+   msgdispatcher_sudo_wrapper_command="$@"
+   true
+}
+
+msgdispatcher_sudo_wrapper() {
+   msgdispatcher_appendix="$1"
+
+   msgdispatcher_sudo_log sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="$msgdispatcher_appendix" "$delete_wrapper"
+
+   ## TODO: catch output
+
+   sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="$msgdispatcher_appendix" "$delete_wrapper"
+
+   ## In case above errors, do not additionally error out from this function.
+   true
 }
 
 inotifywait_loop() {
