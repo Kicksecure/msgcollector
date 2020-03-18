@@ -24,17 +24,17 @@ error_handler() {
 <br></br>Please see Whonix News, Whonix Blog and Whonix User Help Forum.
 <br></br>Please report this bug!
 <br></br>
-<br></br>who_ami: '$who_ami'
+<br></br>who_ami: '<code>$who_ami'</code>
 <br></br>
-<br></br>msgdisptacher_username: '$msgdisptacher_username'
-<br></br>msgdispatcher_identifier: '$msgdispatcher_identifier'
-<br></br>msgdispatcher_appendix: '$msgdispatcher_appendix'
-<br></br>delete_wrapper: '$delete_wrapper'
-<br></br>msgdispatcher_sudo_wrapper_command: '$msgdispatcher_sudo_wrapper_command'
-<br></br>output_msgdispatcher_sudo_wrapper: '$output_msgdispatcher_sudo_wrapper'
+<br></br>msgdisptacher_username: '<code>$msgdisptacher_username</code>'
+<br></br>msgdispatcher_identifier: '<code>$msgdispatcher_identifier</code>'
+<br></br>msgdispatcher_appendix: '<code>$msgdispatcher_appendix</code>'
+<br></br>delete_wrapper: '<code>$delete_wrapper'</code>
+<br></br>msgdispatcher_sudo_wrapper_command: '<code>$msgdispatcher_sudo_wrapper_command</code>'
+<br></br>output_msgdispatcher_sudo_wrapper: '<code>$output_msgdispatcher_sudo_wrapper</code>'
 <br></br>
-<br></br>error_text: '$error_text'
-<br></br>last_exit_code: '$last_exit_code'
+<br></br>error_text: '<code>$error_text</code>'
+<br></br>last_exit_code: '<code>$last_exit_code</code>'
 </p>"
 
    ## Popup window with the message above.
