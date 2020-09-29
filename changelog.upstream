@@ -1,3 +1,19 @@
+commit 88977926d17298eaea08868cbbf1228bc0c0a5d9
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Sep 29 06:33:58 2020 -0400
+
+    fix msgcollector sudoers issue when qubes-core-agent-passwordless-root package was removed
+    
+    Thanks to @TNT_BOOM_BOOM for the bug report!
+    
+    https://forums.whonix.org/t/hardening-qubes-vms-by-removing-passwordless-root-will-give-boot-error-message/10350
+
+commit d411a1adb136dc46d409f6040a5428097e0caf26
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 16 08:38:06 2020 -0400
+
+    bumped changelog version
+
 commit 3d40fa7edea3056db7eadf8a2f07cec8dc2bbaf0
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Wed Apr 15 14:05:34 2020 -0400
