@@ -80,7 +80,7 @@ class GuiMessage(QtWidgets.QDialog):
         self.label.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.label.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
 
-        self.version_group.setTitle('Online versions:')
+        self.version_group.setTitle('Online detected version:')
         self.version_group.setMinimumSize(QtCore.QSize(0, 20 + (len(versions) * 20) + 10))
 
         i = 0
