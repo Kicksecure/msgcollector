@@ -6,7 +6,7 @@ terminal.
 For gui support also install package msgcollector-gui.
 ## How to install `msgcollector` using apt-get ##
 
-1\. Download [Whonix's Signing Key]().
+1\. Download Whonix's Signing Key.
 
 ```
 wget https://www.whonix.org/patrick.asc
