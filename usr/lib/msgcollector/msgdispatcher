@@ -286,7 +286,7 @@ dispatch_cli() {
       local parenttty
       parenttty="$(cat "/run/msgcollector/$who_ami/${msgdispatcher_identifier}_parenttty")"
       if [ "$parenttty" = "/dev/tty1" ]; then
-         ## When for example whonixcheck was run in tty1, then messages were
+         ## When for example systemcheck was run in tty1, then messages were
          ## already echoed by msgcollector. No need to dispatch them again.
          true "Skipping, because parenttty is /dev/tty1."
          return 0
@@ -466,7 +466,7 @@ msgdispatcher_handler() {
 #       if [ "$last_two" = "progressbarx_done" ]; then
 #          first_two="${file_name%_*_*}"
 #          ## first_two example:
-#          ## /run/msgcollector/whonixcheck/whonixcheck_2b3916d6-3b3f-4490-bc85-b97da494a55d
+#          ## /run/msgcollector/systemcheck/systemcheck_2b3916d6-3b3f-4490-bc85-b97da494a55d
 #          progressbaridx=${first_two#*_}
 #          ## progressbaridx example:
 #          ## 2b3916d6-3b3f-4490-bc85-b97da494a55d

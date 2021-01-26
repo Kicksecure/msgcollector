@@ -279,7 +279,7 @@ preparation() {
    fi
 
    ## msgdispatcher needs to be able to read the file. Otherwise:
-   ## cat: /run/msgcollector/whonixcheck/whonixcheck.messagex: Permission denied
+   ## cat: /run/msgcollector/systemcheck/systemcheck.messagex: Permission denied
    ## user running msgdispatcher (user "user") would need to be member of a group
    ## which may read access all of folder /run/msgcollector.
    umask ug=rw,o=r
