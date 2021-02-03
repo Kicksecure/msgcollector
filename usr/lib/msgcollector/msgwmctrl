@@ -111,8 +111,6 @@ get_own_window_title() {
 }
 
 output_wait_for_window() {
-   ## also used by /usr/lib/whonixsetup
-
    trap "error_handler" ERR
 
    local title="$@"
