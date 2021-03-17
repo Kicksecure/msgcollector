@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 ## Copyright (C) 2014 troubadour <trobador@riseup.net>
-## Copyright (C) 2014 - 2020 ENCRYPTED SUPPORT LP <adrelanos@riseup.net>
+## Copyright (C) 2014 - 2021 ENCRYPTED SUPPORT LP <adrelanos@whonix.org>
 
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5 import QtCore, QtGui, QtWidgets
