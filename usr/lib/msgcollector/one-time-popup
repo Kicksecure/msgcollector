@@ -5,7 +5,7 @@
 ## See the file COPYING for copying conditions.
 
 ## Usage:
-## /usr/lib/msgcollector/one-time-popup status-file title message
+## /usr/libexec/msgcollector/one-time-popup status-file title message
 
 ## https://forums.whonix.org/t/do-not-show-this-message-again-generic-one-time-popup/8066
 

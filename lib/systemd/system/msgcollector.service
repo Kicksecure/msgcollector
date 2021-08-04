@@ -10,7 +10,7 @@ Before=getty.target
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/usr/lib/msgcollector/msgdispatcher_init
+ExecStart=/usr/libexec/msgcollector/msgdispatcher_init
 
 [Install]
 WantedBy=multi-user.target

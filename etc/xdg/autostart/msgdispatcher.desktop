@@ -5,4 +5,4 @@
 Name=msgdispatcher
 Comment=message dispatcher (msgdispatcher) service that shows messages by message collector (msgcollector)
 Type=Application
-Exec=/usr/lib/msgcollector/msgdispatcher_xdg_autostart
+Exec=/usr/libexec/msgcollector/msgdispatcher_xdg_autostart

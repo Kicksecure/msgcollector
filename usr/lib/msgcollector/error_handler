@@ -73,7 +73,7 @@ $error_text"
       $output_cli ${output_opts[@]} --messagecli --typecli "error" --message "$MSG"
    else
       local stripped_msg
-      stripped_msg="$(/usr/lib/msgcollector/striphtml "$MSG")"
+      stripped_msg="$(/usr/libexec/msgcollector/striphtml "$MSG")"
       if [ "$stripped_msg" = "" ]; then
          ## In case striphtml failed or is not available.
          echo "$MSG" >&2

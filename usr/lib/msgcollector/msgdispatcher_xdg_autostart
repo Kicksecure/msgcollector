@@ -5,4 +5,4 @@
 
 ## This script gets run by the /etc/xdg/autostart/msgdispatcher.desktop hook.
 
-/usr/lib/msgcollector/msgdispatcher --x & disown
+/usr/libexec/msgcollector/msgdispatcher --x & disown

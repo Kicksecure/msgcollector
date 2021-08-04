@@ -520,7 +520,7 @@ collector() {
       write_to_file="/run/msgcollector/$who_ami/${identifier}_messagecli"
       if [ ! -z "$message" ]; then
          ## variable $message exists
-         message="$(/usr/lib/msgcollector/striphtml "$message")"
+         message="$(/usr/libexec/msgcollector/striphtml "$message")"
          pretty_type_cli "$typecli"
          message="[$p_type] [$identifier] $message"
          echo "$message"
@@ -534,7 +534,7 @@ collector() {
       write_to_file="/run/msgcollector/$who_ami/${identifier}_waitmessagecli"
       if [ ! -z "$message" ]; then
          ## variable $message exists
-         message="$(/usr/lib/msgcollector/striphtml "$message")"
+         message="$(/usr/libexec/msgcollector/striphtml "$message")"
          pretty_type_cli "$typecli"
          message="[$p_type] [$identifier] $message"
          echo "$message"
@@ -548,7 +548,7 @@ collector() {
       if [ "$message" = "" ]; then
          message="message was empty."
       fi
-      message="$(/usr/lib/msgcollector/striphtml "$message")"
+      message="$(/usr/libexec/msgcollector/striphtml "$message")"
       if [ "$message" = "" ]; then
          message="message was empty after striphtml."
       fi
@@ -574,10 +574,10 @@ collector() {
       #echo "msgcollector: progressx: $progressx | caller: $PPID | $caller" >> /home/user/progresslog
 
       if [ "$verbose" = "1" ]; then
-         bash -x /usr/lib/msgcollector/msgprogress --identifier "$identifier" --whoami "$who_ami" --progressbaridx "${progressbaridx}" --progress "$progressx"
+         bash -x /usr/libexec/msgcollector/msgprogress --identifier "$identifier" --whoami "$who_ami" --progressbaridx "${progressbaridx}" --progress "$progressx"
       else
          ## & disown to prevent long waiting.
-         /usr/lib/msgcollector/msgprogress --identifier "$identifier" --whoami "$who_ami" --progressbaridx "${progressbaridx}" --progress "$progressx" & disown
+         /usr/libexec/msgcollector/msgprogress --identifier "$identifier" --whoami "$who_ami" --progressbaridx "${progressbaridx}" --progress "$progressx" & disown
       fi
    fi
    ## }}
@@ -607,12 +607,12 @@ collector() {
          exit 4
       fi
       echo "$parentpid" > "/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_parentpid"
-      message="$(/usr/lib/msgcollector/striphtml "$message")"
+      message="$(/usr/libexec/msgcollector/striphtml "$message")"
       write_to_file="/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_progressbarx"
       append_to_file
 
       ## Cannot run from msgdispatcher due to user mismatch permission issues.
-      /usr/lib/msgcollector/msgprogressbar --identifier "${identifier}" --whoami "$who_ami" --progressbaridx "${progressbaridx}" --progressbartitlex "$progressbartitlex" --message "$message" $animate & disown
+      /usr/libexec/msgcollector/msgprogressbar --identifier "${identifier}" --whoami "$who_ami" --progressbaridx "${progressbaridx}" --progressbartitlex "$progressbartitlex" --message "$message" $animate & disown
    fi
    ## }}
 }
@@ -773,7 +773,7 @@ forget() {
    ## Setting progress to 100, so any eventually still open progress bars get closed.
    ## Deactivated.
    ## Problematic if a new progress bar will be started quickly afterward.
-   #/usr/lib/msgcollector/msgprogress --identifier "$identifier" --whoami "$who_ami" --progress "100" & disown
+   #/usr/libexec/msgcollector/msgprogress --identifier "$identifier" --whoami "$who_ami" --progress "100" & disown
 
    local file_list=(
       "/run/msgcollector/$who_ami/${identifier}_icon"
@@ -803,7 +803,7 @@ forget() {
    ## "/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_fifo"
    ## "/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_progresstxt"
    ## "/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_zenityprogresspid"
-   ## because that could confuse /usr/lib/msgcollector/msgprogress.
+   ## because that could confuse /usr/libexec/msgcollector/msgprogress.
 
    local file_name
    for file_name in "${file_list[@]}"; do
@@ -837,7 +837,7 @@ forgetwaitcli() {
 
 parse_cmd_options "$@"
 
-source /usr/lib/msgcollector/msgcollector_shared
+source /usr/libexec/msgcollector/msgcollector_shared
 maybe_wait
 
 if [ "$forget" = "1" ]; then

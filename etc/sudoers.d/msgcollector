@@ -4,6 +4,6 @@
 Defaults:ALL env_keep += "msgdisptacher_username"
 Defaults:ALL env_keep += "msgdispatcher_identifier"
 Defaults:ALL env_keep += "msgdispatcher_appendix"
-%sudo ALL=NOPASSWD: /usr/lib/msgcollector/msgdispatcher_delete_wrapper
-%user ALL=NOPASSWD: /usr/lib/msgcollector/msgdispatcher_delete_wrapper
-user ALL=NOPASSWD: /usr/lib/msgcollector/msgdispatcher_delete_wrapper
+%sudo ALL=NOPASSWD: /usr/libexec/msgcollector/msgdispatcher_delete_wrapper
+%user ALL=NOPASSWD: /usr/libexec/msgcollector/msgdispatcher_delete_wrapper
+user ALL=NOPASSWD: /usr/libexec/msgcollector/msgdispatcher_delete_wrapper

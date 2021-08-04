@@ -8,7 +8,7 @@
 if [ ! "$(tty)" = "/dev/tty1" ]; then
    return 0
 else
-   /usr/lib/msgcollector/msgdispatcher_profile_d
+   /usr/libexec/msgcollector/msgdispatcher_profile_d
 fi
 
 ## End of /etc/profile.d/40_msgdispatcher.sh

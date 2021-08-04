@@ -17,7 +17,7 @@ error_handler() {
       error_text="$BASH_COMMAND"
    fi
 
-   output_msgdispatcher_sudo_wrapper="$(/usr/lib/msgcollector/br_add "$output_msgdispatcher_sudo_wrapper")" || true
+   output_msgdispatcher_sudo_wrapper="$(/usr/libexec/msgcollector/br_add "$output_msgdispatcher_sudo_wrapper")" || true
 
    local msg="<p>
 <br></br>$scriptname script bug.
@@ -42,10 +42,10 @@ error_handler() {
    ## Popup window with the message above.
    ## /usr/share/icons/anon-icon-pack/whonix.ico might not exist, but
    ## fortunately msgdispatcher_dispatch_x works anyway.
-   /usr/lib/msgcollector/msgdispatcher_dispatch_x "warning" "$scriptname" "$msg" "0" "/usr/share/icons/anon-icon-pack/whonix.ico" &
+   /usr/libexec/msgcollector/msgdispatcher_dispatch_x "warning" "$scriptname" "$msg" "0" "/usr/share/icons/anon-icon-pack/whonix.ico" &
 
    local stripped_msg
-   stripped_msg="$(/usr/lib/msgcollector/striphtml "$msg")"
+   stripped_msg="$(/usr/libexec/msgcollector/striphtml "$msg")"
    if [ "$stripped_msg" = "" ]; then
       ## In case striphtml failed or is not available.
       echo "$msg" >&2
@@ -188,7 +188,7 @@ preparation() {
    #fi
 
    inotifywait_folder="/run/msgcollector"
-   delete_wrapper="/usr/lib/msgcollector/msgdispatcher_delete_wrapper"
+   delete_wrapper="/usr/libexec/msgcollector/msgdispatcher_delete_wrapper"
 }
 
 write_own_pid() {
@@ -322,11 +322,11 @@ dispatch_x_active() {
    fi
 
    if [ "$verbose" = "1" ]; then
-      /usr/lib/msgcollector/msgdispatcher_dispatch_x "$type" "$title" "$msg" "$lefttop" "$icon"
+      /usr/libexec/msgcollector/msgdispatcher_dispatch_x "$type" "$title" "$msg" "$lefttop" "$icon"
    else
       ## Launching into background, so it doesn't block msgdispatcher until
       ## msgdispatcher_dispatch_x exits.
-      /usr/lib/msgcollector/msgdispatcher_dispatch_x "$type" "$title" "$msg" "$lefttop" "$icon" &
+      /usr/libexec/msgcollector/msgdispatcher_dispatch_x "$type" "$title" "$msg" "$lefttop" "$icon" &
    fi
 }
 
@@ -562,7 +562,7 @@ msgdispatcher_loop() {
       maybe_wait
       preparation
       write_own_pid
-      fallbacks ## provided by /usr/lib/msgcollector/msgwmctrl
+      fallbacks ## provided by /usr/libexec/msgcollector/msgwmctrl
       inotifywait_setup
       parse_existing_files
       inotifywait_loop
@@ -571,8 +571,8 @@ msgdispatcher_loop() {
    done
 }
 
-source /usr/lib/msgcollector/msgcollector_shared
-source /usr/lib/msgcollector/msgwmctrl
+source /usr/libexec/msgcollector/msgcollector_shared
+source /usr/libexec/msgcollector/msgwmctrl
 
 parse_cmd_options "$@"
 msgdispatcher_loop
