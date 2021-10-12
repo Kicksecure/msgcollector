@@ -4,8 +4,11 @@
 ## Copyright (C) 2014 - 2021 ENCRYPTED SUPPORT LP <adrelanos@whonix.org>
 ## See the file COPYING for copying conditions.
 
-## Usage:
+## Syntax:
 ## /usr/libexec/msgcollector/one-time-popup status-file title message
+
+## Example:
+## /usr/libexec/msgcollector/one-time-popup ~/testfolder/status-file "test title" "test msg"
 
 ## https://forums.whonix.org/t/do-not-show-this-message-again-generic-one-time-popup/8066
 
