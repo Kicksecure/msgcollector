@@ -1,3 +1,21 @@
+commit 889a4201fca01877f5783d5ba25ede9a334d6d18
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Oct 12 11:40:58 2021 -0400
+
+    comment
+
+commit 2febd8e861b1fafb4c6a55fba8dc09473805263e
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Oct 12 11:40:10 2021 -0400
+
+    /usr/libexec/msgcollector/one-time-popup: create folder if not existing (mkdir -p)
+
+commit 683781d9ba9ce12c18783c7feb9d1423807e5ee0
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Sep 12 11:51:24 2021 -0400
+
+    bumped changelog version
+
 commit 14fc01bb4b2e74913d27e2077e08b6d04431fbdb
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Sat Sep 11 16:31:36 2021 -0400
