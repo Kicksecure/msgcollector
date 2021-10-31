@@ -1,3 +1,15 @@
+commit 807d3ed9154a226ff9bb737c69fbf05a59f52efb
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Oct 30 14:44:35 2021 -0400
+
+    improve `/usr/lib/systemd/user/usertest.service`
+
+commit e0e4f674596f14359d98cf62d76d376594965df3
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Oct 12 12:03:25 2021 -0400
+
+    bumped changelog version
+
 commit 889a4201fca01877f5783d5ba25ede9a334d6d18
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Tue Oct 12 11:40:58 2021 -0400
