@@ -4,9 +4,9 @@
 ## See the file COPYING for copying conditions.
 
 error_handler() {
-   bash_command_backup="$BASH_COMMAND"
-
    local exit_code="$?"
+
+   bash_command_backup="$BASH_COMMAND"
    BUG="1"
 
    local error_cause error_text
