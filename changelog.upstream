@@ -1,3 +1,21 @@
+commit 77a6c4d465dc998470e290a5ada5356ad70cc748
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Jan 2 04:25:13 2022 -0500
+
+    `/usr/libexec/msgcollector/error_handler`: fix exit code capturing
+
+commit 6628c44a34cc93846480faf1731cea293fb8dec1
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Nov 9 14:32:31 2021 -0500
+
+    readme
+
+commit b71e6607729ecbceea0761cf9129a6955138e854
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Oct 31 15:12:07 2021 -0400
+
+    bumped changelog version
+
 commit 807d3ed9154a226ff9bb737c69fbf05a59f52efb
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Sat Oct 30 14:44:35 2021 -0400
