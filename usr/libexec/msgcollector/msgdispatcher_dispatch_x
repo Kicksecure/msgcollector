@@ -76,6 +76,10 @@ class Ui_Dialog(object):
         ## Size is returned
         messageHeight = self.Message.document().size().height()
         maximumHeight = QtWidgets.QDesktopWidget().availableGeometry().height() - 25
+        ## fix for:
+        ## DeprecationWarning: an integer is required (got type float).  Implicit conversion to integers using __int__ is deprecated, and may be removed in a future version of Python.
+        messageHeight = int(messageHeight)
+        maximumHeight = int(maximumHeight)
         if messageHeight <= maximumHeight:
             Dialog.resize(830, messageHeight + 55)
             self.center()
