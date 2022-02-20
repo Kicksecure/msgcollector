@@ -1,3 +1,23 @@
+commit e77c8853c29dfdde46e59297c8b01dbb08058210
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Feb 17 05:46:28 2022 -0500
+
+    fix for
+    
+    DeprecationWarning: an integer is required (got type float).  Implicit conversion to integers using __int__ is deprecated, and may be removed in a future version of Python.
+
+commit 72b1f86cf12a21a4761c3bb05c8c7959fa28d14b
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Feb 17 05:40:18 2022 -0500
+
+    minor
+
+commit b882af6816b69675d51c84d3f935a04bd40235e4
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Jan 2 06:13:06 2022 -0500
+
+    bumped changelog version
+
 commit 77a6c4d465dc998470e290a5ada5356ad70cc748
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Sun Jan 2 04:25:13 2022 -0500
