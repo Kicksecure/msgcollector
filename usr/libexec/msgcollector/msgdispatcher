@@ -40,9 +40,9 @@ error_handler() {
 </p>"
 
    ## Popup window with the message above.
-   ## /usr/share/icons/anon-icon-pack/whonix.ico might not exist, but
+   ## /usr/share/icons/icon-pack-dist/whonix.ico might not exist, but
    ## fortunately msgdispatcher_dispatch_x works anyway.
-   /usr/libexec/msgcollector/msgdispatcher_dispatch_x "warning" "$scriptname" "$msg" "0" "/usr/share/icons/anon-icon-pack/whonix.ico" &
+   /usr/libexec/msgcollector/msgdispatcher_dispatch_x "warning" "$scriptname" "$msg" "0" "/usr/share/icons/icon-pack-dist/whonix.ico" &
 
    local stripped_msg
    stripped_msg="$(/usr/libexec/msgcollector/striphtml "$msg")"
@@ -309,8 +309,8 @@ dispatch_x_active() {
       icon="$(cat "/run/msgcollector/$who_ami/${msgdispatcher_identifier}_icon")"
    else
       ## Fallback.
-      if [ -f "/usr/share/icons/anon-icon-pack/whonix.ico" ]; then
-         icon="/usr/share/icons/anon-icon-pack/whonix.ico"
+      if [ -f "/usr/share/icons/icon-pack-dist/whonix.ico" ]; then
+         icon="/usr/share/icons/icon-pack-dist/whonix.ico"
       else
          icon=""
       fi

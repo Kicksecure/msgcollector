@@ -126,7 +126,7 @@ msgdispatcher_dispatch_x requires 4 mandatory and 1 optional arguments
     title = str(sys.argv[2])
     msg = str(sys.argv[3])
     pos = str(sys.argv[4])
-    icon = "/usr/share/icons/anon-icon-pack/whonix.ico"
+    icon = "/usr/share/icons/icon-pack-dist/whonix.ico"
     if len(sys.argv) == 6:
         icon = str(sys.argv[5])
 

@@ -58,7 +58,7 @@ class GuiMessage(QtWidgets.QDialog):
         palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Base, brush)
         self.setPalette(palette)
 
-        self.setWindowIcon(QIcon("/usr/share/icons/anon-icon-pack/whonix.ico"))
+        self.setWindowIcon(QIcon("/usr/share/icons/icon-pack-dist/whonix.ico"))
         self.setWindowTitle(title)
 
         self.label = QtWidgets.QLabel(self)

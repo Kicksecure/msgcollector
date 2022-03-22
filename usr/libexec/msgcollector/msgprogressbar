@@ -180,7 +180,7 @@ start_progress_bar() {
 
    if [ "$icon" = "" ]; then
       ## TODO: write error log
-      local icon="/usr/share/icons/anon-icon-pack/whonix.ico"
+      local icon="/usr/share/icons/icon-pack-dist/whonix.ico"
    fi
 
    if [ -f "/run/msgcollector/$who_ami/${identifier}_lefttop" ]; then
