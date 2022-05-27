@@ -1,3 +1,19 @@
+commit 8172dd747d53df7ec5bd81c49b4df78c3fd2b9a4
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri May 27 08:35:40 2022 -0400
+
+    fix warning "tb_updater_gui:141: DeprecationWarning: an integer is required (got type float)"
+    
+    Thanks to TNT_BOM_BOM for the bug report!
+    
+    https://forums.whonix.org/t/tb-updater-gui-deprecationwarning-an-integer-is-required-got-type-float/13706
+
+commit d9b7f6c56d4db0249cf5c662a4a62ee92361924b
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed May 25 06:07:12 2022 -0400
+
+    bumped changelog version
+
 commit 7538a8e7c87b1210c5cefd2fa42120a8601450d9
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Fri May 20 15:27:08 2022 -0400
