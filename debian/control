@@ -17,11 +17,21 @@ Architecture: all
 Depends: python3, sudo, inotify-tools, procps, ${misc:Depends}
 Provides: ${diverted-files}
 Conflicts: ${diverted-files}
-Description: Notification System for Terminal
- Collects messages by applications using this system and dispatches them in
- terminal.
+Description: Command Line Interface Messages Toolkit Library
+ A programming library providing an application programming interface (API)
+ that allows the programmer to output colored text in terminal user interfaces
+ (CLI).
  .
- For gui support also install package msgcollector-gui.
+ Applications can send messages to msgcollector which it collects and
+ dispatches once instructed to do so by the application.
+ .
+ For clarity and avoidance of confusion, msgcollector does not collect any
+ data. Applications that do not use msgcollector do not interact with
+ msgcollector. It is roughly in the same category as ncurses but has of course
+ much less and very different features.
+ .
+ For graphical user interface (GUI) support also install package
+ msgcollector-gui.
 
 Package: msgcollector-gui
 Architecture: all
@@ -30,7 +40,18 @@ Depends: msgcollector, wmctrl, python3-pyqt5, zenity,
  ${misc:Depends}
 Provides: ${diverted-files}
 Conflicts: ${diverted-files}
-Description: Notification System for X
- Collects messages by applications using this system and dispatches them in X.
+Description: Graphical User Interface Toolkit Library
+ A programming library providing an application programming interface (API)
+ that allows the programmer to output colored text in graphical user interfaces
+ (GUI).
  .
- A metapackage that installs required dependencies for X support.
+ Applications can send messages to msgcollector which it collects and
+ dispatches once instructed to do so by the application.
+ .
+ For clarity and avoidance of confusion, msgcollector does not collect any
+ data. Applications that do not use msgcollector do not interact with
+ msgcollector. It is roughly in the same category as Qt or GDK but has of
+ course much less and very different features.
+ .
+ A metapackage that installs required dependencies for graphical user interface
+ support.
