@@ -1,3 +1,21 @@
+commit afb0456cbf43bf1d725216f3effc1b4d1feb5f51
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Jun 1 16:06:55 2022 -0400
+
+    description
+
+commit 418b551e7eaa9f7862baf6a8e809cf326d6d233e
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Jun 1 15:54:19 2022 -0400
+
+    better error message if ARG_MAX is exceeded
+
+commit 3820ac3ddd52ed57063ecac81008883c5d303032
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri May 27 10:25:10 2022 -0400
+
+    bumped changelog version
+
 commit 8172dd747d53df7ec5bd81c49b4df78c3fd2b9a4
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Fri May 27 08:35:40 2022 -0400
