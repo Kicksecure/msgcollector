@@ -876,6 +876,3 @@ if [ "$status" = "1" ]; then
 else
    collector
 fi
-
-xxx-test-bug-test
-true
