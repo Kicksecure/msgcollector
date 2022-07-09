@@ -35,7 +35,7 @@ $error_text"
 <br></br>##
 <br></br>## For debugging, run:
 <br></br>##
-<br></br>## bash -x $SCRIPTNAME --verbose
+<br></br>## $SCRIPTNAME --debug
 <br></br>##
 <br></br>## Clean the output and report to developers.
 <br></br>#########################################################################</p>"
