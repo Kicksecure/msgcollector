@@ -54,7 +54,11 @@ error_handler() {
    if [ ! -d ~/".msgcollector" ]; then
       mkdir --parents ~/".msgcollector"
    fi
-## XXX
+   ## XXX: set executable bit on the folder. This has nothing to do with executable binaries. See:
+   ## https://superuser.com/questions/168578/why-must-a-folder-be-executable
+   ## This is required because otherwise the following "touch" command would fail.
+   ## Unclear why this is required. Maybe an issue in /usr/lib/tmpfiles.d/systemcheck.conf config file
+   ## This workaround is good enough.
    chmod +x ~/".msgcollector"
 
    if ! touch  ~/".msgcollector/msgdispatcher-error.log" ; then
