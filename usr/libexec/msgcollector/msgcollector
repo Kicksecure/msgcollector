@@ -54,6 +54,18 @@ error_handler() {
    if [ ! -d ~/".msgcollector" ]; then
       mkdir --parents ~/".msgcollector"
    fi
+## XXX
+   chmod +x ~/".msgcollector"
+
+   if ! touch  ~/".msgcollector/msgdispatcher-error.log" ; then
+      echo "$scriptname: skipping log to $home_var/.msgcollector/msgdispatcher-error.log since failed to 'touch' file." >&2
+      exit 1
+   fi
+
+   if [ ! -w  ~/".msgcollector/msgdispatcher-error.log" ]; then
+      echo "$scriptname: skipping log to ~/.msgcollector/msgdispatcher-error.log since not writeable file: $home_var/.msgcollector" >&2
+      exit 1
+   fi
 
    echo "\
 scriptname: $scriptname
@@ -857,3 +869,6 @@ if [ "$status" = "1" ]; then
 else
    collector
 fi
+
+xxx-test-bug-test
+true
