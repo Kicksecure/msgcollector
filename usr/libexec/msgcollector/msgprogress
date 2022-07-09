@@ -27,7 +27,7 @@ error_handler() {
    if [ ! -d ~/".msgcollector" ]; then
       mkdir --parents ~/".msgcollector"
    fi
-   echo "$scriptname: BASH_COMMAND: $BASH_COMMAND | exit_code: $exit_code" >> ~/".msgcollector/msgdispatcher-error.log"
+   echo "$scriptname: BASH_COMMAND: $BASH_COMMAND | exit_code: $exit_code" | tee -a ~/".msgcollector/msgdispatcher-error.log" >/dev/null
    exit 1
 }
 
