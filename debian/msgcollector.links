@@ -1,0 +1,1 @@
+/etc/profile.d/40_msgdispatcher.sh /etc/zprofile.d/40_msgdispatcher.zsh
