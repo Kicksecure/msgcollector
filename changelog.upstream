@@ -1,3 +1,27 @@
+commit c0fb5359640bd3a4fc0f8bb77ed1d7f351c95182
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Oct 8 12:29:13 2023 -0400
+
+    allow termination through ctrl + c (signal sigterm)
+
+commit b45674133ba04ec218c2234f4849f4117b21ed3a
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Oct 8 12:25:54 2023 -0400
+
+    refactoring
+
+commit 71d2bef5de17481a10d426e41666f48332729551
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Oct 8 12:21:10 2023 -0400
+
+    usr/libexec/msgcollector/alert import from qubes-whonix
+
+commit 55d684b8eb07402e970b49bd932c350e3524d06a
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Oct 8 06:30:48 2023 -0400
+
+    bumped changelog version
+
 commit e6c500f00caca322a43cfd41193b711c86d03fb6
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Sun Oct 8 06:26:48 2023 -0400
