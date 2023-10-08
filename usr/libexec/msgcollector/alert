@@ -64,20 +64,20 @@ class Messages():
                 self.title = language.get('title', None)
                 self.message = language.get('message', None)
             else:
-                self.title = "alert script Qubes-Whonix"
+                self.title = "alert script by msgcollector"
                 self.message = "section " + section + " not found! [...............................]"
 
         except:
             error_msg = "Unexpected error: " + str(sys.exc_info()[0])
             print(error_msg)
-            self.title = "alert script Qubes-Whonix"
+            self.title = "alert script by msgcollector"
             self.message = error_msg
 
 
 
-class WhonixMessageBox(QtWidgets.QMessageBox):
+class AlertMessageBox(QtWidgets.QMessageBox):
     def __init__(self, message):
-        super(WhonixMessageBox, self).__init__()
+        super(AlertMessageBox, self).__init__()
         self.message = message
         self.initUI()
 
@@ -110,7 +110,7 @@ def main():
     app = QtWidgets.QApplication(sys.argv)
 
     message = Messages(args.section, args.filename)
-    dialog = WhonixMessageBox(message)
+    dialog = AlertMessageBox(message)
     sys.exit()
 
 if __name__ == "__main__":
