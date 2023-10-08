@@ -1,3 +1,15 @@
+commit e6e14ef147f5f8b2d72f4bd236cc7c0163f82261
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Oct 8 13:35:53 2023 -0400
+
+    correct signal exit codes
+
+commit e0a0a00b23d903ca4a607b23d5308bc42fcb40bf
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Oct 8 13:10:29 2023 -0400
+
+    bumped changelog version
+
 commit c0fb5359640bd3a4fc0f8bb77ed1d7f351c95182
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Sun Oct 8 12:29:13 2023 -0400
