@@ -13,6 +13,8 @@
 ## https://forums.whonix.org/t/do-not-show-this-message-again-generic-one-time-popup/8066
 
 import sys
+import signal
+
 import os
 from pathlib import Path
 from PyQt5 import QtCore, QtWidgets
