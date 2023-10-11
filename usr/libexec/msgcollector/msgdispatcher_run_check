@@ -18,8 +18,12 @@ msgdispatcher_pid_check() {
       error "$FUNCNAME neither cli nor x is set to 1."
    fi
 
-   [[ -f "$pid_file" ]] || return 0
+   if test -f "$pid_file" ; then
+      true "$0: $FUNCNAME: pid_file $pid_file exists, ok."
+      return 0
+   fi
 
+   true "$0: $FUNCNAME: pid_file $pid_file does NOT exist."
    return 1
 
    ## hidepid=2 broke this
@@ -69,7 +73,7 @@ output_func_x() {
       output_func "$@"
       return "$?"
    fi
-   true "Skipping $FUNCNAME."
+   true "$0: $FUNCNAME: skipping because msgdispatcher_running_x is not set to true."
 }
 
 output_func_cli() {
