@@ -1,1 +1,2 @@
 /etc/profile.d/40_msgdispatcher.sh /etc/zprofile.d/40_msgdispatcher.zsh
+/etc/profile.d/40_msgdispatcher.sh /etc/X11/Xsession.d/40_msgdispatcher.sh
