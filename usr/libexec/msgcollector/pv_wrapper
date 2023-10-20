@@ -13,6 +13,14 @@ set -e
 set -o nounset
 set -o pipefail
 
+trap "error_handler" ERR
+
+error_handler() {
+  local exit_code="$?"
+  local last_err="$BASH_COMMAND"
+  echo "$0: ERROR: BASH_COMMAND '$BASH_COMMAND' exit code '$exit_code'." >&2
+}
+
 while read -r line; do
    percent="$line"
    eval $pv_echo_command
