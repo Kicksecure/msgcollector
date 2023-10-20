@@ -1,3 +1,15 @@
+commit 26e0c4dac2160d6cc8e2fc11f206fe9f9877ca2d
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Oct 20 11:46:43 2023 -0400
+
+    improve pv_wrapper
+
+commit 5ef488c5afabaa74e4b7274273c21a2b912056aa
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Oct 20 10:14:26 2023 -0400
+
+    bumped changelog version
+
 commit 5b8eb4aa424f14de5b99f45ea88a3e864844e092
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Fri Oct 20 10:13:36 2023 -0400
