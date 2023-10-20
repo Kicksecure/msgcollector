@@ -3,7 +3,13 @@
 ## Copyright (C) 2012 - 2023 ENCRYPTED SUPPORT LP <adrelanos@whonix.org>
 ## See the file COPYING for copying conditions.
 
+if [ "$pv_wrapper_debug" = "true" ]; then
+   set -x
+fi
+
 set -e
+set -o nounset
+set -o pipefail
 
 while read -r line; do
    percent="$line"
