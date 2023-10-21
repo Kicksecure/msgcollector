@@ -8,13 +8,17 @@
 if [ ! "$XDG_SESSION_TYPE" = "tty" ]; then
    true "$0: INFO: Skip because this is not running in tty."
    return 0
+   exit 0
 fi
 
 ## Do this only in /dev/tty1.
 if [ ! "$(tty)" = "/dev/tty1" ]; then
    true "$0: INFO: Skip, because not running in /dev/tty1."
    return 0
+   exit 0
 fi
+
+true "$0: INFO: Continue, because running in /dev/tty1."
 
 ## Running in /dev/tty1.
 /usr/libexec/msgcollector/msgdispatcher_profile_d
