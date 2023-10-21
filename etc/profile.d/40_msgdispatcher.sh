@@ -6,13 +6,13 @@
 ## /etc/profile.d/40_msgdispatcher.sh
 
 if [ ! "$XDG_SESSION_TYPE" = "tty" ]; then
-   ## Skip this if not run in tty.
+   true "$0: INFO: Skip because this is not running in tty."
    return 0
 fi
 
 ## Do this only in /dev/tty1.
 if [ ! "$(tty)" = "/dev/tty1" ]; then
-   ## Not running in /dev/tty1.
+   true "$0: INFO: Skip, because not running in /dev/tty1."
    return 0
 fi
 
