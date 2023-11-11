@@ -1,3 +1,41 @@
+commit 33be1030f3482537c4a2769f2f0b7accdf7c50a5
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Nov 11 13:41:31 2023 -0500
+
+    change license to AGPL-3+
+    
+    https://forums.whonix.org/t/license-change-to-agplv3/17455
+
+commit 01e4e1fc3bcf644695669ca94e76c5d1fcf8823b
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Nov 11 11:23:50 2023 -0500
+
+    msgdispatcher_dispatch_x signal support
+
+commit 30c4a1e55e6a195c9aa1a2e4a0b76c78fbc351e1
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Nov 11 11:21:01 2023 -0500
+
+    one time popup signal support
+
+commit 8048326fb0c2e8ed0d2f58fb74018f36b0833bf2
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Nov 11 11:18:30 2023 -0500
+
+    generic gui message signal support
+
+commit cda2f726095bc6d2b6bd35efc0883c6d6e913c1f
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Nov 11 11:15:48 2023 -0500
+
+    /usr/libexec/msgcollector/tb_updater_gui add signal support
+
+commit 471e58cb2df3e64f07f4c32784d570c1aee95ab2
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Oct 21 12:34:12 2023 -0400
+
+    bumped changelog version
+
 commit 50b93607d8009840178dc22c27d30543d2999d80
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Sat Oct 21 12:33:25 2023 -0400
