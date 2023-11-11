@@ -16,6 +16,9 @@ try:
 except AttributeError:
     _fromUtf8 = lambda s: s
 
+def signal_handler(sig, frame):
+    sys.exit(128 + sig)
+
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
@@ -101,8 +104,6 @@ if __name__ == "__main__":
     import sys
     import signal
 
-    signal.signal(signal.SIGINT, signal.SIG_DFL)
-
     syntax_details = """
 msgdispatcher_dispatch_x requires 4 mandatory and 1 optional arguments
     1) Message Type = info|warning|error
@@ -136,4 +137,14 @@ msgdispatcher_dispatch_x requires 4 mandatory and 1 optional arguments
     ui = Ui_Dialog()
     ui.setupUi(Dialog)
     Dialog.show()
-    sys.exit(app.exec_())
+
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+
+    timer = QtCore.QTimer()
+    timer.start(500)
+    timer.timeout.connect(lambda: None)
+
+    app.exec_()
+
+
