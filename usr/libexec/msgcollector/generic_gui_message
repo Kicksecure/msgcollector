@@ -15,6 +15,9 @@ try:
 except AttributeError:
     _fromUtf8 = lambda s: s
 
+def signal_handler(sig, frame):
+    sys.exit(128 + sig)
+
 class GuiMessage(QtWidgets.QDialog):
     def __init__(self):
         super(GuiMessage, self).__init__()
@@ -137,8 +140,16 @@ class GuiMessage(QtWidgets.QDialog):
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+
+    timer = QtCore.QTimer()
+    timer.start(500)
+    timer.timeout.connect(lambda: None)
+
     message = GuiMessage()
-    sys.exit()
+    app.exec_()
+
 
 if __name__ == '__main__':
     main()
