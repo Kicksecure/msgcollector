@@ -28,6 +28,10 @@ if os.path.exists(status_file):
     sys.exit()
 
 
+def signal_handler(sig, frame):
+    sys.exit(128 + sig)
+
+
 class Notice(QtWidgets.QDialog):
     def __init__(self):
         super(Notice, self).__init__()
@@ -70,8 +74,15 @@ class Notice(QtWidgets.QDialog):
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+
+    timer = QtCore.QTimer()
+    timer.start(500)
+    timer.timeout.connect(lambda: None)
+
     ex = Notice()
-    sys.exit(app.exec_())
+    app.exec_()
 
 if __name__ == '__main__':
     main()
