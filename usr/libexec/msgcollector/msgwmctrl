@@ -26,10 +26,13 @@ fallbacks() {
 
    if [ "$(command -v "wmctrl")" = "" ] || [ "$DISPLAY" = "" ]; then
       ## wmctrl is not installed or no X server running.
+      wmctrl_dummy=true
       wmctrl() {
          ## dummy
          true
       }
+   else
+      wmctrl_dummy=false
    fi
 
    if [ "$(command -v "xwininfo")" = "" ] || [ "$DISPLAY" = "" ]; then
@@ -73,6 +76,10 @@ get_own_window_title() {
       local max_wait="120"
    else
       local max_wait="60"
+   fi
+
+   if [ "$wmctrl_dummy" = "true" ]; then
+      local max_wait="0"
    fi
 
    local counter
