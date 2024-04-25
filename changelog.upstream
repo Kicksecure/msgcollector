@@ -1,3 +1,15 @@
+commit 498d9f1084575d14dda4629158fcc03d19047e83
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Apr 25 08:42:12 2024 -0400
+
+    skip wait if wmctrl is unavailable
+
+commit 4fe14bb61fc2644ae6d96901a86fac177612612f
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Feb 2 12:36:02 2024 +0000
+
+    bumped changelog version
+
 commit 9c15c5abd4ebae3c53d84a2737ea27352fad16a4
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Fri Feb 2 07:32:29 2024 -0500
