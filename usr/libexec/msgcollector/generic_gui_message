@@ -24,7 +24,7 @@ Examples:
 
 import sys
 import signal
-
+import argparse
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QIcon, QPixmap
 
@@ -37,20 +37,17 @@ def signal_handler(sig, frame):
     sys.exit(128 + sig)
 
 class GuiMessage(QtWidgets.QDialog):
-    def __init__(self):
+    def __init__(self, args):
         super(GuiMessage, self).__init__()
+        self.args = args
         self.setup_ui()
 
     def setup_ui(self):
-        try:
-            message_type = str(sys.argv[1])
-            title = str(sys.argv[2])
-            message = str(sys.argv[3])
-            question = str(sys.argv[4])
-            self.button = str(sys.argv[5])
-
-        except IndexError:
-            sys.exit('Arguments parsing error: Incorrect number of arguments')
+        message_type = self.args.message_type
+        title = self.args.title
+        message = self.args.message
+        question = self.args.question
+        self.button = self.args.button_type
 
         # Set default icon path for 'info' type
         icon_path = "/usr/share/icons/oxygen/base/64x64/status/dialog-information.png"
@@ -148,6 +145,15 @@ class GuiMessage(QtWidgets.QDialog):
         sys.exit()
 
 def main():
+    parser = argparse.ArgumentParser(description="Create a GUI message dialog using PyQt5.")
+    parser.add_argument('message_type', choices=['info', 'warning', 'error'], help="Type of the message ('info', 'warning', or 'error')")
+    parser.add_argument('title', help="The window title")
+    parser.add_argument('message', help="The main message text")
+    parser.add_argument('question', help="An additional question or prompt")
+    parser.add_argument('button_type', choices=['ok', 'yesno'], help="Type of the button ('ok' for a single OK button, 'yesno' for Yes and No buttons)")
+
+    args = parser.parse_args()
+
     app = QtWidgets.QApplication(sys.argv)
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
@@ -156,7 +162,7 @@ def main():
     timer.start(500)
     timer.timeout.connect(lambda: None)
 
-    message = GuiMessage()
+    message = GuiMessage(args)
     message.show()
     app.exec_()
 
