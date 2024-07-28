@@ -19,7 +19,7 @@ Arguments:
 
 Examples:
 /usr/libexec/msgcollector/generic_gui_message warning "Alert" "This is a warning message." "Do you want to continue?" yesno
-/usr/libexec/msgcollector/generic_gui_message info "Alert" "This is a info message." "" ok
+/usr/libexec/msgcollector/generic_gui_message info "Info" "This is an info message with a link: <a href='https://www.example.com'>Click here</a>" "" ok
 """
 
 import sys
