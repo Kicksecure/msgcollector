@@ -117,8 +117,6 @@ class GuiMessage(QtWidgets.QDialog):
 
         QtCore.QTimer.singleShot(0, self.setSize)
 
-        self.exec_()
-
     def setSize(self):
         ## Size is returned
         messageHeight = int(self.text.document().size().height())
@@ -159,6 +157,7 @@ def main():
     timer.timeout.connect(lambda: None)
 
     message = GuiMessage()
+    message.show()
     app.exec_()
 
 if __name__ == '__main__':
