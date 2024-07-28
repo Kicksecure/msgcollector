@@ -4,6 +4,23 @@
 ## Copyright (C) 2014 troubadour <trobador@riseup.net>
 ## Copyright (C) 2014 - 2023 ENCRYPTED SUPPORT LP <adrelanos@whonix.org>
 
+"""
+This script creates a GUI message dialog using PyQt5.
+
+Usage:
+python3 script_name.py <message_type> <title> <message> <question> <button_type>
+
+Arguments:
+1. message_type: 'info', 'warning', or 'error'
+2. title: The window title
+3. message: The main message text
+4. question: An additional question or prompt
+5. button_type: 'ok' for a single OK button, 'yesno' for Yes and No buttons
+
+Example:
+python3 script_name.py warning "Alert" "This is a warning message." "Do you want to continue?" yesno
+"""
+
 import sys
 import signal
 
