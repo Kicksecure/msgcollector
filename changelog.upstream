@@ -1,3 +1,57 @@
+commit 9373c8a04f9ebfa725ee2ff01393a5fe597f9671
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Jul 28 16:42:54 2024 -0400
+
+    add command line help
+
+commit acc1060633d5145be2725bc3034c71d8860ff7b2
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Jul 28 16:39:15 2024 -0400
+
+    comment
+
+commit 14596b7f28a5ecb793e91113491f577e1b423640
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Jul 28 16:34:55 2024 -0400
+
+    fix
+
+commit 686925f8d4a3dc2bd3a756ffa052e4ccf394e84c
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Jul 28 16:32:02 2024 -0400
+
+    fix
+
+commit 9f5186b7670c8834d9ac4a11cf87bc6c6e01566f
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Jul 28 16:20:20 2024 -0400
+
+    comment
+
+commit 5d130ebacddac165d974410c250f7f7e7add7749
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Jul 28 16:17:01 2024 -0400
+
+    fix
+
+commit 965dc9ce4c9a68b53b8124b0b887032b17e0c0d2
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Jul 28 16:13:19 2024 -0400
+
+    comment
+
+commit c56691543e03e5587d74f2e38064b541d22aba60
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Jul 28 16:12:30 2024 -0400
+
+    comment
+
+commit 92559fcc6f192d4c0f347115c908ffdf997a6697
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Apr 25 13:21:21 2024 +0000
+
+    bumped changelog version
+
 commit 498d9f1084575d14dda4629158fcc03d19047e83
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Thu Apr 25 08:42:12 2024 -0400
