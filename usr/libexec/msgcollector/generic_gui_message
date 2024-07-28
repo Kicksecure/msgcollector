@@ -43,7 +43,7 @@ class GuiMessage(QtWidgets.QDialog):
 
     def setup_ui(self):
         try:
-            itype = str(sys.argv[1])
+            message_type = str(sys.argv[1])
             title = str(sys.argv[2])
             message = str(sys.argv[3])
             question = str(sys.argv[4])
@@ -53,14 +53,15 @@ class GuiMessage(QtWidgets.QDialog):
             sys.exit('Arguments parsing error: Incorrect number of arguments')
 
         # Set default icon path for 'info' type
-        itype = "/usr/share/icons/oxygen/base/64x64/status/dialog-information.png"
+        icon_path = "/usr/share/icons/oxygen/base/64x64/status/dialog-information.png"
 
-        if itype == "warning":
-            itype = "/usr/share/icons/oxygen/base/64x64/status/dialog-warning.png"
-        elif itype == "error":
-            itype = "/usr/share/icons/oxygen/base/64x64/status/dialog-error.png"
+        if message_type == "warning":
+            icon_path = "/usr/share/icons/oxygen/base/64x64/status/dialog-warning.png"
+        elif message_type == "error":
+            icon_path = "/usr/share/icons/oxygen/base/64x64/status/dialog-error.png"
 
-        message = message + '<p>' + question + '</p>'
+        if question:
+            message = message + '<p>' + question + '</p>'
 
         self.gridLayout = QtWidgets.QGridLayout(self)
 
@@ -80,24 +81,24 @@ class GuiMessage(QtWidgets.QDialog):
         self.setWindowTitle(title)
 
         self.label = QtWidgets.QLabel(self)
-        image = QtGui.QImage(itype)
+        image = QtGui.QImage(icon_path)
         self.label.setPixmap(QPixmap.fromImage(image))
 
-        self.label.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
+        self.label.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
         self.gridLayout.addWidget(self.label, 0, 0)
 
         self.text = QtWidgets.QTextBrowser(self)
         self.text.setMinimumSize(535, 0)
-        self.text.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
+        self.text.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
         self.text.setFrameShape(QtWidgets.QFrame.NoFrame)
-        self.text.setTextInteractionFlags(QtCore.Qt.LinksAccessibleByMouse|QtCore.Qt.TextSelectableByMouse)
+        self.text.setTextInteractionFlags(QtCore.Qt.LinksAccessibleByMouse | QtCore.Qt.TextSelectableByMouse)
         self.text.setOpenExternalLinks(True)
         self.text.setText(message)
         self.gridLayout.addWidget(self.text, 0, 1)
 
         self.buttonBox = QtWidgets.QDialogButtonBox(self)
         if self.button == 'yesno':
-            self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Yes|QtWidgets.QDialogButtonBox.No)
+            self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Yes | QtWidgets.QDialogButtonBox.No)
 
             self.yes_button = self.buttonBox.button(QtWidgets.QDialogButtonBox.Yes)
             self.yes_button.clicked.connect(self.yes_pressed)
@@ -114,7 +115,6 @@ class GuiMessage(QtWidgets.QDialog):
 
         self.gridLayout.addWidget(self.buttonBox, 1, 1)
 
-        #self.center()
         QtCore.QTimer.singleShot(0, self.setSize)
 
         self.exec_()
@@ -136,10 +136,10 @@ class GuiMessage(QtWidgets.QDialog):
             self.ok_button.setFocus()
 
     def center(self):
-       frameGm = self.frameGeometry()
-       centerPoint = QtWidgets.QDesktopWidget().availableGeometry().center()
-       frameGm.moveCenter(centerPoint)
-       self.move(frameGm.topLeft())
+        frameGm = self.frameGeometry()
+        centerPoint = QtWidgets.QDesktopWidget().availableGeometry().center()
+        frameGm.moveCenter(centerPoint)
+        self.move(frameGm.topLeft())
 
     def yes_pressed(self):
         print("16384")
