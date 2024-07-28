@@ -48,15 +48,15 @@ class GuiMessage(QtWidgets.QDialog):
             question = str(sys.argv[4])
             self.button = str(sys.argv[5])
 
-        except (IndexError) as e:
-            sys.exit('Arguments parsing error')
+        except IndexError:
+            sys.exit('Arguments parsing error: Incorrect number of arguments')
 
+        # Set default icon path for 'info' type
         itype = "/usr/share/icons/oxygen/base/64x64/status/dialog-information.png"
 
-        if str(sys.argv[1]) == "warning":
+        if itype == "warning":
             itype = "/usr/share/icons/oxygen/base/64x64/status/dialog-warning.png"
-
-        elif str(sys.argv[1]) == "error":
+        elif itype == "error":
             itype = "/usr/share/icons/oxygen/base/64x64/status/dialog-error.png"
 
         message = message + '<p>' + question + '</p>'
@@ -69,8 +69,6 @@ class GuiMessage(QtWidgets.QDialog):
         brush = QtGui.QBrush(QtGui.QColor(255, 255, 255, 0))
         brush.setStyle(QtCore.Qt.SolidPattern)
         palette.setBrush(QtGui.QPalette.Active, QtGui.QPalette.Base, brush)
-        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255, 0))
-        brush.setStyle(QtCore.Qt.SolidPattern)
         palette.setBrush(QtGui.QPalette.Inactive, QtGui.QPalette.Base, brush)
         brush = QtGui.QBrush(QtGui.QColor(244, 244, 244))
         brush.setStyle(QtCore.Qt.SolidPattern)
@@ -83,7 +81,6 @@ class GuiMessage(QtWidgets.QDialog):
         self.label = QtWidgets.QLabel(self)
         image = QtGui.QImage(itype)
         self.label.setPixmap(QPixmap.fromImage(image))
-        #self.Info_Icon.setPixmap(QPixmap.fromImage(image))
 
         self.label.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.gridLayout.addWidget(self.label, 0, 0)
@@ -127,19 +124,15 @@ class GuiMessage(QtWidgets.QDialog):
         maximumHeight = int(QtWidgets.QDesktopWidget().availableGeometry().height() - 60)
         if messageHeight <= maximumHeight:
             self.resize(620, messageHeight + 60)
-            self.center()
-            if self.button == 'yesno':
-                self.no_button.setFocus()
-            elif self.button == 'ok':
-                self.ok_button.setFocus()
-
         else:
             self.resize(620, maximumHeight)
-            self.center()
-            if self.button == 'yesno':
-                self.no_button.setFocus()
-            elif self.button == 'ok':
-                self.ok_button.setFocus()
+
+        self.center()
+
+        if self.button == 'yesno':
+            self.no_button.setFocus()
+        elif self.button == 'ok':
+            self.ok_button.setFocus()
 
     def center(self):
        frameGm = self.frameGeometry()
@@ -166,7 +159,6 @@ def main():
 
     message = GuiMessage()
     app.exec_()
-
 
 if __name__ == '__main__':
     main()
