@@ -107,14 +107,14 @@ get_own_window_title() {
    done
 
    xwininfo_output="$(xwininfo -id "$WINDOWID" 2>&1)"
-
-   xwininfo_first_useful_line="$(echo "$xwininfo_output" | grep '"*"')"
-   ## Example xwininfo_first_useful_line:
+   ## contains:
    ## xwininfo: Window id: 0x2600012 "~/Whonix/packages/msgcollector : bash"
 
-   own_window_title="$(echo "$xwininfo_first_useful_line" | grep -oP '"\K[^"\047]+(?=["\047])')"
+   own_window_title="$(echo "$xwininfo_output" | awk -F'"' '/Window id/ {print $2}')"
    ## Example own_window_title:
    ## ~/Whonix/packages/msgcollector : bash
+
+   true "own_window_title: $own_window_title"
 }
 
 output_wait_for_window() {
@@ -138,13 +138,13 @@ output_wait_for_window() {
 
    while true; do
       ## "2>/dev/null" to hide output "Can not open display.", when not yet available.
-      local temp
+      local wmctrl_list
       ## Getting a list of all existing windows.
-      temp="$(wmctrl -l 2>/dev/null)" || true
+      wmctrl_list="$(wmctrl -l 2>/dev/null)" || true
 
       local grep_exit_code
       grep_exit_code="0"
-      echo "$temp" | grep --quiet "$title" || { grep_exit_code="$?" ; true; };
+      echo "$wmctrl_list" | grep --quiet --fixed-strings -- "$title" || { grep_exit_code="$?" ; true; };
 
       if [ "$grep_exit_code" = "0" ]; then
          true "Found window title \"$title\"."
