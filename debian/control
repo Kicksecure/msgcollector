@@ -37,7 +37,7 @@ Package: msgcollector-gui
 Architecture: all
 Depends: msgcollector, wmctrl, python3-pyqt5, qtwayland5, zenity,
  libnotify-bin | kde-baseapps-bin, mate-notification-daemon, x11-utils,
- ${misc:Depends}
+ gnome-colors-common, ${misc:Depends}
 Provides: ${diverted-files}
 Conflicts: ${diverted-files}
 Description: Graphical User Interface Toolkit Library
