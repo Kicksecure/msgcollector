@@ -4,37 +4,38 @@
 ## Copyright (C) 2014 - 2023 ENCRYPTED SUPPORT LP <adrelanos@whonix.org>
 ## See the file COPYING for copying conditions.
 
-## Syntax:
-## /usr/libexec/msgcollector/one-time-popup status-file title message
+"""
+This script creates a one-time popup message dialog using PyQt5. The popup will not be shown again if the user selects "Do not show this message again."
 
-## Example:
-## /usr/libexec/msgcollector/one-time-popup ~/testfolder/status-file "test title" "test msg"
+Usage:
+/usr/libexec/msgcollector/one-time-popup <status_file> <title> <message>
 
-## https://forums.whonix.org/t/do-not-show-this-message-again-generic-one-time-popup/8066
+Arguments:
+1. status_file: Path to the status file used to track if the message should be shown again
+2. title: The window title
+3. message: The main message text
+
+Example:
+/usr/libexec/msgcollector/one-time-popup ~/testfolder/status-file "Test Title" "Test Message"
+
+For more information, visit: https://forums.whonix.org/t/do-not-show-this-message-again-generic-one-time-popup/8066
+"""
 
 import sys
 import signal
-
 import os
 from pathlib import Path
 from PyQt5 import QtCore, QtWidgets
 
-status_file = sys.argv[1]
-title = sys.argv[2]
-message = sys.argv[3]
-
-
-if os.path.exists(status_file):
-    sys.exit()
-
-
 def signal_handler(sig, frame):
     sys.exit(128 + sig)
 
-
 class Notice(QtWidgets.QDialog):
-    def __init__(self):
+    def __init__(self, status_file, title, message):
         super(Notice, self).__init__()
+        self.status_file = status_file
+        self.title = title
+        self.message = message
         self.initUI()
 
     def initUI(self):
@@ -47,32 +48,38 @@ class Notice(QtWidgets.QDialog):
         OKbtn.resize(OKbtn.sizeHint())
         OKbtn.move(270, 260)
 
-        lb = QtWidgets.QLabel(message, self)
-        lb.setGeometry(0, 0, 550, 190) ## window vsize -110.
+        lb = QtWidgets.QLabel(self.message, self)
+        lb.setGeometry(0, 0, 550, 190)  # Window size -110.
         lb.setWordWrap(True)
         lb.move(25, 20)
 
         self.resize(600, 300)
-        #self.center()
-        self.setWindowTitle(title)
+        self.setWindowTitle(self.title)
         self.show()
 
     def checkState(self, state):
-        status_folder = os.path.dirname(status_file)
+        status_folder = os.path.dirname(self.status_file)
         Path(status_folder).mkdir(parents=True, exist_ok=True)
-        f = open(status_file, "w")
-        f.write(str(state))
-        f.close()
+        with open(self.status_file, "w") as f:
+            f.write(str(state))
 
     def center(self):
-        self.resize(False)
         qr = self.frameGeometry()
         cp = QtWidgets.QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
 
-
 def main():
+    if len(sys.argv) != 4:
+        print("Usage: /usr/libexec/msgcollector/one-time-popup <status_file> <title> <message>", file=sys.stderr)
+        sys.exit(1)
+
+    status_file, title, message = sys.argv[1], sys.argv[2], sys.argv[3]
+
+    # Check if the message has already been dismissed
+    if os.path.exists(status_file):
+        sys.exit()
+
     app = QtWidgets.QApplication(sys.argv)
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
@@ -81,7 +88,7 @@ def main():
     timer.start(500)
     timer.timeout.connect(lambda: None)
 
-    ex = Notice()
+    ex = Notice(status_file, title, message)
     app.exec_()
 
 if __name__ == '__main__':
