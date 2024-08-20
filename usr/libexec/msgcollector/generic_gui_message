@@ -59,6 +59,9 @@ class GuiMessage(QtWidgets.QDialog):
             icon_image = "dialog-error.svg"
         icon_path = os.path.join(icon_dir, icon_image)
 
+        if not os.path.exists(icon_path):
+            print(f"INFO: The icon path '{icon_path}' does not exist.", file=sys.stderr)
+
         if question:
             message = message + '<p>' + question + '</p>'
 

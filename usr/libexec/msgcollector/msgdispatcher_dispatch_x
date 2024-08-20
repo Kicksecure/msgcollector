@@ -130,6 +130,9 @@ msgdispatcher_dispatch_x requires 4 mandatory and 1 optional arguments
         sys.exit("'msgdispatcher_dispatch_x'. Information type not recognized: %s" % str(sys.argv[1]))
     itype = os.path.join(idir, itype)
 
+    if not os.path.exists(itype):
+        print(f"INFO: The icon path '{itype}' does not exist.", file=sys.stderr)
+
     title = str(sys.argv[2])
     msg = str(sys.argv[3])
     pos = str(sys.argv[4])
