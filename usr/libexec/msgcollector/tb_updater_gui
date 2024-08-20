@@ -4,36 +4,47 @@
 ## Copyright (C) 2014 troubadour <trobador@riseup.net>
 ## Copyright (C) 2014 - 2023 ENCRYPTED SUPPORT LP <adrelanos@whonix.org>
 
+"""
+This script creates a GUI message dialog using PyQt5, intended to confirm downloads
+and display information about currently installed and available versions.
+
+Usage:
+/usr/libexec/msgcollector/msgdispatcher_dispatch_x <message_type> <title> <installed_version> <online_versions> <message> <question> <button_type>
+
+Arguments:
+1. message_type: 'info', 'warning', or 'error'
+2. title: The window title
+3. installed_version: The currently installed version
+4. online_versions: A comma-separated list of online available versions
+5. message: The main message text
+6. question: An additional question or prompt
+7. button_type: 'ok' for a single OK button, 'yesno' for Yes and No buttons
+
+Example:
+/usr/libexec/msgcollector/msgdispatcher_dispatch_x warning "Update Available" "1.0" "1.1,1.2" "A new version is available." "Do you want to update?" yesno
+"""
+
 import os
 import sys
 import signal
-
+import argparse
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5 import QtCore, QtGui, QtWidgets
-
-#try:
-    #_fromUtf8 = QtCore.QString.fromUtf8
-#except AttributeError:
-    #_fromUtf8 = lambda s: s
 
 def signal_handler(sig, frame):
     sys.exit(128 + sig)
 
 class GuiMessage(QtWidgets.QDialog):
-    def __init__(self):
+    def __init__(self, args):
         super(GuiMessage, self).__init__()
 
-        try:
-            self.itype = str(sys.argv[1])
-            self.title = str(sys.argv[2])
-            self.installed_version = str(sys.argv[3])
-            self.online_versions = str(sys.argv[4])
-            self.message = str(sys.argv[5])
-            self.question = str(sys.argv[6])
-            self.button = str(sys.argv[7])
-
-        except (IndexError) as e:
-            sys.exit('Arguments parsing error')
+        self.itype = args.message_type
+        self.title = args.title
+        self.installed_version = args.installed_version
+        self.online_versions = args.online_versions
+        self.message = args.message
+        self.question = args.question
+        self.button = args.button_type
 
         self.layout = QtWidgets.QGridLayout(self)
         self.i_label = QtWidgets.QLabel(self)
@@ -66,8 +77,6 @@ class GuiMessage(QtWidgets.QDialog):
         brush = QtGui.QBrush(QtGui.QColor(255, 255, 255, 0))
         brush.setStyle(QtCore.Qt.SolidPattern)
         palette.setBrush(QtGui.QPalette.Active, QtGui.QPalette.Base, brush)
-        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255, 0))
-        brush.setStyle(QtCore.Qt.SolidPattern)
         palette.setBrush(QtGui.QPalette.Inactive, QtGui.QPalette.Base, brush)
         brush = QtGui.QBrush(QtGui.QColor(244, 244, 244))
         brush.setStyle(QtCore.Qt.SolidPattern)
@@ -79,10 +88,10 @@ class GuiMessage(QtWidgets.QDialog):
 
         image = QtGui.QImage(itype)
         self.i_label.setPixmap(QPixmap.fromImage(image))
-        self.i_label.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
+        self.i_label.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
         self.label.setText('<p><b>Download confirmation</b></p>\
                             </p>Currently installed version: <code>%s</code> <p/>' % self.installed_version)
-        self.label.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
+        self.label.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
         self.label.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
 
         self.version_group.setTitle('Online detected version:')
@@ -95,18 +104,18 @@ class GuiMessage(QtWidgets.QDialog):
                 self.version.setChecked(True)
             self.version.Name = version
             self.version.setText(version)
-            self.version.setGeometry(QtCore.QRect(10, i * 20  + 20, 510, 21))
+            self.version.setGeometry(QtCore.QRect(10, i * 20 + 20, 510, 21))
             i += 1
 
         self.text.setMinimumSize(530, 0)
-        self.text.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
+        self.text.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
         self.text.setFrameShape(QtWidgets.QFrame.NoFrame)
-        self.text.setTextInteractionFlags(QtCore.Qt.LinksAccessibleByMouse|QtCore.Qt.TextSelectableByMouse)
+        self.text.setTextInteractionFlags(QtCore.Qt.LinksAccessibleByMouse | QtCore.Qt.TextSelectableByMouse)
         self.text.setOpenExternalLinks(True)
         self.text.setText(message)
 
         if self.button == 'yesno':
-            self.button_box.setStandardButtons(QtWidgets.QDialogButtonBox.Yes|QtWidgets.QDialogButtonBox.No)
+            self.button_box.setStandardButtons(QtWidgets.QDialogButtonBox.Yes | QtWidgets.QDialogButtonBox.No)
 
             self.yes_button = self.button_box.button(QtWidgets.QDialogButtonBox.Yes)
             self.yes_button.clicked.connect(self.yes_pressed)
@@ -149,7 +158,6 @@ class GuiMessage(QtWidgets.QDialog):
                 self.no_button.setFocus()
             elif self.button == 'ok':
                 self.ok_button.setFocus()
-
         else:
             self.resize(800, maximum_height)
             self.center()
@@ -159,10 +167,10 @@ class GuiMessage(QtWidgets.QDialog):
                 self.ok_button.setFocus()
 
     def center(self):
-       frame_geometry = self.frameGeometry()
-       center_point = QtWidgets.QDesktopWidget().availableGeometry().center()
-       frame_geometry.moveCenter(center_point)
-       self.move(frame_geometry.topLeft())
+        frame_geometry = self.frameGeometry()
+        center_point = QtWidgets.QDesktopWidget().availableGeometry().center()
+        frame_geometry.moveCenter(center_point)
+        self.move(frame_geometry.topLeft())
 
     def yes_pressed(self):
         for version in self.version_group.findChildren(QtWidgets.QRadioButton):
@@ -175,6 +183,17 @@ class GuiMessage(QtWidgets.QDialog):
         sys.exit()
 
 def main():
+    parser = argparse.ArgumentParser(description="Create a GUI message dialog using PyQt5.")
+    parser.add_argument('message_type', choices=['info', 'warning', 'error'], help="Type of the message ('info', 'warning', or 'error')")
+    parser.add_argument('title', help="The window title")
+    parser.add_argument('installed_version', help="The currently installed version")
+    parser.add_argument('online_versions', help="Comma-separated list of online available versions")
+    parser.add_argument('message', help="The main message text")
+    parser.add_argument('question', help="An additional question or prompt")
+    parser.add_argument('button_type', choices=['ok', 'yesno'], help="Type of the button ('ok' for a single OK button, 'yesno' for Yes and No buttons)")
+
+    args = parser.parse_args()
+
     app = QtWidgets.QApplication(sys.argv)
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
@@ -183,7 +202,7 @@ def main():
     timer.start(500)
     timer.timeout.connect(lambda: None)
 
-    message = GuiMessage()
+    message = GuiMessage(args)
 
     app.exec_()
 

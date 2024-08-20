@@ -4,29 +4,47 @@
 ## Copyright (C) 2014 troubadour <trobador@riseup.net>
 ## Copyright (C) 2014 - 2023 ENCRYPTED SUPPORT LP <adrelanos@whonix.org>
 
+"""
+This script creates a GUI message dialog using PyQt5. It allows the user to specify
+the type of message, title, and content, as well as customize the icon and position of the dialog.
+
+Usage:
+/usr/libexec/msgcollector/msgdispatcher_dispatch_x <message_type> <title> <message> <position> [icon]
+
+Arguments:
+1. message_type: 'info', 'warning', or 'error'
+2. title: The window title
+3. message: The main message text
+4. position: The position of the dialog (e.g., "1" for top-left corner)
+5. icon (optional): Path to a custom icon (defaults to a specific icon if not provided)
+
+Example:
+/usr/libexec/msgcollector/msgdispatcher_dispatch_x warning "Warning Title" "This is a warning message." "1" "/path/to/custom/icon.svg"
+"""
+
 import os
 import sys
 import signal
-
+import argparse
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import QObject, pyqtSignal
-
-try:
-    _fromUtf8 = QtCore.QString.fromUtf8
-except AttributeError:
-    _fromUtf8 = lambda s: s
 
 def signal_handler(sig, frame):
     sys.exit(128 + sig)
 
 class Ui_Dialog(object):
-    def setupUi(self, Dialog):
+    def setupUi(self, Dialog, args):
+        self.Dialog = Dialog
+        self.title = args.title
+        self.msg = args.message
+        self.icon = args.icon
+        self.pos = args.position
+
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHeightForWidth(Dialog.sizePolicy().hasHeightForWidth())
         Dialog.setSizePolicy(sizePolicy)
-        Dialog.setWindowIcon(QIcon(icon))
-        if pos == "1":
+        Dialog.setWindowIcon(QIcon(self.icon))
+        if self.pos == "1":
             Dialog.move(0, 0)
 
         self.gridLayout = QtWidgets.QGridLayout(Dialog)
@@ -36,9 +54,9 @@ class Ui_Dialog(object):
         sizePolicy.setHeightForWidth(self.Info_Icon.sizePolicy().hasHeightForWidth())
         self.Info_Icon.setSizePolicy(sizePolicy)
 
-        image = QtGui.QImage(itype)
+        image = QtGui.QImage(args.itype)
         self.Info_Icon.setPixmap(QPixmap.fromImage(image))
-        self.Info_Icon.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
+        self.Info_Icon.setAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
         self.gridLayout.addWidget(self.Info_Icon, 0, 0, 1, 1)
 
         self.Message = QtWidgets.QTextBrowser(Dialog)
@@ -74,74 +92,54 @@ class Ui_Dialog(object):
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):
-        Dialog.setWindowTitle(QtWidgets.QApplication.translate("Dialog", title, None))
-        self.Message.setHtml(QtWidgets.QApplication.translate("Dialog", msg, None))
-        ## Size is not readily available, so, create a signal
+        Dialog.setWindowTitle(self.title)
+        self.Message.setHtml(self.msg)
         QtCore.QTimer.singleShot(0, self.setSize)
 
     def setSize(self):
-        ## Size is returned
-        messageHeight = self.Message.document().size().height()
-        maximumHeight = QtWidgets.QDesktopWidget().availableGeometry().height() - 25
-        ## fix for:
-        ## DeprecationWarning: an integer is required (got type float).  Implicit conversion to integers using __int__ is deprecated, and may be removed in a future version of Python.
-        messageHeight = int(messageHeight)
-        maximumHeight = int(maximumHeight)
+        messageHeight = int(self.Message.document().size().height())
+        maximumHeight = int(QtWidgets.QDesktopWidget().availableGeometry().height() - 25)
         if messageHeight <= maximumHeight:
-            Dialog.resize(830, messageHeight + 55)
+            self.Dialog.resize(830, messageHeight + 55)
             self.center()
         else:
-            Dialog.resize(830, maximumHeight)
+            self.Dialog.resize(830, maximumHeight)
             self.center()
 
     def center(self):
-       frameGm = Dialog.frameGeometry()
-       centerPoint = QtWidgets.QDesktopWidget().availableGeometry().center()
-       frameGm.moveCenter(centerPoint)
-       Dialog.move(frameGm.topLeft())
+        frameGm = self.Dialog.frameGeometry()
+        centerPoint = QtWidgets.QDesktopWidget().availableGeometry().center()
+        frameGm.moveCenter(centerPoint)
+        self.Dialog.move(frameGm.topLeft())
 
+def main():
+    parser = argparse.ArgumentParser(description="Create a GUI message dialog using PyQt5.")
+    parser.add_argument('message_type', choices=['info', 'warning', 'error'], help="Type of the message ('info', 'warning', or 'error')")
+    parser.add_argument('title', help="The window title")
+    parser.add_argument('message', help="The main message text")
+    parser.add_argument('position', help="The position of the dialog (e.g., '1' for top-left corner)")
+    parser.add_argument('icon', nargs='?', default="/usr/share/icons/icon-pack-dist/whonix.ico", help="Path to a custom icon (optional)")
 
-if __name__ == "__main__":
-    import sys
-    import signal
+    args = parser.parse_args()
 
-    syntax_details = """
-msgdispatcher_dispatch_x requires 4 mandatory and 1 optional arguments
-    1) Message Type = info|warning|error
-    2) Title of the message box
-    3) Message in the message box
-    4) Position of the message (Value 0 or more)
-    5) Icon to be used (optional)
-"""
-    if len(sys.argv) < 5:
-       sys.exit("'msgdispatcher_dispatch_x'. Invalid number of options {}".format(syntax_details))
+    idir = "/usr/share/icons/gnome-colors-common/scalable/status/"
+    if args.message_type == "info":
+        args.itype = os.path.join(idir, "dialog-information.svg")
+    elif args.message_type == "warning":
+        args.itype = os.path.join(idir, "dialog-warning.svg")
+    elif args.message_type == "error":
+        args.itype = os.path.join(idir, "dialog-error.svg")
+    else:
+        sys.exit("Information type not recognized: {}".format(args.message_type))
+
+    if not os.path.exists(args.itype):
+        print(f"INFO: The icon path '{args.itype}' does not exist.", file=sys.stderr)
+
     app = QtWidgets.QApplication(sys.argv)
     Dialog = QtWidgets.QDialog()
 
-    idir = "/usr/share/icons/gnome-colors-common/scalable/status/"
-    if str(sys.argv[1]) == "info":
-        itype = "dialog-information.svg"
-    elif str(sys.argv[1]) == "warning":
-        itype = "dialog-warning.svg"
-    elif str(sys.argv[1]) == "error":
-        itype = "dialog-error.svg"
-    else:
-        itype = ""
-        sys.exit("'msgdispatcher_dispatch_x'. Information type not recognized: %s" % str(sys.argv[1]))
-    itype = os.path.join(idir, itype)
-
-    if not os.path.exists(itype):
-        print(f"INFO: The icon path '{itype}' does not exist.", file=sys.stderr)
-
-    title = str(sys.argv[2])
-    msg = str(sys.argv[3])
-    pos = str(sys.argv[4])
-    icon = "/usr/share/icons/icon-pack-dist/whonix.ico"
-    if len(sys.argv) == 6:
-        icon = str(sys.argv[5])
-
     ui = Ui_Dialog()
-    ui.setupUi(Dialog)
+    ui.setupUi(Dialog, args)
     Dialog.show()
 
     signal.signal(signal.SIGINT, signal_handler)
@@ -152,3 +150,6 @@ msgdispatcher_dispatch_x requires 4 mandatory and 1 optional arguments
     timer.timeout.connect(lambda: None)
 
     app.exec_()
+
+if __name__ == '__main__':
+    main()
