@@ -4,6 +4,7 @@
 ## Copyright (C) 2014 troubadour <trobador@riseup.net>
 ## Copyright (C) 2014 - 2023 ENCRYPTED SUPPORT LP <adrelanos@whonix.org>
 
+import os
 import sys
 import signal
 
@@ -44,13 +45,13 @@ class GuiMessage(QtWidgets.QDialog):
         self.setup_ui()
 
     def setup_ui(self):
-        itype = "/usr/share/icons/oxygen/base/64x64/status/dialog-information.png"
-
+        idir = "/usr/share/icons/gnome-colors-common/scalable/status/"
+        itype = "dialog-information.svg"
         if self.itype == "warning":
-            itype = "/usr/share/icons/oxygen/base/128x128/status/dialog-warning.png"
-
+            itype = "dialog-warning.svg"
         elif self.itype == "error":
-            itype = "/usr/share/icons/oxygen/base/128x128/status/dialog-error.png"
+            itype = "dialog-error.svg"
+        itype = os.path.join(idir, itype)
 
         versions = self.online_versions.split(',')
 

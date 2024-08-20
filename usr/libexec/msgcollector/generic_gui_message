@@ -22,6 +22,7 @@ Examples:
 /usr/libexec/msgcollector/generic_gui_message info "Info" "This is an info message with a link: <a href='https://www.example.com'>Click here</a>" "" ok
 """
 
+import os
 import sys
 import signal
 import argparse
@@ -49,13 +50,14 @@ class GuiMessage(QtWidgets.QDialog):
         question = self.args.question
         self.button = self.args.button_type
 
+        icon_dir = "/usr/share/icons/gnome-colors-common/scalable/status/"
         # Set default icon path for 'info' type
-        icon_path = "/usr/share/icons/oxygen/base/64x64/status/dialog-information.png"
-
+        icon_image = "dialog-information.svg"
         if message_type == "warning":
-            icon_path = "/usr/share/icons/oxygen/base/64x64/status/dialog-warning.png"
+            icon_image = "dialog-warning.svg"
         elif message_type == "error":
-            icon_path = "/usr/share/icons/oxygen/base/64x64/status/dialog-error.png"
+            icon_image = "dialog-error.svg"
+        icon_path = os.path.join(icon_dir, icon_image)
 
         if question:
             message = message + '<p>' + question + '</p>'

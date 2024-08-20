@@ -4,6 +4,7 @@
 ## Copyright (C) 2014 troubadour <trobador@riseup.net>
 ## Copyright (C) 2014 - 2023 ENCRYPTED SUPPORT LP <adrelanos@whonix.org>
 
+import os
 import sys
 import signal
 
@@ -117,15 +118,17 @@ msgdispatcher_dispatch_x requires 4 mandatory and 1 optional arguments
     app = QtWidgets.QApplication(sys.argv)
     Dialog = QtWidgets.QDialog()
 
+    idir = "/usr/share/icons/gnome-colors-common/scalable/status/"
     if str(sys.argv[1]) == "info":
-        itype = "/usr/share/icons/oxygen/base/64x64/status/dialog-information.png"
+        itype = "dialog-information.svg"
     elif str(sys.argv[1]) == "warning":
-        itype = "/usr/share/icons/oxygen/base/128x128/status/dialog-warning.png"
+        itype = "dialog-warning.svg"
     elif str(sys.argv[1]) == "error":
-        itype = "/usr/share/icons/oxygen/base/128x128/status/dialog-error.png"
+        itype = "dialog-error.svg"
     else:
         itype = ""
         sys.exit("'msgdispatcher_dispatch_x'. Information type not recognized: %s" % str(sys.argv[1]))
+    itype = os.path.join(idir, itype)
 
     title = str(sys.argv[2])
     msg = str(sys.argv[3])
@@ -146,5 +149,3 @@ msgdispatcher_dispatch_x requires 4 mandatory and 1 optional arguments
     timer.timeout.connect(lambda: None)
 
     app.exec_()
-
-
