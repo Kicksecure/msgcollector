@@ -25,6 +25,7 @@ import sys
 import signal
 import os
 from pathlib import Path
+import argparse
 from PyQt5 import QtCore, QtWidgets
 
 def signal_handler(sig, frame):
@@ -70,14 +71,15 @@ class Notice(QtWidgets.QDialog):
         self.move(qr.topLeft())
 
 def main():
-    if len(sys.argv) != 4:
-        print("Usage: /usr/libexec/msgcollector/one-time-popup <status_file> <title> <message>", file=sys.stderr)
-        sys.exit(1)
+    parser = argparse.ArgumentParser(description="Create a one-time popup message dialog using PyQt5.")
+    parser.add_argument('status_file', help="Path to the status file used to track if the message should be shown again")
+    parser.add_argument('title', help="The window title")
+    parser.add_argument('message', help="The main message text")
 
-    status_file, title, message = sys.argv[1], sys.argv[2], sys.argv[3]
+    args = parser.parse_args()
 
     # Check if the message has already been dismissed
-    if os.path.exists(status_file):
+    if os.path.exists(args.status_file):
         sys.exit()
 
     app = QtWidgets.QApplication(sys.argv)
@@ -88,7 +90,7 @@ def main():
     timer.start(500)
     timer.timeout.connect(lambda: None)
 
-    ex = Notice(status_file, title, message)
+    ex = Notice(args.status_file, args.title, args.message)
     app.exec_()
 
 if __name__ == '__main__':
