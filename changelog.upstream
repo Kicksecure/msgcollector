@@ -1,3 +1,64 @@
+commit afbc43264c002df06bc5424e616f886595e5eb97
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Aug 20 07:17:29 2024 -0400
+
+    add command line parser
+
+commit 5abfadc331cdec6f450fdf60b79c03ada6c2ca65
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Aug 20 07:15:43 2024 -0400
+
+    - add comment
+    - refactoring
+
+commit e7a9c59d2e4eef990d8fb5afbedd31833c021ed1
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Aug 20 06:59:41 2024 -0400
+
+    - add command line parser
+    - add explanatory comment
+    - refactoring
+
+commit 848269f9854db39baa712eed83a3a335cb9915a4
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Aug 20 06:38:30 2024 -0400
+
+    point out if icon does not exist on stderr
+
+commit b067afca1a719087eba0ed6aecddf8a5ba0b564d
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Aug 20 06:27:19 2024 -0400
+
+    Depends: gnome-colors-common
+
+commit ddbf31c91d8ef8394bca381520f4c19d265d6412
+Merge: 4b3deb1 b1735d7
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Aug 20 06:21:32 2024 -0400
+
+    Merge remote-tracking branch 'github-kicksecure/master'
+
+commit b1735d7de211f69084c5b8c57a51654f809e9dcf
+Merge: 4b3deb1 41c683c
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Aug 20 06:20:19 2024 -0400
+
+    Merge pull request #4 from ben-grande/gnome-icons
+    
+    Change icon directories
+
+commit 41c683c2ce446f91347fdd9c2efe259bfffac272
+Author: Ben Grande <ben.grande.b@gmail.com>
+Date:   Mon Aug 19 16:04:43 2024 +0200
+
+    Change icon directories
+
+commit 4b3deb1b7c47079aec29ee13d79b2b9a61e3d0be
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Jul 28 22:17:18 2024 +0000
+
+    bumped changelog version
+
 commit 49cf6454d2a6c04be936cd01aaa8d22bbdd85ffa
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Sun Jul 28 18:14:09 2024 -0400
