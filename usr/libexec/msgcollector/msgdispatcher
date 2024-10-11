@@ -309,8 +309,8 @@ dispatch_x_active() {
       icon="$(cat "/run/msgcollector/$who_ami/${msgdispatcher_identifier}_icon")"
    else
       ## Fallback.
-      if [ -f "/usr/share/icons/icon-pack-dist/whonix.ico" ]; then
-         icon="/usr/share/icons/icon-pack-dist/whonix.ico"
+      if [ -f "/usr/share/icons/gnome/24x24/status/info.png" ]; then
+         icon="/usr/share/icons/gnome/24x24/status/info.png"
       else
          icon=""
       fi

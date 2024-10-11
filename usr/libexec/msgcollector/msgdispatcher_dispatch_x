@@ -118,7 +118,7 @@ def main():
     parser.add_argument('title', help="The window title")
     parser.add_argument('message', help="The main message text")
     parser.add_argument('position', help="The position of the dialog (e.g., '1' for top-left corner)")
-    parser.add_argument('icon', nargs='?', default="/usr/share/icons/icon-pack-dist/whonix.ico", help="Path to a custom icon (optional)")
+    parser.add_argument('icon', nargs='?', default="/usr/share/icons/gnome/24x24/status/info.png", help="Path to a custom icon (optional)")
 
     args = parser.parse_args()
 
