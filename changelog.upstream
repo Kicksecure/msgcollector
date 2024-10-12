@@ -1,3 +1,21 @@
+commit 7fc33b947223a006fcf9ece82f1285b20d87efbe
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Oct 11 06:01:41 2024 -0400
+
+    change icon
+
+commit 3b466ae46e04f63c99c7574fb0e68a4a93cd8346
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Oct 11 05:46:42 2024 -0400
+
+    update tb-updater GUI icon
+
+commit 69a3d6e506c0a64217e6a9cb9244afe44d8578da
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Aug 20 12:12:01 2024 +0000
+
+    bumped changelog version
+
 commit afbc43264c002df06bc5424e616f886595e5eb97
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Tue Aug 20 07:17:29 2024 -0400
