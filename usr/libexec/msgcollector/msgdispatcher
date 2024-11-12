@@ -64,9 +64,6 @@ ex_funct() {
       kill -s sigterm "$inotifywait_subshell_pid" || true
    fi
 
-   if [ -f "$pid_file" ]; then
-      rm --force "$pid_file"
-   fi
    if [ -f "$inotifywait_subshell_fifo" ]; then
       rm --force "$inotifywait_subshell_fifo"
    fi
@@ -157,13 +154,9 @@ preparation() {
    fi
 
    if [ "$cli" = "1" ]; then
-      pid_file="${msgcollector_run_dir}/msgdispatcher_pidcli"
-      lock_file="${msgcollector_run_dir}/msgdispatcher_cli_lock"
       inotifywait_subshell_fifo="${msgcollector_run_dir}/msgdispatcher_cli_subshell_fifo"
       inotifywait_success_file="${msgcollector_run_dir}/msgdispatcher_cli_inotifywait_success"
    elif [ "$gui" = "1" ]; then
-      pid_file="${msgcollector_run_dir}/msgdispatcher_pidx"
-      lock_file="${msgcollector_run_dir}/msgdispatcher_x_lock"
       inotifywait_subshell_fifo="${msgcollector_run_dir}/msgdispatcher_x_subshell_fifo"
       inotifywait_success_file="${msgcollector_run_dir}/msgdispatcher_x_inotifywait_success"
    else
@@ -178,56 +171,6 @@ preparation() {
 
    inotifywait_folder="${msgcollector_run_dir}"
    test -d "$inotifywait_folder"
-}
-
-write_own_pid() {
-   trap "error_handler" ERR
-
-   local subshell_pid wait_exit_code msgdispatcher_pid
-   msgdispatcher_pid="$$"
-
-   (
-      trap "error_handler" ERR
-      flock_exit_code="0"
-      flock --nonblock --exclusive 200 || { flock_exit_code="$?" ; true; };
-      true "$scriptname $FUNCNAME (subshell) (pid: $$): lock_file: $lock_file | flock_exit_code: $flock_exit_code"
-
-      if [ -f "$pid_file" ]; then
-         true "$scriptname $FUNCNAME (subshell) (pid: $$): pid file $pid_file already exists."
-         pid="$(cat "$pid_file")" || true
-         true "$scriptname $FUNCNAME (subshell) (pid: $$): pid file $pid_file contains pid: $pid"
-         if [ ! "$pid" = "" ]; then
-            kill_exit_code="0"
-            kill -0 "$pid" || { kill_exit_code="$?" ; true; };
-            if [ "$kill_exit_code" = "0" ]; then
-               true "$scriptname $FUNCNAME (subshell) (pid: $$): msgdispatcher with pid $pid already running."
-               exit 1
-            else
-              true "$scriptname $FUNCNAME (subshell) (pid: $$): msgdispatcher with pid $pid not running."
-            fi
-         fi
-      fi
-
-      if [ "$flock_exit_code" = "0" ]; then
-         true "$scriptname $FUNCNAME (subshell) (pid: $$): writing msgdispatcher_pid $msgdispatcher_pid to pid_file $pid_file."
-         echo "$msgdispatcher_pid" > "$pid_file"
-      else
-         true "$scriptname $FUNCNAME (subshell) (pid: $$): Could not acquire lock."
-         exit 2
-      fi
-   ) 200>"$lock_file" &
-
-   subshell_pid="$!"
-
-   wait_exit_code="0"
-   wait "$subshell_pid" || { wait_exit_code="$?" ; true; };
-
-   if [ ! "$wait_exit_code" = "0" ]; then
-      true "$scriptname $FUNCNAME (pid: $$): Subshell exit code: $wait_exit_code. Exiting."
-      exit 0
-   else
-      true "$scriptname $FUNCNAME (pid: $$): Acquire lock ok."
-   fi
 }
 
 ## {{ Small wrapper to use either kdialog, notify-send or nothing.
@@ -569,7 +512,6 @@ msgdispatcher_loop() {
    trap "error_handler" ERR
    while true; do
       preparation
-      write_own_pid
       fallbacks ## provided by /usr/libexec/msgcollector/msgwmctrl
       inotifywait_setup
       parse_existing_files
