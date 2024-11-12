@@ -17,8 +17,6 @@ error_handler() {
       error_text="$BASH_COMMAND"
    fi
 
-   output_msgdispatcher_delete_wrapper="$(/usr/libexec/msgcollector/br_add "$output_msgdispatcher_delete_wrapper")" || true
-
    local msg="<p>
 <br></br>$scriptname script bug.
 <br></br>
@@ -31,8 +29,6 @@ error_handler() {
 <br></br>msgdispatcher_identifier: '<code>$msgdispatcher_identifier</code>'
 <br></br>msgdispatcher_appendix: '<code>$msgdispatcher_appendix</code>'
 <br></br>delete_wrapper: '<code>$delete_wrapper'</code>
-<br></br>msgdispatcher_delete_wrapper_command: '<code>$msgdispatcher_delete_wrapper_command</code>'
-<br></br>output_msgdispatcher_delete_wrapper: '<code>$output_msgdispatcher_delete_wrapper</code>'
 <br></br>
 <br></br>error_text: '<code>$error_text</code>'
 <br></br>last_exit_code: '<code>$last_exit_code</code>'
@@ -365,7 +361,8 @@ inotifywait_setup() {
 
       trap "inotifywait_subshell_trap_sigterm" SIGTERM
 
-      inotifywait --quiet --recursive --monitor --event create --format "%w%f" "$inotifywait_folder" &
+      ## TODO: Does this work? Was: '--event create'
+      inotifywait --quiet --recursive --monitor --event close_write --format "%w%f" "$inotifywait_folder" &
       inotifywait_pid="$!"
       touch "$inotifywait_success_file"
       wait_exit_code="0"
@@ -524,6 +521,12 @@ check() {
 Invalid character!" >&2
       exit 200
    fi
+   if [ "$2" = "" ]; then
+      echo "$0:
+\$1 (variable name): '$1'
+\$2 (variable content): empty!" >&2
+      exit 201
+   fi
 }
 
 msgdispatcher_delete_wrapper() {
@@ -531,14 +534,11 @@ msgdispatcher_delete_wrapper() {
 
    msgdispatcher_appendix="$1"
 
-   check "msgdisptacher_username" "${msgdisptacher_username}"
    check "msgdispatcher_identifier" "${msgdispatcher_identifier}"
    check "msgdispatcher_appendix" "${msgdispatcher_appendix}"
 
    local file_name
    file_name="${msgcollector_run_dir}/${msgdispatcher_identifier}_${msgdispatcher_appendix}"
-
-   check "file_name" "${file_name}"
 
    if test -f "$file_name" ; then
       safe-rm -f "$file_name"
