@@ -820,7 +820,7 @@ forget() {
    local file_name
    for file_name in "${file_list[@]}"; do
       if [ -e "$file_name" ]; then
-         rm --force "$file_name"
+         safe-rm --force "$file_name"
       fi
    done
    unset file_name
@@ -837,7 +837,7 @@ forgetwaitcli() {
    local file_name
    for file_name in "${file_list[@]}"; do
       if [ -e "$file_name" ]; then
-         rm --force "$file_name"
+         safe-rm --force "$file_name"
       fi
    done
    unset local file_name

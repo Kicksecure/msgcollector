@@ -65,7 +65,7 @@ ex_funct() {
    fi
 
    if [ -f "$inotifywait_subshell_fifo" ]; then
-      rm --force "$inotifywait_subshell_fifo"
+      safe-rm --force "$inotifywait_subshell_fifo"
    fi
 
    true "$FUNCNAME: Signal $SIGNAL_TYPE received. Exiting."
@@ -166,7 +166,7 @@ preparation() {
 
    ## Care for race condition.
    #if [ -f "$inotifywait_success_file" ]; then
-      #rm --force "$inotifywait_success_file"
+      #safe-rm --force "$inotifywait_success_file"
    #fi
 
    inotifywait_folder="${msgcollector_run_dir}"
@@ -275,7 +275,7 @@ inotifywait_setup() {
       kill -s sigterm "$inotifywait_subshell_pid" || true
    fi
 
-   rm --force "$inotifywait_subshell_fifo"
+   safe-rm --force "$inotifywait_subshell_fifo"
    mkfifo "$inotifywait_subshell_fifo"
 
    {
@@ -286,7 +286,7 @@ inotifywait_setup() {
          else
             error_text="exit_code: $exit_code | BASH_COMMAND: $BASH_COMMAND"
          fi
-         rm --force "$inotifywait_success_file"
+         safe-rm --force "$inotifywait_success_file"
          error_handler "$error_text"
          exit 1
       }
@@ -299,7 +299,7 @@ inotifywait_setup() {
          if [ ! "$inotifywait_pid" = "" ]; then
             kill -s sigterm "$inotifywait_pid"
          fi
-         rm --force "$inotifywait_success_file"
+         safe-rm --force "$inotifywait_success_file"
          true "$BASH_SOURCE: $FUNCNAME: INFO: signal SIGTERM received. Exiting."
          exit 143
       }

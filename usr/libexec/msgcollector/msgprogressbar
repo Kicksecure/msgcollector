@@ -105,10 +105,10 @@ cleanup_self() {
 
    true "$0 $FUNCNAME: killing zenity_progress_pid $zenity_progress_pid..."
    kill -s sigterm "$zenity_progress_pid" >/dev/null 2>/dev/null || true
-   rm --force "$fifo"
-   rm --force "$progress_txt_file"
-   rm --force "$zenity_progress_pid_file"
-   rm --force "$parent_pid_file"
+   safe-rm --force "$fifo"
+   safe-rm --force "$progress_txt_file"
+   safe-rm --force "$zenity_progress_pid_file"
+   safe-rm --force "$parent_pid_file"
 }
 
 output_ex() {
@@ -208,7 +208,7 @@ start_progress_bar() {
    fi
 
    ## Clean up eventual old progress bar.
-   rm --force "$fifo"
+   safe-rm --force "$fifo"
 
    mkfifo "$fifo"
 
