@@ -1,3 +1,33 @@
+commit c02d23e47e5dcfa5662e2239e2719a0a7d3eac49
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Nov 12 08:58:07 2024 -0500
+
+    restore pid check
+
+commit 29057af7bdf05f30af135ed05fd17c4877d9231d
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Nov 12 08:50:10 2024 -0500
+
+    refactoring
+
+commit 0c911cd092163b8aaecf35cb11d9403a9b800da8
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Nov 12 08:48:09 2024 -0500
+
+    refactoring
+
+commit cd0ae21be8cdcf9f6c4ff53d1138ea331a67b4aa
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Nov 12 08:47:15 2024 -0500
+
+    refactoring
+
+commit 5c91e7304618ca4d37caf8cd1aa9b6b34f7f9595
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Nov 12 13:30:21 2024 +0000
+
+    bumped changelog version
+
 commit c635921f4b59a5e376271b615b55557a1160f4c6
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Tue Nov 12 08:26:38 2024 -0500
