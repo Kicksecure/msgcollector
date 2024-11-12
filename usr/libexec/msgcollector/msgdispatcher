@@ -550,7 +550,6 @@ inotifywait_loop() {
 msgdispatcher_loop() {
    trap "error_handler" ERR
    while true; do
-      maybe_wait
       preparation
       write_own_pid
       fallbacks ## provided by /usr/libexec/msgcollector/msgwmctrl

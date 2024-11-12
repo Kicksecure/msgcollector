@@ -839,9 +839,6 @@ source /usr/libexec/msgcollector/msgcollector_shared
 ## sets: ${msgcollector_run_dir}
 folder_init
 
-## provided by: /usr/libexec/msgcollector/msgcollector_shared
-maybe_wait
-
 if [ "$forget" = "1" ]; then
    forget
    exit 0
