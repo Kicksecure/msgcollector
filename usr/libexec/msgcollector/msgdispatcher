@@ -122,7 +122,7 @@ parse_cmd_options() {
                shift
                ;;
            --gui)
-               x="1"
+               gui="1"
                shift
                ;;
            --)
@@ -142,7 +142,7 @@ parse_cmd_options() {
    if [ "$cli" = "1" ]; then
       return 0
    fi
-   if [ "$x" = "1" ]; then
+   if [ "$gui" = "1" ]; then
       return 0
    fi
    echo "$0 ERROR: needs to be started with either --gui or --cli." >&2
@@ -159,7 +159,7 @@ preparation() {
       lock_file="${msgcollector_run_dir}/msgdispatcher_cli_lock"
       inotifywait_subshell_fifo="${msgcollector_run_dir}/msgdispatcher_cli_subshell_fifo"
       inotifywait_success_file="${msgcollector_run_dir}/msgdispatcher_cli_inotifywait_success"
-   elif [ "$x" = "1" ]; then
+   elif [ "$gui" = "1" ]; then
       pid_file="${msgcollector_run_dir}/msgdispatcher_pidx"
       lock_file="${msgcollector_run_dir}/msgdispatcher_x_lock"
       inotifywait_subshell_fifo="${msgcollector_run_dir}/msgdispatcher_x_subshell_fifo"
@@ -404,7 +404,7 @@ msgdispatcher_handler() {
    ## Remove "${msgcollector_run_dir}/".
    msgdispatcher_identifier="${temp_item##*/}"
 
-   if [ "$x" = "1" ]; then
+   if [ "$gui" = "1" ]; then
       if [ "$file_name" = "${msgcollector_run_dir}/${msgdispatcher_identifier}_messagex_done" ]; then
          if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_messagex" ]; then
             true "INFO: messagex file exists."
