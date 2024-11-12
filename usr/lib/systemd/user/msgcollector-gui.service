@@ -2,10 +2,10 @@
 ## See the file COPYING for copying conditions.
 
 ## Do not use sudo!
-#systemctl --user enable msgcollector
-#systemctl --user start msgcollector
-#systemctl --user status msgcollector
-#journalctl --user -f -u msgcollector
+#systemctl --user enable msgcollector-gui.service
+#systemctl --user start msgcollector-gui.service
+#systemctl --user status msgcollector-gui.service
+#journalctl --user -f -u msgcollector-gui.service
 
 [Unit]
 Description=msgcollector msgdispatcher
