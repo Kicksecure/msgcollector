@@ -12,7 +12,7 @@ msgdispatcher_pid_check() {
       else
          return 1
       fi
-   elif [ "x" = "$1" ]; then
+   elif [ "gui" = "$1" ]; then
       if &>/dev/null systemctl --no-pager --no-block --user is-active msgcollector-gui.service ; then
          return 0
       else
@@ -30,7 +30,7 @@ msgdispatcher_run_check() {
 
    ## systemcheck sets GUI / CLI variables
    if [ "$GUI" = "true" ]; then
-      if msgdispatcher_pid_check "x" ; then
+      if msgdispatcher_pid_check "gui" ; then
          msgdispatcher_running_x="true"
       fi
    fi
