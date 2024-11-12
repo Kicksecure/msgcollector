@@ -57,9 +57,7 @@ msgdispatcher_wait() {
       if [ "$msgdispatcher_running_x" = "true" ] || [ "$msgdispatcher_running_cli" = "true" ]; then
          break
       fi
-      sleep "2" &
-      lastpid="$!"
-      wait "$lastpid" || break
+      loop_protection
    done
 }
 
