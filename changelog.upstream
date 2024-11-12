@@ -1,3 +1,29 @@
+commit cf8bad5fa5d018fffc30556c5012ae43ee9320d0
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Nov 12 09:40:45 2024 -0500
+
+    refactoring
+
+commit 45d2c602c68f78f264028b6d0eb812c7eb219637
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Nov 12 09:38:31 2024 -0500
+
+    refactoring
+
+commit ec5241311a892f59a14363d7c0891b91d221e238
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Nov 12 09:34:40 2024 -0500
+
+    port to systemd user service
+    
+    port from /etc/xdg/autostart/msgdispatcher.desktop to /usr/lib/systemd/user/msgcollector-gui.service
+
+commit 7ad6e0aa18f797d09ecb751e7dd1d03023d54a7e
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Nov 12 14:01:46 2024 +0000
+
+    bumped changelog version
+
 commit c02d23e47e5dcfa5662e2239e2719a0a7d3eac49
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Tue Nov 12 08:58:07 2024 -0500
