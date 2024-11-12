@@ -1,0 +1,21 @@
+## Copyright (C) 2019 - 2023 ENCRYPTED SUPPORT LP <adrelanos@whonix.org>
+## See the file COPYING for copying conditions.
+
+## Do not use sudo!
+#systemctl --user enable usertest
+#systemctl --user start usertest
+#systemctl --user status usertest
+#journalctl --user -u usertest
+
+[Unit]
+Description=User Test Systemd Unit File
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+Environment=ZUSERTESTVAR=usertest
+ExecStart=/bin/true
+#ExecStart=/usr/bin/env
+
+[Install]
+WantedBy=default.target
