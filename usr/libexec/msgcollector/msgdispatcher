@@ -17,7 +17,7 @@ error_handler() {
       error_text="$BASH_COMMAND"
    fi
 
-   output_msgdispatcher_sudo_wrapper="$(/usr/libexec/msgcollector/br_add "$output_msgdispatcher_sudo_wrapper")" || true
+   output_msgdispatcher_delete_wrapper="$(/usr/libexec/msgcollector/br_add "$output_msgdispatcher_delete_wrapper")" || true
 
    local msg="<p>
 <br></br>$scriptname script bug.
@@ -31,8 +31,8 @@ error_handler() {
 <br></br>msgdispatcher_identifier: '<code>$msgdispatcher_identifier</code>'
 <br></br>msgdispatcher_appendix: '<code>$msgdispatcher_appendix</code>'
 <br></br>delete_wrapper: '<code>$delete_wrapper'</code>
-<br></br>msgdispatcher_sudo_wrapper_command: '<code>$msgdispatcher_sudo_wrapper_command</code>'
-<br></br>output_msgdispatcher_sudo_wrapper: '<code>$output_msgdispatcher_sudo_wrapper</code>'
+<br></br>msgdispatcher_delete_wrapper_command: '<code>$msgdispatcher_delete_wrapper_command</code>'
+<br></br>output_msgdispatcher_delete_wrapper: '<code>$output_msgdispatcher_delete_wrapper</code>'
 <br></br>
 <br></br>error_text: '<code>$error_text</code>'
 <br></br>last_exit_code: '<code>$last_exit_code</code>'
@@ -421,15 +421,15 @@ msgdispatcher_handler() {
             title="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_titlex")"
             type="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_typex")"
             dispatch_x_active "$type" "$msg"
-            msgdispatcher_sudo_wrapper "messagex_done"
-            msgdispatcher_sudo_wrapper "titlex"
-            msgdispatcher_sudo_wrapper "messagex"
-            msgdispatcher_sudo_wrapper "lefttop"
-            msgdispatcher_sudo_wrapper "typex"
+            msgdispatcher_delete_wrapper "messagex_done"
+            msgdispatcher_delete_wrapper "titlex"
+            msgdispatcher_delete_wrapper "messagex"
+            msgdispatcher_delete_wrapper "lefttop"
+            msgdispatcher_delete_wrapper "typex"
          else
             ## Not using rm outside the if, to prevent race conditions.
             ## Not always using rm, without if to prevent forking.
-            msgdispatcher_sudo_wrapper "messagex_done"
+            msgdispatcher_delete_wrapper "messagex_done"
          fi
          return 0
       fi
@@ -447,12 +447,12 @@ msgdispatcher_handler() {
             else
                dispatch_x_passive "$type" "$title" "$msg"
             fi
-            msgdispatcher_sudo_wrapper "forceactive"
-            msgdispatcher_sudo_wrapper "passivepopupqueuex_done"
-            msgdispatcher_sudo_wrapper "passivepopupqueuex"
-            msgdispatcher_sudo_wrapper "passivepopupqueuextitle"
+            msgdispatcher_delete_wrapper "forceactive"
+            msgdispatcher_delete_wrapper "passivepopupqueuex_done"
+            msgdispatcher_delete_wrapper "passivepopupqueuex"
+            msgdispatcher_delete_wrapper "passivepopupqueuextitle"
          else
-            msgdispatcher_sudo_wrapper "passivepopupqueuex_done"
+            msgdispatcher_delete_wrapper "passivepopupqueuex_done"
          fi
          return 0
       fi
@@ -467,7 +467,7 @@ msgdispatcher_handler() {
 #          ## 2b3916d6-3b3f-4490-bc85-b97da494a55d
 #          if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_${progressbaridx}_progressbarx" ]; then
 #             if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_${progressbaridx}_progressbarx_animate" ]; then
-#                msgdispatcher_sudo_wrapper "${progressbaridx}_progressbarx_animate"
+#                msgdispatcher_delete_wrapper "${progressbaridx}_progressbarx_animate"
 #                animate="--animate"
 #             else
 #                unset animate
@@ -481,11 +481,11 @@ msgdispatcher_handler() {
 #             fi
 #
 #             unset animate
-#             msgdispatcher_sudo_wrapper "${progressbaridx}_progressbarx_done"
-#             msgdispatcher_sudo_wrapper "${progressbaridx}_progressbartitlex"
-#             msgdispatcher_sudo_wrapper "${progressbaridx}_progressbarx"
+#             msgdispatcher_delete_wrapper "${progressbaridx}_progressbarx_done"
+#             msgdispatcher_delete_wrapper "${progressbaridx}_progressbartitlex"
+#             msgdispatcher_delete_wrapper "${progressbaridx}_progressbarx"
 #          else
-#             msgdispatcher_sudo_wrapper "${progressbaridx}_progressbarx_done"
+#             msgdispatcher_delete_wrapper "${progressbaridx}_progressbarx_done"
 #          fi
 #          return 0
 #       fi
@@ -496,10 +496,10 @@ msgdispatcher_handler() {
             msg="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_waitmessagecli")"
             type="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_typecli")"
             dispatch_cli "$msg"
-            msgdispatcher_sudo_wrapper "waitmessagecli_done"
-            msgdispatcher_sudo_wrapper "waitmessagecli"
+            msgdispatcher_delete_wrapper "waitmessagecli_done"
+            msgdispatcher_delete_wrapper "waitmessagecli"
          else
-            msgdispatcher_sudo_wrapper "waitmessagecli_done"
+            msgdispatcher_delete_wrapper "waitmessagecli_done"
          fi
          return 0
       fi
@@ -508,10 +508,10 @@ msgdispatcher_handler() {
             msg="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_messagecli")"
             type="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_typecli")"
             dispatch_cli "$msg"
-            msgdispatcher_sudo_wrapper "messagecli_done"
-            msgdispatcher_sudo_wrapper "messagecli"
+            msgdispatcher_delete_wrapper "messagecli_done"
+            msgdispatcher_delete_wrapper "messagecli"
          else
-            msgdispatcher_sudo_wrapper "messagecli_done"
+            msgdispatcher_delete_wrapper "messagecli_done"
          fi
          return 0
       fi
@@ -520,20 +520,20 @@ msgdispatcher_handler() {
    fi
 }
 
-msgdispatcher_sudo_log() {
+msgdispatcher_delete_log() {
    trap "error_handler" ERR
-   msgdispatcher_sudo_wrapper_command="$@"
+   msgdispatcher_delete_wrapper_command="$@"
    true
 }
 
-msgdispatcher_sudo_wrapper() {
+msgdispatcher_delete_wrapper() {
    trap "error_handler" ERR
 
    msgdispatcher_appendix="$1"
 
-   msgdispatcher_sudo_log msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="$msgdispatcher_appendix" "$delete_wrapper"
+   msgdispatcher_delete_log msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="$msgdispatcher_appendix" "$delete_wrapper"
 
-   output_msgdispatcher_sudo_wrapper="$(msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="$msgdispatcher_appendix" "$delete_wrapper" 2>&1)"
+   output_msgdispatcher_delete_wrapper="$(msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="$msgdispatcher_appendix" "$delete_wrapper" 2>&1)"
 
    ## In case above errors, do not additionally error out from this function.
    true
