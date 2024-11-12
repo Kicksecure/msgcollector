@@ -9,12 +9,13 @@
 
 [Unit]
 Description=msgcollector msgdispatcher
-#PartOf=graphical-session.target
-#After=graphical-session.target
 
 [Service]
 Type=simple
 ExecStart=/usr/libexec/msgcollector/msgdispatcher --gui
 
 [Install]
-WantedBy=graphical-session.target
+## Not functional in Qubes.
+## systemctl --user status graphical-session.target
+#WantedBy=graphical-session.target
+WantedBy=default.target
