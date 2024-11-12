@@ -20,4 +20,13 @@ ExecStart=/usr/libexec/msgcollector/msgdispatcher
 ## Qubes fails to start/activate systemd graphical-session.target target #9576
 ## https://github.com/QubesOS/qubes-issues/issues/9576
 #WantedBy=graphical-session.target
+##
+## default.target comes with other issues. Probably missing environment variables.
+##
+## Nov 12 11:32:57 kicksecure-bookworm msgdispatcher[11462]: qt.qpa.xcb: could not connect to display
+## Nov 12 11:32:57 kicksecure-bookworm msgdispatcher[11462]: qt.qpa.plugin: Could not load the Qt platform plugin "xcb" in "" even though it was found.
+## Nov 12 11:32:57 kicksecure-bookworm msgdispatcher[11462]: This application failed to start because no Qt platform plugin could be initialized. Reinstalling the application may fix this problem.
+## Nov 12 11:32:57 kicksecure-bookworm msgdispatcher[11462]: Available platform plugins are: eglfs, linuxfb, minimal, minimalegl, offscreen, vnc, wayland-egl, wayland, wayland-xcomposite-egl, wayland-xcomposite-glx, xcb.
+##
+## graphical-session.target would probably not have these issues.
 WantedBy=default.target
