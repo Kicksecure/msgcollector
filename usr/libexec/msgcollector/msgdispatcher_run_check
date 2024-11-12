@@ -5,7 +5,8 @@
 
 msgdispatcher_pid_check() {
    if [ "cli" = "$1" ]; then
-      if &>/dev/null systemctl --no-pager --no-block --user is-active msgcollector-cli.service ; then
+      ## msgcollector-cli.service does not exist yet. For now, it's the same systemd unit file.
+      if &>/dev/null systemctl --no-pager --no-block --user is-active msgcollector-gui.service ; then
          return 0
       else
          return 1
