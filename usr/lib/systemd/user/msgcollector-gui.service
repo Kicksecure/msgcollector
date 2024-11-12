@@ -13,7 +13,6 @@ PartOf=graphical-session.target
 After=graphical-session.target
 
 [Service]
-RemainAfterExit=yes
 ExecStart=/usr/libexec/msgcollector/msgdispatcher --gui
 
 [Install]
