@@ -76,24 +76,10 @@ parse_cmd_options() {
    ## will remain in the "$@" positional parameters.
 }
 
-loop_protection() {
-   if [ "$prot" = "" ]; then
-      prot="0"
-      ## Do not wait on first run of this function.
-      return 0
-   fi
-   prot="$(( $prot + 1 ))"
-   if [ "$prot" -gt "60" ]; then
-      ## Timeout reached.
-      exit 2
-   fi
-   sleep 1 &
-   wait "$!"
-}
-
 progress_bar() {
    trap "error_handler" ERR
 
+   ## provided by: /usr/libexec/msgcollector/msgcollector_shared
    loop_protection
 
    local fifo="${msgcollector_run_dir}/${identifier}_${progressbaridx}_fifo"

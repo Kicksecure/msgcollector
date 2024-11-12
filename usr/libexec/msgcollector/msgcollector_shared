@@ -11,10 +11,16 @@ folder_init() {
 }
 
 loop_protection() {
-   trap "error_handler" ERR
-
+   if [ "$prot" = "" ]; then
+      prot="0"
+      ## Do not wait on first run of this function.
+      return 0
+   fi
    prot="$(( $prot + 1 ))"
-   if [ $prot -gt "60" ]; then
+   if [ "$prot" -gt "60" ]; then
+      ## Timeout reached.
       exit 2
    fi
+   sleep 1 &
+   wait "$!"
 }
