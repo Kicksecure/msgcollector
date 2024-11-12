@@ -29,15 +29,15 @@ error_handler() {
 ## Please see Whonix News, Whonix Blog and Whonix User Help Forum.
 ## Please report this bug!
 ##
-## scriptname: $scriptname
-## identifier: $identifier
-## my_command_line_parameters: $my_command_line_parameters
-## write_to_file: $write_to_file
-## parentpid: $parentpid
-## ps_p_parentpid: $ps_p_parentpid
-## my_pstree: $my_pstree
-## BASH_COMMAND: $BASH_COMMAND
-## exit_code: $exit_code
+## scriptname: '$scriptname'
+## identifier: '$identifier'
+## my_command_line_parameters: '$my_command_line_parameters'
+## write_to_file: '$write_to_file'
+## parentpid: '$parentpid'
+## ps_p_parentpid: '$ps_p_parentpid'
+## my_pstree: '$my_pstree'
+## BASH_COMMAND: '$BASH_COMMAND'
+## exit_code: '$exit_code'
 ###############################################################################\
 "
    echo "$msg" >&2
@@ -58,7 +58,7 @@ error_handler() {
    ## This is required because otherwise the following "touch" command would fail.
    ## Unclear why this is required. Maybe an issue in /usr/lib/tmpfiles.d/systemcheck.conf config file
    ## This workaround is good enough.
-   chmod +x ~/".msgcollector"
+   chmod +x ~/".msgcollector" || true
 
    if ! touch  ~/".msgcollector/msgdispatcher-error.log" ; then
       echo "$scriptname: skipping log to $home_var/.msgcollector/msgdispatcher-error.log since failed to 'touch' file." >&2
@@ -403,7 +403,15 @@ collector() {
 
    ## {{ --icon
    if [ ! "$icon" = "" ]; then
-      echo "$icon" > "${msgcollector_run_dir}/${identifier}_icon"
+      ## Debugging.
+      #ls -la "${msgcollector_run_dir}"
+      #test -r "${msgcollector_run_dir}"
+      #test -w "${msgcollector_run_dir}"
+      #test -r "${msgcollector_run_dir}/${identifier}_icon" || true "not readable"
+      #test -w "${msgcollector_run_dir}/${identifier}_icon" || true "not writeable"
+      #whoami
+      ## NOTE: If not writeable, AppArmor issues?
+      echo "$icon" > "${msgcollector_run_dir}/${identifier}_icon
    fi
    ## }}
 
