@@ -25,7 +25,6 @@ error_handler() {
 <br></br>Please see Whonix News, Whonix Blog and Whonix User Help Forum.
 <br></br>Please report this bug!
 <br></br>
-<br></br>msgdisptacher_username: '<code>$msgdisptacher_username</code>'
 <br></br>msgdispatcher_identifier: '<code>$msgdispatcher_identifier</code>'
 <br></br>msgdispatcher_appendix: '<code>$msgdispatcher_appendix</code>'
 <br></br>delete_wrapper: '<code>$delete_wrapper'</code>
@@ -398,9 +397,6 @@ msgdispatcher_handler() {
    if [ ! "$file_extension" = "done" ]; then
       return 0
    fi
-
-   arrIN=(${file_name//// })
-   msgdisptacher_username="${arrIN[2]}"
 
    ## Remove "_done".
    temp_item="${file_name%%_*}"
