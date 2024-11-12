@@ -1,3 +1,105 @@
+commit c635921f4b59a5e376271b615b55557a1160f4c6
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Nov 12 08:26:38 2024 -0500
+
+    code simplification
+
+commit f65da167bf114b977aa9790c23971512ffecc207
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Nov 12 08:25:03 2024 -0500
+
+    debugging
+
+commit e98d70d3e007f8752f58bcb2233bc05334eef699
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Nov 12 08:19:00 2024 -0500
+
+    fix
+
+commit 82730aa86928e618d3fc4fdf602cab21f8fb901b
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Nov 12 08:11:02 2024 -0500
+
+    code simplification
+
+commit ec0c50d1c27e2202066cda5b16a2544d65fe6307
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Nov 12 07:55:20 2024 -0500
+
+    fix
+
+commit b9785cd14dfd05baf8d390067aac4090ecddf37e
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Nov 12 07:44:29 2024 -0500
+
+    output
+
+commit ca5eae8145da1dbd86da62a6e01866b2d78b65b2
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Nov 12 07:31:39 2024 -0500
+
+    fix
+
+commit ef8e700824f98b63a6b0dba3a167fcc601361739
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Nov 12 07:25:31 2024 -0500
+
+    msgcollector
+
+commit 6f529c5204ac539c087870df3e0d42328e2f3ad9
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Nov 12 07:10:44 2024 -0500
+
+    code simplification
+
+commit 642a3553050410e2eb6c1f046558c6ece749e600
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Nov 12 07:05:59 2024 -0500
+
+    give up setting /run/msgcollector folder to maximum 10 MB
+    
+    mount requires root but msgcollector runs as user
+    
+    hard to implement with sudo hardening
+    
+    no security gain as other applications could run local DOS to create huge files
+
+commit 5656fe2ef107bd34b15c731b20b6ca05428b2200
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Nov 12 07:04:03 2024 -0500
+
+    refactoring
+
+commit 834746e4016af05fa89b9067201c24c5ffca313f
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Nov 12 06:46:02 2024 -0500
+
+    refactoring
+
+commit 98a0bdd244424abbaa5770afaa1daae327acce3f
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Nov 12 06:45:02 2024 -0500
+
+    sudo hardening
+
+commit 00bd1f755a648afa4cff20b1f4d673ec6b39b973
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Nov 12 06:38:44 2024 -0500
+
+    permission hardening
+
+commit 8f4898d18a17298fa40ddb5e56bb29290fd576f0
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Nov 12 06:36:54 2024 -0500
+
+    towards sudoers.d hardening
+
+commit 6001e482563fe504451aa0f2658d8c6d9904ef7d
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Oct 12 04:56:58 2024 +0000
+
+    bumped changelog version
+
 commit 7fc33b947223a006fcf9ece82f1285b20d87efbe
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Fri Oct 11 06:01:41 2024 -0400
