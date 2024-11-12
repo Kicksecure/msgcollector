@@ -158,10 +158,6 @@ preparation() {
    ## Sanity test.
    command -v flock >/dev/null 2>/dev/null
 
-   if [ ! -d "${msgcollector_run_dir}" ]; then
-      mkdir --parents "${msgcollector_run_dir}"
-   fi
-
    if [ "$cli" = "1" ]; then
       pid_file="${msgcollector_run_dir}/msgdispatcher_pidcli"
       lock_file="${msgcollector_run_dir}/msgdispatcher_cli_lock"

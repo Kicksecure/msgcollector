@@ -94,11 +94,6 @@ parse_cmd_options() {
 
 preparation() {
    trap "error_handler" ERR
-
-   if [ ! -d "${msgcollector_run_dir}" ]; then
-      mkdir --parents "${msgcollector_run_dir}"
-   fi
-
    fifo="${msgcollector_run_dir}/${identifier}_${progressbaridx}_fifo"
    progress_txt_file="${msgcollector_run_dir}/${identifier}_${progressbaridx}_progresstxt"
    parent_pid_file="${msgcollector_run_dir}/${identifier}_${progressbaridx}_parentpid"

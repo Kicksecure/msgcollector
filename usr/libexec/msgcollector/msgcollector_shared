@@ -5,6 +5,9 @@
 
 folder_init() {
    msgcollector_run_dir="/run/user/$(id -u)/msgcollector"
+   if ! test -d "${msgcollector_run_dir}" ; then
+      mkdir --parents "${msgcollector_run_dir}"
+   fi
 }
 
 loop_protection() {
