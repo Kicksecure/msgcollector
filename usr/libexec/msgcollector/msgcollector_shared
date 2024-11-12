@@ -11,13 +11,13 @@ folder_init() {
 }
 
 loop_protection() {
-   if [ "$prot" = "" ]; then
-      prot="0"
+   if [ "$loop_counter_protection" = "" ]; then
+      loop_counter_protection="0"
       ## Do not wait on first run of this function.
       return 0
    fi
-   prot="$(( $prot + 1 ))"
-   if [ "$prot" -gt "60" ]; then
+   loop_counter_protection="$(( $loop_counter_protection + 1 ))"
+   if [ "$loop_counter_protection" -gt "60" ]; then
       ## Timeout reached.
       exit 2
    fi
