@@ -159,7 +159,7 @@ preparation() {
    command -v flock >/dev/null 2>/dev/null
 
    if [ ! -d "${msgcollector_run_dir}" ]; then
-      mkdir --parents --mode ugo+rwx "${msgcollector_run_dir}"
+      mkdir --parents "${msgcollector_run_dir}"
    fi
 
    if [ "$cli" = "1" ]; then

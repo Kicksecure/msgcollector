@@ -96,7 +96,7 @@ preparation() {
    trap "error_handler" ERR
 
    if [ ! -d "${msgcollector_run_dir}" ]; then
-      mkdir --parents--mode ugo+rwx "${msgcollector_run_dir}"
+      mkdir --parents "${msgcollector_run_dir}"
    fi
 
    fifo="${msgcollector_run_dir}/${identifier}_${progressbaridx}_fifo"
