@@ -627,6 +627,7 @@ append_to_file() {
    trap "error_handler" ERR
 
    if [ "$onlyecho" = "1" ]; then
+      true "onlyecho"
       return 0
    fi
 
