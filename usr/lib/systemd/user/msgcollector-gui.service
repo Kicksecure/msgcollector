@@ -29,4 +29,6 @@ ExecStart=/usr/libexec/msgcollector/msgdispatcher
 ## Nov 12 11:32:57 kicksecure-bookworm msgdispatcher[11462]: Available platform plugins are: eglfs, linuxfb, minimal, minimalegl, offscreen, vnc, wayland-egl, wayland, wayland-xcomposite-egl, wayland-xcomposite-glx, xcb.
 ##
 ## graphical-session.target would probably not have these issues.
-WantedBy=default.target
+#WantedBy=default.target
+
+WantedBy=graphical-session.target
