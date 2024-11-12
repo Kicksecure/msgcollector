@@ -17,5 +17,7 @@ ExecStart=/usr/libexec/msgcollector/msgdispatcher --gui
 [Install]
 ## Not functional in Qubes.
 ## systemctl --user status graphical-session.target
+## Qubes fails to start/activate systemd graphical-session.target target #9576
+## https://github.com/QubesOS/qubes-issues/issues/9576
 #WantedBy=graphical-session.target
 WantedBy=default.target
