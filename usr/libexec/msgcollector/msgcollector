@@ -411,7 +411,7 @@ collector() {
       #test -w "${msgcollector_run_dir}/${identifier}_icon" || true "not writeable"
       #whoami
       ## NOTE: If not writeable, AppArmor issues?
-      echo "$icon" > "${msgcollector_run_dir}/${identifier}_icon
+      echo "$icon" > "${msgcollector_run_dir}/${identifier}_icon"
    fi
    ## }}
 
