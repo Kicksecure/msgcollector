@@ -31,6 +31,10 @@ msgdispatcher_pid_check() {
 }
 
 msgdispatcher_run_check() {
+   source /usr/libexec/msgcollector/msgcollector_shared
+   ## sets: ${msgcollector_run_dir}
+   folder_init
+
    if msgdispatcher_pid_check "x" ; then
       msgdispatcher_running_x="true"
    fi
@@ -45,11 +49,11 @@ msgdispatcher_init() {
    output_x="output_func_x"
    output_cli="output_func_cli"
    msgdispatcher_run_check
+   msgdispatcher_wait
 }
 
 msgdispatcher_wait() {
    while true; do
-      msgdispatcher_run_check
       if [ "$msgdispatcher_running_x" = "true" ] || [ "$msgdispatcher_running_cli" = "true" ]; then
          break
       fi
