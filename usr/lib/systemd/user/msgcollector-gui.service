@@ -14,7 +14,7 @@ After=graphical-session.target
 
 [Service]
 RemainAfterExit=yes
-ExecStart=/usr/libexec/msgcollector/msgdispatcher --x
+ExecStart=/usr/libexec/msgcollector/msgdispatcher --gui
 
 [Install]
 WantedBy=graphical-session.target

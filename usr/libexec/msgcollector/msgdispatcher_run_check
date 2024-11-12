@@ -19,7 +19,7 @@ msgdispatcher_pid_check() {
          return 1
       fi
    else
-      error "$FUNCNAME neither cli nor x is set to 1."
+      error "$FUNCNAME: neither cli nor gui!"
    fi
 }
 

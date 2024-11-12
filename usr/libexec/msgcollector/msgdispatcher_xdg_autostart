@@ -5,4 +5,4 @@
 
 ## OLD - No longer in use.
 ## This script gets run by the /etc/xdg/autostart/msgdispatcher.desktop hook.
-#/usr/libexec/msgcollector/msgdispatcher --x & disown
+#/usr/libexec/msgcollector/msgdispatcher --gui & disown

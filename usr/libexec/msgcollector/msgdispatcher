@@ -121,7 +121,7 @@ parse_cmd_options() {
                cli="1"
                shift
                ;;
-           --x)
+           --gui)
                x="1"
                shift
                ;;
@@ -145,7 +145,7 @@ parse_cmd_options() {
    if [ "$x" = "1" ]; then
       return 0
    fi
-   echo "$0 ERROR: needs to be started with either --x or --cli." >&2
+   echo "$0 ERROR: needs to be started with either --gui or --cli." >&2
 }
 
 preparation() {
