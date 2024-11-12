@@ -7,27 +7,20 @@ msgdispatcher_pid_check() {
    local pid_file pid
 
    if [ "cli" = "$1" ]; then
-      pid_file="${msgcollector_run_dir}/msgdispatcher_pidcli"
+      if &>/dev/null systemctl --no-pager --no-block --user is-active msgcollector-cli.service ; then
+         return 0
+      else
+         return 1
+      fi
    elif [ "x" = "$1" ]; then
-      pid_file="${msgcollector_run_dir}/msgdispatcher_pidx"
+      if &>/dev/null systemctl --no-pager --no-block --user is-active msgcollector-gui.service ; then
+         return 0
+      else
+         return 1
+      fi
    else
       error "$FUNCNAME neither cli nor x is set to 1."
    fi
-
-   if ! test -f "$pid_file" ; then
-      true "$0: $FUNCNAME: pid_file $pid_file does NOT exist."
-      return 1
-   fi
-
-   true "$0: $FUNCNAME: pid_file $pid_file exists, ok."
-
-   pid="$(cat "$pid_file")" || return 5
-   ## `kill` does not work if running under a different user account then set
-   ## in variable `who_ami`, therefore using `ps`.
-   kill -0 "$pid" >/dev/null 2>&1 || return 6
-   ps -p "$pid" >/dev/null 2>&1 || return 6
-
-   return 0
 }
 
 msgdispatcher_run_check() {
@@ -35,11 +28,16 @@ msgdispatcher_run_check() {
    ## sets: ${msgcollector_run_dir}
    folder_init
 
-   if msgdispatcher_pid_check "x" ; then
-      msgdispatcher_running_x="true"
+   ## systemcheck sets GUI / CLI variables
+   if [ "$GUI" = "true" ]; then
+      if msgdispatcher_pid_check "x" ; then
+         msgdispatcher_running_x="true"
+      fi
    fi
-   if msgdispatcher_pid_check "cli" ; then
-      msgdispatcher_running_cli="true"
+   if [ "$CLI" = "true" ]; then
+      if msgdispatcher_pid_check "cli" ; then
+         msgdispatcher_running_cli="true"
+      fi
    fi
 }
 
@@ -48,7 +46,6 @@ msgdispatcher_init() {
    output_general="output_func_general"
    output_x="output_func_x"
    output_cli="output_func_cli"
-   msgdispatcher_run_check
    msgdispatcher_wait
 }
 
@@ -57,7 +54,9 @@ msgdispatcher_wait() {
       if [ "$msgdispatcher_running_x" = "true" ] || [ "$msgdispatcher_running_cli" = "true" ]; then
          break
       fi
-      loop_protection
+      msgdispatcher_run_check
+      #loop_protection
+      break
    done
 }
 

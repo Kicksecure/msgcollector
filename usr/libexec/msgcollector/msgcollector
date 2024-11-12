@@ -7,6 +7,8 @@
 set -e
 set -o pipefail
 
+true "$0: START"
+
 scriptname="$(basename "$BASH_SOURCE")"
 
 error_handler() {
@@ -96,6 +98,8 @@ parse_cmd_options() {
 
    ## Thanks to:
    ## http://mywiki.wooledge.org/BashFAQ/035
+
+   true "${cyan}INFO:${cyan} parse_cmd_options msgcollector"
 
    while true; do
        case $1 in
@@ -867,3 +871,5 @@ if [ "$status" = "1" ]; then
 else
    collector
 fi
+
+true "$0: END"
