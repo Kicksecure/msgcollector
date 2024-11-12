@@ -410,6 +410,7 @@ msgdispatcher_handler() {
    if [ "$x" = "1" ]; then
       if [ "$file_name" = "${msgcollector_run_dir}/${msgdispatcher_identifier}_messagex_done" ]; then
          if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_messagex" ]; then
+            true "INFO: messagex file exists."
             msg="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_messagex")"
             title="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_titlex")"
             type="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_typex")"
@@ -420,6 +421,7 @@ msgdispatcher_handler() {
             msgdispatcher_delete_wrapper "lefttop"
             msgdispatcher_delete_wrapper "typex"
          else
+            true "INFO: messagex file does NOT exist."
             ## Not using rm outside the if, to prevent race conditions.
             ## Not always using rm, without if to prevent forking.
             msgdispatcher_delete_wrapper "messagex_done"
@@ -486,12 +488,14 @@ msgdispatcher_handler() {
    elif [ "$cli" = "1" ]; then
       if [ "$file_name" = "${msgcollector_run_dir}/${msgdispatcher_identifier}_waitmessagecli_done" ]; then
          if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_waitmessagecli" ]; then
+            true "INFO: waitmessagecli file exists."
             msg="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_waitmessagecli")"
             type="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_typecli")"
             dispatch_cli "$msg"
             msgdispatcher_delete_wrapper "waitmessagecli_done"
             msgdispatcher_delete_wrapper "waitmessagecli"
          else
+            true "INFO: waitmessagecli file does NOT exist."
             msgdispatcher_delete_wrapper "waitmessagecli_done"
          fi
          return 0
