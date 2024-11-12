@@ -1,3 +1,39 @@
+commit 1673dd2f10362cc526a4ec8f85dab52dbf125fe2
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Nov 12 11:29:34 2024 -0500
+
+    remove management of own pidfile and lockfile since no longer required
+
+commit 011528b1585ee048b35addf274abb76a49f43df1
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Nov 12 11:22:17 2024 -0500
+
+    cleanup
+
+commit 0b3dea4ccb7249e6a6c707c2310b894286fb810c
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Nov 12 11:20:55 2024 -0500
+
+    refactor gui versus cli (tty) detection
+
+commit 9caba24a4a232d6b0999bc91e4a8e7adeeda0eb0
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Nov 12 11:12:28 2024 -0500
+
+    refactoring
+
+commit 8cc60adb05a5776aba62f35365d3c7a314949e15
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Nov 12 11:08:15 2024 -0500
+
+    comment
+
+commit 9d0e4cc920376714a1b246947a09cb448eee4218
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Nov 12 15:48:46 2024 +0000
+
+    bumped changelog version
+
 commit 30bab61404e53b4f9bbaf2b5a153660d756d9ef9
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Tue Nov 12 10:48:38 2024 -0500
