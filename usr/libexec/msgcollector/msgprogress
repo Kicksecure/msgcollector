@@ -50,10 +50,6 @@ parse_cmd_options() {
                identifier="$2"
                shift 2
                ;;
-           --whoami)
-               who_ami_discard="$2"
-               shift 2
-               ;;
            --progress)
                progress="$2"
                shift 2
@@ -100,8 +96,8 @@ progress_bar() {
 
    loop_protection
 
-   local fifo="/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_fifo"
-   local progress_txt_file="/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_progresstxt"
+   local fifo="${msgcollector_run_dir}/${identifier}_${progressbaridx}_fifo"
+   local progress_txt_file="${msgcollector_run_dir}/${identifier}_${progressbaridx}_progresstxt"
 
    if [ "$did_echo" = "1" ]; then
       true "did already echo to progress_txt_file"
@@ -110,9 +106,9 @@ progress_bar() {
       timeout 1 /bin/bash -c "echo $progress" > "$progress_txt_file" || true
    fi
 
-   if [ -p "/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_fifo" ]; then
-      if [ -f "/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_zenityprogresspid" ]; then
-         zenity_progress_pid="$(cat "/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_zenityprogresspid")"
+   if [ -p "${msgcollector_run_dir}/${identifier}_${progressbaridx}_fifo" ]; then
+      if [ -f "${msgcollector_run_dir}/${identifier}_${progressbaridx}_zenityprogresspid" ]; then
+         zenity_progress_pid="$(cat "${msgcollector_run_dir}/${identifier}_${progressbaridx}_zenityprogresspid")"
          ## Check if zenity is running.
          local ps_p_exit_code
          ps_p_exit_code="0"
@@ -130,19 +126,19 @@ progress_bar() {
             true "ps_p_exit_code was not 0, was $ps_p_exit_code"
          fi
       else
-         true "zenityprogresspid does not exist: /run/msgcollector/$who_ami/${identifier}_${progressbaridx}_zenityprogresspid"
+         true "zenityprogresspid does not exist: ${msgcollector_run_dir}/${identifier}_${progressbaridx}_zenityprogresspid"
       fi
    else
-      true "fifo does not exist: /run/msgcollector/$who_ami/${identifier}_${progressbaridx}_fifo"
+      true "fifo does not exist: ${msgcollector_run_dir}/${identifier}_${progressbaridx}_fifo"
    fi
    ## XXX
    #progress_bar
    return 0
 }
 
-umask ug=rw,o=r
-
-who_ami=$(whoami)
+source /usr/libexec/msgcollector/msgcollector_shared
+## sets: ${msgcollector_run_dir}
+folder_init
 
 parse_cmd_options "$@"
 

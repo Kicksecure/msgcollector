@@ -5,6 +5,10 @@
 
 set -e
 
+source /usr/libexec/msgcollector/msgcollector_shared
+## sets: ${msgcollector_run_dir}
+folder_init
+
 check() {
    if ! [[ "$1" =~ ^[0-9a-zA-Z_-]+$ ]]; then
       echo "Invalid character!" >&2
@@ -13,19 +17,17 @@ check() {
    fi
 }
 
-who_ami="$1"
-identifier="$2"
-progressbaridx="$3"
+identifier="$1"
+progressbaridx="$2"
 
-check "$who_ami"
 check "$identifier"
 check "$progressbaridx"
 
-if [ ! -f "/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_parentpid" ]; then
+if [ ! -f "${msgcollector_run_dir}/${identifier}_${progressbaridx}_parentpid" ]; then
    exit 0
 fi
 
-parentpid="$(cat "/run/msgcollector/$who_ami/${identifier}_${progressbaridx}_parentpid")"
+parentpid="$(cat "${msgcollector_run_dir}/${identifier}_${progressbaridx}_parentpid")"
 
 true "parentpid: '$parentpid'"
 

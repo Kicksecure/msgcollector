@@ -7,12 +7,15 @@
 
 ## Terminate msgdispatcher --cli when logging out from tty1.
 
+source /usr/libexec/msgcollector/msgcollector_shared
+## sets: ${msgcollector_run_dir}
+folder_init
+
 if [ ! "$(tty)" = "/dev/tty1" ]; then
    true
 else
-   who_ami="$(whoami)"
-   if [ -f "/run/msgcollector/$who_ami/msgdispatcher_pidcli" ]; then
-      pid="$(cat "/run/msgcollector/$who_ami/msgdispatcher_pidcli")"
+   if [ -f "${msgcollector_run_dir}/msgdispatcher_pidcli" ]; then
+      pid="$(cat "${msgcollector_run_dir}/msgdispatcher_pidcli")"
       if [ ! "$pid" = "" ]; then
          kill -s sigterm "$pid"
       fi

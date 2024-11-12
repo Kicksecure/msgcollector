@@ -3,6 +3,10 @@
 ## Copyright (C) 2012 - 2023 ENCRYPTED SUPPORT LP <adrelanos@whonix.org>
 ## See the file COPYING for copying conditions.
 
+folder_init() {
+   msgcollector_run_dir="/run/user/$(id -u)/msgcollector"
+}
+
 loop_protection() {
    trap "error_handler" ERR
 
@@ -13,7 +17,7 @@ loop_protection() {
 }
 
 ## {{ In case /etc/init.d/msgcollector has not started yet, i.e. has not
-##    created "/run/msgcollector" yet, wait a bit.
+##    created ${msgcollector_run_dir} yet, wait a bit.
 maybe_wait() {
    trap "error_handler" ERR
 
@@ -24,8 +28,8 @@ maybe_wait() {
 
    loop_protection
 
-   if [ ! -d "/run/msgcollector" ]; then
-      true "Waiting for /run/msgcollector..."
+   if [ ! -d "${msgcollector_run_dir}" ]; then
+      true "Waiting for '${msgcollector_run_dir}'..."
       sleep 2 &
       wait "$!"
       maybe_wait

@@ -27,7 +27,6 @@ error_handler() {
 <br></br>Please see Whonix News, Whonix Blog and Whonix User Help Forum.
 <br></br>Please report this bug!
 <br></br>
-<br></br>who_ami: '<code>$who_ami'</code>
 <br></br>msgdisptacher_username: '<code>$msgdisptacher_username</code>'
 <br></br>msgdispatcher_identifier: '<code>$msgdispatcher_identifier</code>'
 <br></br>msgdispatcher_appendix: '<code>$msgdispatcher_appendix</code>'
@@ -159,26 +158,22 @@ preparation() {
    ## Sanity test.
    command -v flock >/dev/null 2>/dev/null
 
-   who_ami="$(whoami)"
-
-   umask ug=rw,o=r
-
-   if [ ! -d "/run/msgcollector/$who_ami" ]; then
-      mkdir --parents --mode ugo+rwx "/run/msgcollector/$who_ami"
+   if [ ! -d "${msgcollector_run_dir}" ]; then
+      mkdir --parents --mode ugo+rwx "${msgcollector_run_dir}"
    fi
 
    if [ "$cli" = "1" ]; then
-      pid_file="/run/msgcollector/$who_ami/msgdispatcher_pidcli"
-      lock_file="/run/msgcollector/$who_ami/msgdispatcher_cli_lock"
-      inotifywait_subshell_fifo="/run/msgcollector/$who_ami/msgdispatcher_cli_subshell_fifo"
-      inotifywait_success_file="/run/msgcollector/$who_ami/msgdispatcher_cli_inotifywait_success"
+      pid_file="${msgcollector_run_dir}/msgdispatcher_pidcli"
+      lock_file="${msgcollector_run_dir}/msgdispatcher_cli_lock"
+      inotifywait_subshell_fifo="${msgcollector_run_dir}/msgdispatcher_cli_subshell_fifo"
+      inotifywait_success_file="${msgcollector_run_dir}/msgdispatcher_cli_inotifywait_success"
    elif [ "$x" = "1" ]; then
-      pid_file="/run/msgcollector/$who_ami/msgdispatcher_pidx"
-      lock_file="/run/msgcollector/$who_ami/msgdispatcher_x_lock"
-      inotifywait_subshell_fifo="/run/msgcollector/$who_ami/msgdispatcher_x_subshell_fifo"
-      inotifywait_success_file="/run/msgcollector/$who_ami/msgdispatcher_x_inotifywait_success"
+      pid_file="${msgcollector_run_dir}/msgdispatcher_pidx"
+      lock_file="${msgcollector_run_dir}/msgdispatcher_x_lock"
+      inotifywait_subshell_fifo="${msgcollector_run_dir}/msgdispatcher_x_subshell_fifo"
+      inotifywait_success_file="${msgcollector_run_dir}/msgdispatcher_x_inotifywait_success"
    else
-      echo "$$" > "/run/msgcollector/$who_ami/msgdispatcher_piderror"
+      echo "$$" > "${msgcollector_run_dir}/msgdispatcher_piderror"
       exit 3
    fi
 
@@ -187,7 +182,7 @@ preparation() {
       #rm --force "$inotifywait_success_file"
    #fi
 
-   inotifywait_folder="/run/msgcollector"
+   inotifywait_folder="${msgcollector_run_dir}"
    delete_wrapper="/usr/libexec/msgcollector/msgdispatcher_delete_wrapper"
 }
 
@@ -282,9 +277,9 @@ dispatch_cli() {
    local msg
    msg="$1"
 
-   if [ -f "/run/msgcollector/$who_ami/${msgdispatcher_identifier}_parenttty" ]; then
+   if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_parenttty" ]; then
       local parenttty
-      parenttty="$(cat "/run/msgcollector/$who_ami/${msgdispatcher_identifier}_parenttty")"
+      parenttty="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_parenttty")"
       if [ "$parenttty" = "/dev/tty1" ]; then
          ## When for example systemcheck was run in tty1, then messages were
          ## already echoed by msgcollector. No need to dispatch them again.
@@ -299,14 +294,14 @@ dispatch_cli() {
 dispatch_x_active() {
    trap "error_handler" ERR
 
-   if [ -f "/run/msgcollector/$who_ami/${msgdispatcher_identifier}_lefttop" ]; then
+   if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_lefttop" ]; then
       local lefttop
       lefttop="1"
    fi
 
    local icon
-   if [ -f "/run/msgcollector/$who_ami/${msgdispatcher_identifier}_icon" ]; then
-      icon="$(cat "/run/msgcollector/$who_ami/${msgdispatcher_identifier}_icon")"
+   if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_icon" ]; then
+      icon="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_icon")"
    else
       ## Fallback.
       if [ -f "/usr/share/icons/gnome/24x24/status/info.png" ]; then
@@ -416,15 +411,15 @@ msgdispatcher_handler() {
 
    ## Remove "_done".
    temp_item="${file_name%%_*}"
-   ## Remove "/run/msgcollector/$msgdisptacher_username/".
+   ## Remove "${msgcollector_run_dir}/".
    msgdispatcher_identifier="${temp_item##*/}"
 
    if [ "$x" = "1" ]; then
-      if [ "$file_name" = "/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_messagex_done" ]; then
-         if [ -f "/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_messagex" ]; then
-            msg="$(cat "/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_messagex")"
-            title="$(cat "/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_titlex")"
-            type="$(cat "/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_typex")"
+      if [ "$file_name" = "${msgcollector_run_dir}/${msgdispatcher_identifier}_messagex_done" ]; then
+         if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_messagex" ]; then
+            msg="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_messagex")"
+            title="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_titlex")"
+            type="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_typex")"
             dispatch_x_active "$type" "$msg"
             msgdispatcher_sudo_wrapper "messagex_done"
             msgdispatcher_sudo_wrapper "titlex"
@@ -438,14 +433,14 @@ msgdispatcher_handler() {
          fi
          return 0
       fi
-      if [ "$file_name" = "/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_passivepopupqueuex_done" ]; then
-         if [ -f "/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_passivepopupqueuex" ]; then
-            msg="$(cat "/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_passivepopupqueuex")"
-            title="$(cat "/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_passivepopupqueuextitle")"
+      if [ "$file_name" = "${msgcollector_run_dir}/${msgdispatcher_identifier}_passivepopupqueuex_done" ]; then
+         if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_passivepopupqueuex" ]; then
+            msg="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_passivepopupqueuex")"
+            title="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_passivepopupqueuextitle")"
             ## TODO: do not use "_typex" to avoid conflicts with "messagex_done".
-            #type="$(cat "/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_typex")"
+            #type="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_typex")"
             type="info"
-            if [ -f "/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_forceactive" ]; then
+            if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_forceactive" ]; then
                ## TODO: --forceactive not yet implemented.
                #dispatch_x_active "$type" "$msg"
                dispatch_x_passive "$type" "$title" "$msg"
@@ -470,19 +465,19 @@ msgdispatcher_handler() {
 #          progressbaridx=${first_two#*_}
 #          ## progressbaridx example:
 #          ## 2b3916d6-3b3f-4490-bc85-b97da494a55d
-#          if [ -f "/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_${progressbaridx}_progressbarx" ]; then
-#             if [ -f "/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_${progressbaridx}_progressbarx_animate" ]; then
+#          if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_${progressbaridx}_progressbarx" ]; then
+#             if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_${progressbaridx}_progressbarx_animate" ]; then
 #                msgdispatcher_sudo_wrapper "${progressbaridx}_progressbarx_animate"
 #                animate="--animate"
 #             else
 #                unset animate
 #             fi
-#             if [ -f "/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_${progressbaridx}_progressbartitlex" ]; then
+#             if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_${progressbaridx}_progressbartitlex" ]; then
 #                local progressbartitlex
-#                progressbartitlex="$(cat "/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_${progressbaridx}_progressbartitlex")"
+#                progressbartitlex="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_${progressbaridx}_progressbartitlex")"
 #             fi
-#             if [ -f "/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_${progressbaridx}_progressbarx" ]; then
-#                progressbarx="$(cat "/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_${progressbaridx}_progressbarx")"
+#             if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_${progressbaridx}_progressbarx" ]; then
+#                progressbarx="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_${progressbaridx}_progressbarx")"
 #             fi
 #
 #             unset animate
@@ -496,10 +491,10 @@ msgdispatcher_handler() {
 #       fi
 
    elif [ "$cli" = "1" ]; then
-      if [ "$file_name" = "/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_waitmessagecli_done" ]; then
-         if [ -f "/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_waitmessagecli" ]; then
-            msg="$(cat "/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_waitmessagecli")"
-            type="$(cat "/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_typecli")"
+      if [ "$file_name" = "${msgcollector_run_dir}/${msgdispatcher_identifier}_waitmessagecli_done" ]; then
+         if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_waitmessagecli" ]; then
+            msg="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_waitmessagecli")"
+            type="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_typecli")"
             dispatch_cli "$msg"
             msgdispatcher_sudo_wrapper "waitmessagecli_done"
             msgdispatcher_sudo_wrapper "waitmessagecli"
@@ -508,10 +503,10 @@ msgdispatcher_handler() {
          fi
          return 0
       fi
-      if [ "$file_name" = "/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_messagecli_done" ]; then
-         if [ -f "/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_messagecli" ]; then
-            msg="$(cat "/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_messagecli")"
-            type="$(cat "/run/msgcollector/$msgdisptacher_username/${msgdispatcher_identifier}_typecli")"
+      if [ "$file_name" = "${msgcollector_run_dir}/${msgdispatcher_identifier}_messagecli_done" ]; then
+         if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_messagecli" ]; then
+            msg="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_messagecli")"
+            type="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_typecli")"
             dispatch_cli "$msg"
             msgdispatcher_sudo_wrapper "messagecli_done"
             msgdispatcher_sudo_wrapper "messagecli"
@@ -572,6 +567,9 @@ msgdispatcher_loop() {
 }
 
 source /usr/libexec/msgcollector/msgcollector_shared
+## sets: ${msgcollector_run_dir}
+folder_init
+
 source /usr/libexec/msgcollector/msgwmctrl
 
 parse_cmd_options "$@"

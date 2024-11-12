@@ -5,6 +5,10 @@
 
 set -e
 
+source /usr/libexec/msgcollector/msgcollector_shared
+## sets: ${msgcollector_run_dir}
+folder_init
+
 check() {
    if ! [[ "$2" =~ ^[0-9a-zA-Z_-]+$ ]]; then
       echo "$0:
@@ -19,7 +23,7 @@ check "msgdisptacher_username" "${msgdisptacher_username}"
 check "msgdispatcher_identifier" "${msgdispatcher_identifier}"
 check "msgdispatcher_appendix" "${msgdispatcher_appendix}"
 
-file_name="/run/msgcollector/${msgdisptacher_username}/${msgdispatcher_identifier}_${msgdispatcher_appendix}"
+file_name="${msgcollector_run_dir}/${msgdispatcher_identifier}_${msgdispatcher_appendix}"
 
 if [ -f "$file_name" ]; then
    true "$0: exists: $file_name"

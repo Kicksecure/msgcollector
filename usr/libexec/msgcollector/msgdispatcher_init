@@ -5,17 +5,19 @@
 
 set -e
 
-umask ug=rw,o=r || exit 2
+source /usr/libexec/msgcollector/msgcollector_shared
+## sets: ${msgcollector_run_dir}
+folder_init
 
-DONE_FILE="/run/msgcollector/init_done"
+DONE_FILE="${msgcollector_run_dir}/init_done"
 SIZE="10M"
 
-mkdir --parents /run/msgcollector || exit 3
+mkdir --parents "${msgcollector_run_dir}" || exit 3
 
 if [ ! -f "$DONE_FILE" ]; then
-    mount -t tmpfs -o size="$SIZE",nosuid,nodev,noexec none /run/msgcollector || exit 4
+    mount -t tmpfs -o size="$SIZE",nosuid,nodev,noexec none "${msgcollector_run_dir}" || exit 4
 else
-    mount -t tmpfs -o size="$SIZE",nosuid,nodev,noexec,remount none /run/msgcollector || exit 5
+    mount -t tmpfs -o size="$SIZE",nosuid,nodev,noexec,remount none "${msgcollector_run_dir}" || exit 5
 fi
 
 touch "$DONE_FILE" || exit 6

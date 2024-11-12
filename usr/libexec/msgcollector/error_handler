@@ -24,10 +24,9 @@ $error_text"
 <br></br>## $SCRIPTNAME script bug.
 <br></br>## No panic. Nothing is broken. Just some rare condition has been hit.
 <br></br>## Try again later. There is likely a solution for this problem.
-<br></br>## Please see Whonix News, Whonix Blog and Whonix User Help Forum.
+<br></br>## Please see News, Blog and User Help Forum.
 <br></br>## Please report this bug!
 <br></br>##
-<br></br>## who_ami: $who_ami
 <br></br>## identifier: $identifier
 <br></br>## IDENTIFIER: $IDENTIFIER
 <br></br>## exit_code: $exit_code
@@ -44,10 +43,9 @@ $error_text"
 <br></br>## $SCRIPTNAME script bug.
 <br></br>## No panic. Nothing is broken. Just some rare condition has been hit.
 <br></br>## Try again later. There is likely a solution for this problem.
-<br></br>## Please see Whonix News, Whonix Blog and Whonix User Help Forum.
+<br></br>## Please see News, Blog and User Help Forum.
 <br></br>## Please report this bug!
 <br></br>##
-<br></br>## who_ami: $who_ami
 <br></br>## identifier: $identifier
 <br></br>## exit_code: $exit_code
 <br></br>## error_cause: $error_cause
