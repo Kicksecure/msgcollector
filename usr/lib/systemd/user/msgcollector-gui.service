@@ -12,7 +12,7 @@ Description=msgcollector msgdispatcher
 
 [Service]
 Type=simple
-ExecStart=/usr/libexec/msgcollector/msgdispatcher --gui
+ExecStart=/usr/libexec/msgcollector/msgdispatcher
 
 [Install]
 ## Not functional in Qubes.

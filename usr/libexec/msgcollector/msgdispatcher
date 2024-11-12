@@ -117,14 +117,6 @@ parse_cmd_options() {
                verbose="1"
                shift
                ;;
-           --cli)
-               cli="1"
-               shift
-               ;;
-           --gui)
-               gui="1"
-               shift
-               ;;
            --)
                shift
                break
@@ -138,14 +130,6 @@ parse_cmd_options() {
                ;;
        esac
    done
-
-   if [ "$cli" = "1" ]; then
-      return 0
-   fi
-   if [ "$gui" = "1" ]; then
-      return 0
-   fi
-   echo "$0 ERROR: needs to be started with either --gui or --cli." >&2
 }
 
 preparation() {
@@ -153,6 +137,24 @@ preparation() {
 
    ## Sanity test.
    command -v flock >/dev/null 2>/dev/null
+
+   if [ "$XDG_SESSION_TYPE" = "x11" ]; then
+      gui=1
+      cli=0
+   elif [ "$XDG_SESSION_TYPE" = "wayland" ]; then
+      gui=1
+      cli=0
+   elif [ "$XDG_SESSION_TYPE" = "tty" ]; then
+      cli=1
+      ## Do this only in /dev/tty1.
+      if [ ! "$(tty)" = "/dev/tty1" ]; then
+         echo "$0: INFO: Skip, because not running in /dev/tty1."
+         exit 0
+      fi
+   else
+      echo "$0 INFO: XDG_SESSION_TYPE is neither x11 nor wayland nor tty, exiting."
+      exit 0
+   fi
 
    if [ "$cli" = "1" ]; then
       pid_file="${msgcollector_run_dir}/msgdispatcher_pidcli"

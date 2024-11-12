@@ -3,4 +3,5 @@
 ## Copyright (C) 2012 - 2023 ENCRYPTED SUPPORT LP <adrelanos@whonix.org>
 ## See the file COPYING for copying conditions.
 
-/usr/libexec/msgcollector/msgdispatcher --cli & disown
+## No longer in use.
+#/usr/libexec/msgcollector/msgdispatcher & disown
