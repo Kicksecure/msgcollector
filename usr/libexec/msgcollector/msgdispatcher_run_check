@@ -4,8 +4,6 @@
 ## See the file COPYING for copying conditions.
 
 msgdispatcher_pid_check() {
-   local pid_file pid
-
    if [ "cli" = "$1" ]; then
       if &>/dev/null systemctl --no-pager --no-block --user is-active msgcollector-cli.service ; then
          return 0
