@@ -1,4 +1,4 @@
-## Copyright (C) 2019 - 2023 ENCRYPTED SUPPORT LP <adrelanos@whonix.org>
+## Copyright (C) 2019 - 2024 ENCRYPTED SUPPORT LP <adrelanos@whonix.org>
 ## See the file COPYING for copying conditions.
 
 ## Do not use sudo!
@@ -11,11 +11,8 @@
 Description=User Test Systemd Unit File
 
 [Service]
-Type=oneshot
-RemainAfterExit=yes
-Environment=ZUSERTESTVAR=usertest
-ExecStart=/bin/true
-#ExecStart=/usr/bin/env
+Type=simple
+ExecStart=/usr/bin/sleep infinity
 
 [Install]
 WantedBy=default.target

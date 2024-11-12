@@ -13,6 +13,7 @@ Description=msgcollector msgdispatcher
 #After=graphical-session.target
 
 [Service]
+Type=simple
 ExecStart=/usr/libexec/msgcollector/msgdispatcher --gui
 
 [Install]
