@@ -531,9 +531,9 @@ msgdispatcher_sudo_wrapper() {
 
    msgdispatcher_appendix="$1"
 
-   msgdispatcher_sudo_log sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="$msgdispatcher_appendix" "$delete_wrapper"
+   msgdispatcher_sudo_log msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="$msgdispatcher_appendix" "$delete_wrapper"
 
-   output_msgdispatcher_sudo_wrapper="$(sudo --non-interactive msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="$msgdispatcher_appendix" "$delete_wrapper" 2>&1)"
+   output_msgdispatcher_sudo_wrapper="$(msgdisptacher_username="$msgdisptacher_username" msgdispatcher_identifier="$msgdispatcher_identifier" msgdispatcher_appendix="$msgdispatcher_appendix" "$delete_wrapper" 2>&1)"
 
    ## In case above errors, do not additionally error out from this function.
    true
