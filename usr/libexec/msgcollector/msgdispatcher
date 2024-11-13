@@ -29,7 +29,6 @@ error_handler() {
 <br></br>
 <br></br>msgdispatcher_identifier: '<code>$msgdispatcher_identifier</code>'
 <br></br>msgdispatcher_appendix: '<code>$msgdispatcher_appendix</code>'
-<br></br>delete_wrapper: '<code>$delete_wrapper'</code>
 <br></br>
 <br></br>error_text: '<code>$error_text</code>'
 <br></br>last_exit_code: '<code>$last_exit_code</code>'
