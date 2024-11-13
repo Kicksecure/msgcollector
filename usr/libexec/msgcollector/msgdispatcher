@@ -6,6 +6,7 @@
 #set -x
 set -e
 set -o pipefail
+set -o errtrace
 #trap 'sleep 1' DEBUG
 
 scriptname="$(basename "$BASH_SOURCE")"
@@ -82,8 +83,6 @@ trap_sighup() {
 trap "trap_sighup" SIGHUP
 
 trap_sigterm() {
-   trap "error_handler" ERR
-
    SIGNAL_TYPE="SIGTERM"
    EXIT_CODE="143"
    ex_funct
@@ -92,8 +91,6 @@ trap_sigterm() {
 trap "trap_sigterm" SIGTERM
 
 trap_sigint() {
-   trap "error_handler" ERR
-
    SIGNAL_TYPE="SIGINT"
    EXIT_CODE="130"
    ex_funct
@@ -102,8 +99,6 @@ trap_sigint() {
 trap "trap_sigint" SIGINT ## ctrl + c
 
 parse_cmd_options() {
-   trap "error_handler" ERR
-
    ## Thanks to:
    ## http://mywiki.wooledge.org/BashFAQ/035
 
@@ -130,8 +125,6 @@ parse_cmd_options() {
 }
 
 preparation() {
-   trap "error_handler" ERR
-
    ## Sanity test.
    command -v flock >/dev/null 2>/dev/null
 
@@ -183,8 +176,6 @@ preparation() {
 
 ## {{ Small wrapper to use either kdialog, notify-send or nothing.
 passive_popup_tool() {
-   trap "error_handler" ERR
-
    local time title text
    time="$1"
    title="$2"
@@ -217,8 +208,6 @@ passive_popup_tool() {
 ## }}
 
 dispatch_cli() {
-   trap "error_handler" ERR
-
    local msg
    msg="$1"
 
@@ -237,8 +226,6 @@ dispatch_cli() {
 }
 
 dispatch_x_active() {
-   trap "error_handler" ERR
-
    if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_lefttop" ]; then
       local lefttop
       lefttop="1"
@@ -271,14 +258,10 @@ dispatch_x_active() {
 }
 
 dispatch_x_passive() {
-   trap "error_handler" ERR
-
    passive_popup_tool "20" "$title" "$msg"
 }
 
 inotifywait_setup() {
-   trap "error_handler" ERR
-
    if [ ! "$inotifywait_subshell_pid" = "" ]; then
       kill -s sigterm "$inotifywait_subshell_pid" || true
    fi
@@ -330,8 +313,6 @@ inotifywait_setup() {
 }
 
 parse_existing_files() {
-   trap "error_handler" ERR
-
    ## Prevent race condition while inotifywait might not be started yet.
    sleep "2" &
    wait "$!"
@@ -344,8 +325,6 @@ parse_existing_files() {
 }
 
 msgdispatcher_handler() {
-   trap "error_handler" ERR
-
    true "PROCESSING file_name: $file_name"
    file_extension="${file_name##*_}"
    if [ ! "$file_extension" = "done" ]; then
@@ -484,8 +463,6 @@ Invalid character!" >&2
 }
 
 msgdispatcher_delete_wrapper() {
-   trap "error_handler" ERR
-
    msgdispatcher_appendix="$1"
 
    check "msgdispatcher_identifier" "${msgdispatcher_identifier}"
@@ -505,8 +482,6 @@ msgdispatcher_delete_wrapper() {
 }
 
 inotifywait_loop() {
-   trap "error_handler" ERR
-
    true "$scriptname $FUNCNAME (pid: $$): Starting loop."
 
    local temp_item last_two first_two progressbaridx
@@ -517,7 +492,6 @@ inotifywait_loop() {
 }
 
 msgdispatcher_loop() {
-   trap "error_handler" ERR
    while true; do
       preparation
       fallbacks ## provided by /usr/libexec/msgcollector/msgwmctrl
