@@ -261,6 +261,10 @@ dispatch_x_passive() {
 }
 
 inotifywait_setup() {
+   ## Prevent race condition while inotifywait might not be started yet.
+   ## A subshell is used to manage the lifecycle of inotifywait and ensure it's properly monitored.
+   ## The use of a success file is crucial here to determine if inotifywait started correctly.
+
    if [ ! "$inotifywait_subshell_pid" = "" ]; then
       kill -s sigterm "$inotifywait_subshell_pid" || true
    fi
@@ -296,24 +300,33 @@ inotifywait_setup() {
 
       trap "inotifywait_subshell_trap_sigterm" SIGTERM
 
-      ## TODO: Does this work? Was: '--event create'
+      ## Start inotifywait in a subshell to continuously monitor the directory.
+      ## The subshell approach is used so that the script can both start inotifywait and then verify its setup status.
+      ## If the inotifywait process fails to set up, the success file won't be created.
       inotifywait --quiet --recursive --monitor --event close_write --format "%w%f" "$inotifywait_folder" &
       inotifywait_pid="$!"
       touch "$inotifywait_success_file"
       wait_exit_code="0"
-      ## Should wait forever.
+      true "INFO: Wait for the inotifywait pid..."
+      ## If it fails, handle the error gracefully.
       wait "$inotifywait_pid" || { wait_exit_code="$?" ; true; };
+      ## Ideally, should never reach beyond this point.
+
+      ## This does not result in the script exiting.
+      ## This is because below inotifywait_subshell_pid does not wait to check the exit code of the subshell.
       inotifywait_subshell_error_handler "Failed to set up inotifywait! inotifywait_folder: $inotifywait_folder | wait_exit_code: $wait_exit_code"
       exit "$wait_exit_code"
-   } > "$inotifywait_subshell_fifo" &
+   } | sponge -- "$inotifywait_subshell_fifo" &
 
    inotifywait_subshell_pid="$!"
    true "$scriptname $FUNCNAME (pid: $$): Started subshell for inotify with pid: $inotifywait_subshell_pid"
 }
 
 parse_existing_files() {
-   ## Prevent race condition while inotifywait might not be started yet.
+   ## Sleep to allow inotifywait to set up before processing any existing files.
+   ## This prevents any race conditions where existing files might not be processed due to a delay in inotifywait setup.
    sleep "2" &
+   true "INFO: wait for parse_existing_files sleep 2 pid"
    wait "$!"
 
    for folder_name in "$inotifywait_folder/"*; do
@@ -497,7 +510,8 @@ msgdispatcher_loop() {
       inotifywait_setup
       parse_existing_files
       inotifywait_loop
-      sleep 10 &
+      sleep 10
+      true "INFO: wait for main loop sleep 10 pid"
       wait "$!"
    done
 }
