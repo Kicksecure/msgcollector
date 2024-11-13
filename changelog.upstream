@@ -1,3 +1,27 @@
+commit b3f91f4d9647a5131913799eac3433015b93eef0
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Nov 13 04:23:35 2024 -0500
+
+    debugging
+
+commit f98c044c8e2bfb5d21b0206b383d9b5cf431a7c3
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Nov 13 04:21:27 2024 -0500
+
+    improve GUI detection
+
+commit 5151f9c625fac4dd2e82a150c2d35db140cde73c
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Nov 13 04:19:58 2024 -0500
+
+    fix detection of Qubes X11
+
+commit 72f1a2a039906bd80761b940308ce41fd22a6979
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Nov 12 17:06:55 2024 +0000
+
+    bumped changelog version
+
 commit a8b4042933f123955b0c9493f33935e3098b5464
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Tue Nov 12 12:06:45 2024 -0500
