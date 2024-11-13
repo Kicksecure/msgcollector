@@ -1,3 +1,15 @@
+commit 1342f0abfb1c41218697c51f5f39703b23c071d5
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Nov 13 07:44:44 2024 -0500
+
+    add start systemd user unit from /etc/xdg/autostart workaround
+
+commit 333be143adc29f7ffe9e492c143d29e27e5ff7cc
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Nov 13 11:49:03 2024 +0000
+
+    bumped changelog version
+
 commit b3f91f4d9647a5131913799eac3433015b93eef0
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Wed Nov 13 04:23:35 2024 -0500
