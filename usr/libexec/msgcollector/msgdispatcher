@@ -316,7 +316,10 @@ inotifywait_setup() {
       ## This is because below inotifywait_subshell_pid does not wait to check the exit code of the subshell.
       inotifywait_subshell_error_handler "Failed to set up inotifywait! inotifywait_folder: $inotifywait_folder | inotifywait_wait_exit_code: $inotifywait_wait_exit_code"
       exit "$inotifywait_wait_exit_code"
-   } | sponge -- "$inotifywait_subshell_fifo" &
+   } > "$inotifywait_subshell_fifo" &
+
+   ## Does not work:
+   #} | sponge -- "$inotifywait_subshell_fifo" &
 
    inotifywait_subshell_pid="$!"
    true "$scriptname $FUNCNAME (pid: $$): Started subshell for inotify with pid: $inotifywait_subshell_pid"
