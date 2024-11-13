@@ -289,16 +289,16 @@ inotifywait_setup() {
 
       inotifywait_subshell_trap_sigterm() {
          trap "error_handler" ERR
-         true "$BASH_SOURCE: $FUNCNAME: INFO: signal SIGTERM received. Cleaning up..."
+         true "$BASH_SOURCE: $FUNCNAME: INFO: signal SIGTERM/SIGINT received. Cleaning up..."
          if [ ! "$inotifywait_pid" = "" ]; then
             kill -s sigterm "$inotifywait_pid"
          fi
          safe-rm --force "$inotifywait_success_file"
-         true "$BASH_SOURCE: $FUNCNAME: INFO: signal SIGTERM received. Exiting."
+         true "$BASH_SOURCE: $FUNCNAME: INFO: signal SIGTERM/SIGINT received. Exiting."
          exit 143
       }
 
-      trap "inotifywait_subshell_trap_sigterm" SIGTERM
+      trap "inotifywait_subshell_trap_sigterm" SIGTERM SIGINT
 
       ## Start inotifywait in a subshell to continuously monitor the directory.
       ## The subshell approach is used so that the script can both start inotifywait and then verify its setup status.
