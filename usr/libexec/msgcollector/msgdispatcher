@@ -24,7 +24,7 @@ error_handler() {
 <br></br>
 <br></br>No panic. Nothing is broken. Just some rare condition has been hit.
 <br></br>Try again later. There is likely a solution for this problem.
-<br></br>Please see Whonix News, Whonix Blog and Whonix User Help Forum.
+<br></br>Please see News, Blog and User Help Forum.
 <br></br>Please report this bug!
 <br></br>
 <br></br>msgdispatcher_identifier: '<code>$msgdispatcher_identifier</code>'
