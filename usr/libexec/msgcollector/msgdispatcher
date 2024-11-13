@@ -144,6 +144,9 @@ preparation() {
    elif [ "$XDG_CURRENT_DESKTOP" = "X-QUBES" ]; then
       gui=1
       cli=0
+   elif [ ! "$DISPLAY" = "" ]; then
+      gui=1
+      cli=0
    elif [ "$XDG_SESSION_TYPE" = "tty" ]; then
       cli=1
       ## Do this only in /dev/tty1.
