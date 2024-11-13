@@ -306,16 +306,16 @@ inotifywait_setup() {
       inotifywait --quiet --recursive --monitor --event close_write --format "%w%f" "$inotifywait_folder" &
       inotifywait_pid="$!"
       touch "$inotifywait_success_file"
-      wait_exit_code="0"
+      inotifywait_wait_exit_code="0"
       true "INFO: Wait for the inotifywait pid..."
       ## If it fails, handle the error gracefully.
-      wait "$inotifywait_pid" || { wait_exit_code="$?" ; true; };
+      wait "$inotifywait_pid" || { inotifywait_wait_exit_code="$?" ; true; };
       ## Ideally, should never reach beyond this point.
 
       ## This does not result in the script exiting.
       ## This is because below inotifywait_subshell_pid does not wait to check the exit code of the subshell.
-      inotifywait_subshell_error_handler "Failed to set up inotifywait! inotifywait_folder: $inotifywait_folder | wait_exit_code: $wait_exit_code"
-      exit "$wait_exit_code"
+      inotifywait_subshell_error_handler "Failed to set up inotifywait! inotifywait_folder: $inotifywait_folder | inotifywait_wait_exit_code: $inotifywait_wait_exit_code"
+      exit "$inotifywait_wait_exit_code"
    } | sponge -- "$inotifywait_subshell_fifo" &
 
    inotifywait_subshell_pid="$!"
