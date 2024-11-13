@@ -1,8 +1,26 @@
 #!/bin/bash
 
-## Copyright (C) 2012 - 2023 ENCRYPTED SUPPORT LP <adrelanos@whonix.org>
+## Copyright (C) 2012 - 2024 ENCRYPTED SUPPORT LP <adrelanos@whonix.org>
 ## See the file COPYING for copying conditions.
+
+set -x
+
+true "$0: START"
 
 ## OLD - No longer in use.
 ## This script gets run by the /etc/xdg/autostart/msgdispatcher.desktop hook.
 #/usr/libexec/msgcollector/msgdispatcher & disown
+
+## Workaround for:
+## Qubes fails to start/activate systemd graphical-session.target target #9576
+## https://github.com/QubesOS/qubes-issues/issues/9576
+## See also:
+## /usr/lib/systemd/user/msgcollector-gui.service
+
+if [ "$(systemctl is-enabled msgcollector-gui.service)" == "masked" ]; then
+  exit 0
+fi
+
+systemctl --user --no-pager --no-block start msgcollector-gui.service
+
+true "$0: END"
