@@ -1,3 +1,15 @@
+commit 1c755a81cffe5c09adcccb202a868d09853e9794
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Dec 4 09:40:44 2024 -0500
+
+    fix systemd unit exit code handling
+
+commit 32f5fb24eaec13940a2e21bdc89e439fa99eee09
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Nov 13 17:37:20 2024 +0000
+
+    bumped changelog version
+
 commit be33d1552e8ba8f2effea30c1db3906ba11ef29f
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Wed Nov 13 12:37:10 2024 -0500
