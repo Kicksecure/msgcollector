@@ -17,7 +17,7 @@ true "$0: START"
 ## See also:
 ## /usr/lib/systemd/user/msgcollector-gui.service
 
-if [ "$(systemctl is-enabled msgcollector-gui.service)" == "masked" ]; then
+if [ "$(systemctl --user is-enabled msgcollector-gui.service)" == "masked" ]; then
   exit 0
 fi
 
