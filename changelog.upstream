@@ -1,3 +1,15 @@
+commit 54040043a77271ba700c8a4c087a2e27578cab2e
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Dec 6 10:11:37 2024 -0500
+
+    fix check if msgcollector-gui systemd user unit is masked
+
+commit cd0088e3e0b8a5c957c5e17bc8c6cf75fc69beaf
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Dec 4 14:41:24 2024 +0000
+
+    bumped changelog version
+
 commit 1c755a81cffe5c09adcccb202a868d09853e9794
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Wed Dec 4 09:40:44 2024 -0500
