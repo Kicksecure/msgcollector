@@ -14,7 +14,7 @@ Rules-Requires-Root: no
 
 Package: msgcollector
 Architecture: all
-Depends: python3, inotify-tools, procps, safe-rm, ${misc:Depends}
+Depends: python3, inotify-tools, procps, safe-rm, moreutils, ${misc:Depends}
 Provides: ${diverted-files}
 Conflicts: ${diverted-files}
 Description: Command Line Interface Messages Toolkit Library
