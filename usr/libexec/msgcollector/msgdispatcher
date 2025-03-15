@@ -221,24 +221,21 @@ inotifywait_setup() {
 }
 
 parse_existing_files() {
-   ## Sleep to allow inotifywait to set up before processing any existing files.
-   ## This prevents any race conditions where existing files might not be processed due to a delay in inotifywait setup.
-   true "INFO: wait for parse_existing_files sleep 2 pid"
-   sleep -- "2"
-
-   for folder_name in "$inotifywait_folder/"*; do
-      for file_name in "$folder_name/"*; do
-         msgdispatcher_handler
-      done
+   for file_name in "$inotifywait_folder/"*; do
+      true "parse_existing_files: file_name: $file_name"
+      msgdispatcher_handler
    done
 }
 
 msgdispatcher_handler() {
-   true "PROCESSING file_name: $file_name"
+   true "msgdispatcher_handler: file_name: $file_name"
    file_extension="${file_name##*_}"
    if [ ! "$file_extension" = "done" ]; then
+      true "msgdispatcher_handler: Not a done file. Stop processing, ok."
+      true "----------"
       return 0
    fi
+   true "msgdispatcher_handler: Done file. Continue processing..."
 
    ## Remove "_done".
    temp_item="${file_name%%_*}"
@@ -264,6 +261,7 @@ msgdispatcher_handler() {
             ## Not always using rm, without if to prevent forking.
             msgdispatcher_delete_wrapper "messagex_done"
          fi
+         true "----------"
          return 0
       fi
       if [ "$file_name" = "${msgcollector_run_dir}/${msgdispatcher_identifier}_passivepopupqueuex_done" ]; then
@@ -287,6 +285,7 @@ msgdispatcher_handler() {
          else
             msgdispatcher_delete_wrapper "passivepopupqueuex_done"
          fi
+         true "----------"
          return 0
       fi
 
@@ -320,6 +319,7 @@ msgdispatcher_handler() {
 #          else
 #             msgdispatcher_delete_wrapper "${progressbaridx}_progressbarx_done"
 #          fi
+#          true "----------"
 #          return 0
 #       fi
 
@@ -336,6 +336,7 @@ msgdispatcher_handler() {
             true "INFO: waitmessagecli file does NOT exist."
             msgdispatcher_delete_wrapper "waitmessagecli_done"
          fi
+         true "----------"
          return 0
       fi
       if [ "$file_name" = "${msgcollector_run_dir}/${msgdispatcher_identifier}_messagecli_done" ]; then
@@ -348,9 +349,11 @@ msgdispatcher_handler() {
          else
             msgdispatcher_delete_wrapper "messagecli_done"
          fi
+         true "----------"
          return 0
       fi
    else
+      true "----------"
       exit 1
    fi
 }

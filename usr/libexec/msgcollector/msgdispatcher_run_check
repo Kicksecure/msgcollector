@@ -15,6 +15,7 @@ msgdispatcher_pid_check() {
       if &>/dev/null systemctl --no-pager --no-block --user is-active msgcollector-gui.service ; then
          return 0
       else
+         ## TODO: Prevents "systemcheck --gui" to write msgcollector gui status files.
          return 1
       fi
    else
