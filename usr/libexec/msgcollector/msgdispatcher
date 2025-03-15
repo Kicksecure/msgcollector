@@ -392,7 +392,7 @@ msgdispatcher_delete_wrapper() {
 inotifywait_loop() {
    true "$0: Starting loop."
 
-   while read -r file_name; do
+   while read -r -- file_name; do
       true "file_name: $file_name"
       msgdispatcher_handler
    done < "$inotifywait_subshell_fifo"
