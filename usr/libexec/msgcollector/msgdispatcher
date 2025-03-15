@@ -48,7 +48,7 @@ error_handler() {
    if [ ! -d ~/".msgcollector" ]; then
       mkdir --parents ~/".msgcollector"
    fi
-   echo "$0: BASH_COMMAND: $BASH_COMMAND | exit_code: $exit_code" | tee -a ~/".msgcollector/msgdispatcher-error.log" >/dev/null
+   echo "$0: BASH_COMMAND: $BASH_COMMAND | exit_code: $exit_code" | sponge -a -- ~/".msgcollector/msgdispatcher-error.log" >/dev/null
 
    true
 }
@@ -158,7 +158,7 @@ preparation() {
       inotifywait_subshell_fifo="${msgcollector_run_dir}/msgdispatcher_x_subshell_fifo"
       inotifywait_success_file="${msgcollector_run_dir}/msgdispatcher_x_inotifywait_success"
    else
-      echo "$$" > "${msgcollector_run_dir}/msgdispatcher_piderror"
+      echo "$$" | sponge -- "${msgcollector_run_dir}/msgdispatcher_piderror" >/dev/null
       exit 3
    fi
 
