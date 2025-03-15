@@ -145,11 +145,11 @@ preparation() {
       cli=1
       ## Do this only in /dev/tty1.
       if [ ! "$(tty)" = "/dev/tty1" ]; then
-         echo "$0: INFO: Skip, because not running in /dev/tty1."
+         echo "$scriptname: INFO: Skip, because not running in /dev/tty1."
          exit 0
       fi
    else
-      echo "$0: INFO: XDG_SESSION_TYPE is neither x11 nor wayland nor tty, DISPLAY is not set either, exiting."
+      echo "$scriptname: INFO: XDG_SESSION_TYPE is neither x11 nor wayland nor tty, DISPLAY is not set either, exiting."
       exit 0
    fi
 
@@ -463,14 +463,14 @@ msgdispatcher_handler() {
 
 check() {
    if ! [[ "$2" =~ ^[0-9a-zA-Z_-]+$ ]]; then
-      echo "$0:
+      echo "$scriptname:
 \$1 (variable name): '$1'
 \$2 (variable content): '$2'
 Invalid character!" >&2
       exit 200
    fi
    if [ "$2" = "" ]; then
-      echo "$0:
+      echo "$scriptname:
 \$1 (variable name): '$1'
 \$2 (variable content): empty!" >&2
       exit 201
