@@ -11,9 +11,12 @@
 Description=msgcollector msgdispatcher
 
 [Service]
-Type=simple
+Type=notify
 ExecStart=/usr/libexec/msgcollector/msgdispatcher
 KillMode=control-group
+NotifyAccess=all
+WatchdogSec=30
+Restart=always
 
 [Install]
 ## Not functional in Qubes.

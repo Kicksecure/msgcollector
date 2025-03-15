@@ -392,21 +392,25 @@ msgdispatcher_delete_wrapper() {
 inotifywait_loop() {
    true "$0: Starting loop."
 
+   ## Launching inotifywait_loop into the background.
    while read -r -- file_name; do
       true "file_name: $file_name"
       msgdispatcher_handler
-   done < "$inotifywait_subshell_fifo"
+   done < "$inotifywait_subshell_fifo" &
 }
 
 msgdispatcher_loop() {
+   preparation
+   fallbacks ## provided by /usr/libexec/msgcollector/msgwmctrl
+   inotifywait_setup
+   parse_existing_files
+   systemd-notify --pid="$$" --ready
+   inotifywait_loop
+
    while true; do
-      preparation
-      fallbacks ## provided by /usr/libexec/msgcollector/msgwmctrl
-      inotifywait_setup
-      parse_existing_files
-      inotifywait_loop
-      true "INFO: wait for main loop sleep 10 pid"
-      sleep 10
+      systemd-notify --pid="$$" WATCHDOG=1
+      sleep -- 10 &
+      wait -- "$!"
    done
 }
 
