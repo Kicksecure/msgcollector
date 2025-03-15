@@ -58,7 +58,7 @@ error_handler() {
 trap "error_handler" ERR
 
 ex_funct() {
-   true "$BASH_SOURCE: $FUNCNAME: INFO: Signal $SIGNAL_TYPE received. Cleaning up..."
+   true "$scriptname: $FUNCNAME: INFO: Signal $SIGNAL_TYPE received. Cleaning up..."
 
    if [ ! "$inotifywait_subshell_pid" = "" ]; then
       kill -s sigterm "$inotifywait_subshell_pid" || true
@@ -149,7 +149,7 @@ preparation() {
          exit 0
       fi
    else
-      echo "$0 INFO: XDG_SESSION_TYPE is neither x11 nor wayland nor tty, DISPLAY is not set either, exiting."
+      echo "$0: INFO: XDG_SESSION_TYPE is neither x11 nor wayland nor tty, DISPLAY is not set either, exiting."
       exit 0
    fi
 
@@ -289,12 +289,12 @@ inotifywait_setup() {
 
       inotifywait_subshell_trap_sigterm() {
          trap "error_handler" ERR
-         true "$BASH_SOURCE: $FUNCNAME: INFO: signal SIGTERM/SIGINT received. Cleaning up..."
+         true "$scriptname: $FUNCNAME: INFO: signal SIGTERM/SIGINT received. Cleaning up..."
          if [ ! "$inotifywait_pid" = "" ]; then
             kill -s sigterm "$inotifywait_pid"
          fi
          safe-rm --force "$inotifywait_success_file"
-         true "$BASH_SOURCE: $FUNCNAME: INFO: signal SIGTERM/SIGINT received. Exiting."
+         true "$scriptname: $FUNCNAME: INFO: signal SIGTERM/SIGINT received. Exiting."
          exit 143
       }
 
