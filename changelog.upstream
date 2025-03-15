@@ -1,3 +1,83 @@
+commit c2dd1860ec3cb38c77868046ac41b57845665fc4
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Mar 15 03:56:57 2025 -0400
+
+    fix
+
+commit f7ce766fe2d9a21a457c7dca63c6fc3d5903943d
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Mar 15 03:29:01 2025 -0400
+
+    monitor msgcollector pids
+
+commit 1462f82daf641b949de484e597725b41002b47bd
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Mar 15 03:22:24 2025 -0400
+
+    msgdispatcher: add systemd watchdog support
+
+commit 0b20debf50eb73d02aea0c782070acf1c1d3e563
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Mar 15 03:09:00 2025 -0400
+
+    end-of-options
+
+commit c43d39981324558834821605001d340e96d5bdc6
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Mar 15 03:07:39 2025 -0400
+
+    port msgdispatcher process management to systemd for code simplification
+    
+    https://forums.whonix.org/t/systemcheck-fails-for-unclear-reason/21424/19
+
+commit 9095e809ecfe9b68a645a7da12010b88efd4cde6
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Mar 15 02:36:30 2025 -0400
+
+    end-of-options
+
+commit c0021278ad10ed00fa24ee1c0dd52704c18f73a9
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Mar 15 02:25:12 2025 -0400
+
+    sponge
+
+commit 765f79253a63d631fa52ad341214f43f9b9e3037
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Mar 15 02:24:35 2025 -0400
+
+    sponge
+
+commit 4c3b13a82313bab4169336204461dab6f3b02b8a
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Mar 15 02:23:00 2025 -0400
+
+    refactoring
+
+commit 4e9e1cf83059bf976e265c63d39553e08eee984d
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Mar 15 02:21:11 2025 -0400
+
+    output
+
+commit b38ee24c2f0dc07c7f02c6c1830e7d7e00ca607e
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Mar 15 02:20:32 2025 -0400
+
+    output
+
+commit e933873a269964877f4d51b12018b6aa5ac6b64c
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Mar 15 02:16:45 2025 -0400
+
+    output
+
+commit 93739d600b1fd9ded6361e5b9c1680422eae5118
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Jan 23 16:25:41 2025 +0000
+
+    bumped changelog version
+
 commit d18031b4d4c91e997a08753533f5bb15e2a7e867
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Thu Jan 23 11:12:01 2025 -0500
