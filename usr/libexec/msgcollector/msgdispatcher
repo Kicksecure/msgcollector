@@ -9,8 +9,6 @@ set -o pipefail
 set -o errtrace
 #trap 'sleep 1' DEBUG
 
-scriptname="$(basename "$BASH_SOURCE")"
-
 error_handler() {
    local last_exit_code="$?"
    if [ ! "$1" = "" ]; then
@@ -20,7 +18,7 @@ error_handler() {
    fi
 
    local msg="<p>
-<br></br>$scriptname script bug.
+<br></br>$0 script bug.
 <br></br>
 <br></br>No panic. Nothing is broken. Just some rare condition has been hit.
 <br></br>Try again later. There is likely a solution for this problem.
@@ -37,7 +35,7 @@ error_handler() {
    ## Popup window with the message above.
    ## /usr/share/icons/icon-pack-dist/whonix.ico might not exist, but
    ## fortunately msgdispatcher_dispatch_x works anyway.
-   /usr/libexec/msgcollector/msgdispatcher_dispatch_x "warning" "$scriptname" "$msg" "0" "/usr/share/icons/icon-pack-dist/whonix.ico" &
+   /usr/libexec/msgcollector/msgdispatcher_dispatch_x "warning" "$0" "$msg" "0" "/usr/share/icons/icon-pack-dist/whonix.ico" &
 
    local stripped_msg
    stripped_msg="$(/usr/libexec/msgcollector/striphtml "$msg")"
@@ -50,7 +48,7 @@ error_handler() {
    if [ ! -d ~/".msgcollector" ]; then
       mkdir --parents ~/".msgcollector"
    fi
-   echo "$scriptname: BASH_COMMAND: $BASH_COMMAND | exit_code: $exit_code" | tee -a ~/".msgcollector/msgdispatcher-error.log" >/dev/null
+   echo "$0: BASH_COMMAND: $BASH_COMMAND | exit_code: $exit_code" | tee -a ~/".msgcollector/msgdispatcher-error.log" >/dev/null
 
    true
 }
@@ -58,7 +56,7 @@ error_handler() {
 trap "error_handler" ERR
 
 ex_funct() {
-   true "$scriptname: $FUNCNAME: INFO: Signal $SIGNAL_TYPE received. Cleaning up..."
+   true "$0: $FUNCNAME: INFO: Signal $SIGNAL_TYPE received. Cleaning up..."
 
    if [ ! "$inotifywait_subshell_pid" = "" ]; then
       kill -s sigterm "$inotifywait_subshell_pid" || true
@@ -113,7 +111,7 @@ parse_cmd_options() {
                break
                ;;
            -*)
-               echo "$scriptname: unknown option: $1" >&2
+               echo "$0: unknown option: $1" >&2
                exit 1
                ;;
            *)
@@ -145,11 +143,11 @@ preparation() {
       cli=1
       ## Do this only in /dev/tty1.
       if [ ! "$(tty)" = "/dev/tty1" ]; then
-         echo "$scriptname: INFO: Skip, because not running in /dev/tty1."
+         echo "$0: INFO: Skip, because not running in /dev/tty1."
          exit 0
       fi
    else
-      echo "$scriptname: INFO: XDG_SESSION_TYPE is neither x11 nor wayland nor tty, DISPLAY is not set either, exiting."
+      echo "$0: INFO: XDG_SESSION_TYPE is neither x11 nor wayland nor tty, DISPLAY is not set either, exiting."
       exit 0
    fi
 
@@ -289,12 +287,12 @@ inotifywait_setup() {
 
       inotifywait_subshell_trap_sigterm() {
          trap "error_handler" ERR
-         true "$scriptname: $FUNCNAME: INFO: signal SIGTERM/SIGINT received. Cleaning up..."
+         true "$0: $FUNCNAME: INFO: signal SIGTERM/SIGINT received. Cleaning up..."
          if [ ! "$inotifywait_pid" = "" ]; then
             kill -s sigterm "$inotifywait_pid"
          fi
          safe-rm --force "$inotifywait_success_file"
-         true "$scriptname: $FUNCNAME: INFO: signal SIGTERM/SIGINT received. Exiting."
+         true "$0: $FUNCNAME: INFO: signal SIGTERM/SIGINT received. Exiting."
          exit 143
       }
 
@@ -322,7 +320,7 @@ inotifywait_setup() {
    #} | sponge -- "$inotifywait_subshell_fifo" &
 
    inotifywait_subshell_pid="$!"
-   true "$scriptname: $FUNCNAME (pid: $$): Started subshell for inotify with pid: $inotifywait_subshell_pid"
+   true "$0: $FUNCNAME (pid: $$): Started subshell for inotify with pid: $inotifywait_subshell_pid"
 }
 
 parse_existing_files() {
@@ -463,14 +461,14 @@ msgdispatcher_handler() {
 
 check() {
    if ! [[ "$2" =~ ^[0-9a-zA-Z_-]+$ ]]; then
-      echo "$scriptname:
+      echo "$0:
 \$1 (variable name): '$1'
 \$2 (variable content): '$2'
 Invalid character!" >&2
       exit 200
    fi
    if [ "$2" = "" ]; then
-      echo "$scriptname:
+      echo "$0:
 \$1 (variable name): '$1'
 \$2 (variable content): empty!" >&2
       exit 201
@@ -497,7 +495,7 @@ msgdispatcher_delete_wrapper() {
 }
 
 inotifywait_loop() {
-   true "$scriptname: $FUNCNAME (pid: $$): Starting loop."
+   true "$0: $FUNCNAME (pid: $$): Starting loop."
 
    local temp_item last_two first_two progressbaridx
 
