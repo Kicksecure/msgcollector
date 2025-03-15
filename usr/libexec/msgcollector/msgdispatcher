@@ -217,6 +217,7 @@ inotifywait_setup() {
    mkfifo -- "$inotifywait_subshell_fifo"
    ## Start inotifywait in a sub process to continuously monitor the directory.
    inotifywait --quiet --recursive --monitor --event close_write --format "%w%f" -- "$inotifywait_folder" > "$inotifywait_subshell_fifo" &
+   inotifywait_main_pid="$!"
 }
 
 parse_existing_files() {
@@ -397,6 +398,7 @@ inotifywait_loop() {
       true "file_name: $file_name"
       msgdispatcher_handler
    done < "$inotifywait_subshell_fifo" &
+   inotifywait_subshell_pid="$!"
 }
 
 msgdispatcher_loop() {
@@ -411,6 +413,9 @@ msgdispatcher_loop() {
       systemd-notify --pid="$$" WATCHDOG=1
       sleep -- 10 &
       wait -- "$!"
+      ## Check that pids are still running.
+      kill -0 -- "$inotifywait_main_pid"
+      kill -0 -- "$inotifywait_subshell_pid"
    done
 }
 
