@@ -46,7 +46,7 @@ error_handler() {
       echo "$stripped_msg" >&2
    fi
    if [ ! -d ~/".msgcollector" ]; then
-      mkdir --parents ~/".msgcollector"
+      mkdir --parents -- ~/".msgcollector"
    fi
    echo "$0: BASH_COMMAND: $BASH_COMMAND | exit_code: $exit_code" | sponge -a -- ~/".msgcollector/msgdispatcher-error.log" >/dev/null
 
@@ -59,11 +59,11 @@ ex_funct() {
    true "$0: $FUNCNAME: INFO: Signal $SIGNAL_TYPE received. Cleaning up..."
 
    if [ ! "$inotifywait_subshell_pid" = "" ]; then
-      kill -s sigterm "$inotifywait_subshell_pid" || true
+      kill -s sigterm -- "$inotifywait_subshell_pid" || true
    fi
 
    if [ -f "$inotifywait_subshell_fifo" ]; then
-      safe-rm --force "$inotifywait_subshell_fifo"
+      safe-rm --force -- "$inotifywait_subshell_fifo"
    fi
 
    true "$FUNCNAME: Signal $SIGNAL_TYPE received. Exiting."
@@ -164,7 +164,7 @@ preparation() {
 
    ## Care for race condition.
    #if [ -f "$inotifywait_success_file" ]; then
-      #safe-rm --force "$inotifywait_success_file"
+      #safe-rm --force -- "$inotifywait_success_file"
    #fi
 
    inotifywait_folder="${msgcollector_run_dir}"
@@ -188,7 +188,7 @@ passive_popup_tool() {
 
    if command -v "qubesdb-read" >/dev/null 2>&1 ; then
       if command -v "notify-send" >/dev/null 2>&1 ; then
-         notify-send --expire-time "${time}000" "$title" "$text"
+         notify-send --expire-time "${time}000" -- "$title" "$text"
          return 0
       fi
    fi
@@ -197,9 +197,10 @@ passive_popup_tool() {
    ## - that is not the case for CLI Custom-Workstation users
    ## - that may not be the case for Gnome users
    if command -v "kdialog" >/dev/null 2>&1 ; then
+      ## kdialog does not support end-of-options.
       kdialog --title "$title" --passivepopup "$text" "$time"
    elif command -v "notify-send" >/dev/null 2>&1 ; then
-      notify-send --expire-time "${time}000" "$title" "$text"
+      notify-send --expire-time "${time}000" -- "$title" "$text"
    fi
 }
 ## }}
@@ -230,7 +231,7 @@ dispatch_x_active() {
 
    local icon
    if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_icon" ]; then
-      icon="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_icon")"
+      icon="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_icon")"
    else
       ## Fallback.
       if [ -f "/usr/share/icons/gnome/24x24/status/info.png" ]; then
@@ -264,11 +265,11 @@ inotifywait_setup() {
    ## The use of a success file is crucial here to determine if inotifywait started correctly.
 
    if [ ! "$inotifywait_subshell_pid" = "" ]; then
-      kill -s sigterm "$inotifywait_subshell_pid" || true
+      kill -s sigterm -- "$inotifywait_subshell_pid" || true
    fi
 
-   safe-rm --force "$inotifywait_subshell_fifo"
-   mkfifo "$inotifywait_subshell_fifo"
+   safe-rm --force -- "$inotifywait_subshell_fifo"
+   mkfifo -- "$inotifywait_subshell_fifo"
 
    {
       inotifywait_subshell_error_handler() {
@@ -278,7 +279,7 @@ inotifywait_setup() {
          else
             error_text="exit_code: $exit_code | BASH_COMMAND: $BASH_COMMAND"
          fi
-         safe-rm --force "$inotifywait_success_file"
+         safe-rm --force -- "$inotifywait_success_file"
          error_handler "$error_text"
          exit 1
       }
@@ -289,9 +290,9 @@ inotifywait_setup() {
          trap "error_handler" ERR
          true "$0: $FUNCNAME: INFO: signal SIGTERM/SIGINT received. Cleaning up..."
          if [ ! "$inotifywait_pid" = "" ]; then
-            kill -s sigterm "$inotifywait_pid"
+            kill -s sigterm -- "$inotifywait_pid"
          fi
-         safe-rm --force "$inotifywait_success_file"
+         safe-rm --force -- "$inotifywait_success_file"
          true "$0: $FUNCNAME: INFO: signal SIGTERM/SIGINT received. Exiting."
          exit 143
       }
@@ -301,7 +302,7 @@ inotifywait_setup() {
       ## Start inotifywait in a subshell to continuously monitor the directory.
       ## The subshell approach is used so that the script can both start inotifywait and then verify its setup status.
       ## If the inotifywait process fails to set up, the success file won't be created.
-      inotifywait --quiet --recursive --monitor --event close_write --format "%w%f" "$inotifywait_folder" &
+      inotifywait --quiet --recursive --monitor --event close_write --format "%w%f" -- "$inotifywait_folder" &
       inotifywait_pid="$!"
       touch "$inotifywait_success_file"
       inotifywait_wait_exit_code="0"
@@ -326,9 +327,9 @@ inotifywait_setup() {
 parse_existing_files() {
    ## Sleep to allow inotifywait to set up before processing any existing files.
    ## This prevents any race conditions where existing files might not be processed due to a delay in inotifywait setup.
-   sleep "2" &
+   sleep -- "2" &
    true "INFO: wait for parse_existing_files sleep 2 pid"
-   wait "$!"
+   wait -- "$!"
 
    for folder_name in "$inotifywait_folder/"*; do
       for file_name in "$folder_name/"*; do
@@ -353,9 +354,9 @@ msgdispatcher_handler() {
       if [ "$file_name" = "${msgcollector_run_dir}/${msgdispatcher_identifier}_messagex_done" ]; then
          if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_messagex" ]; then
             true "INFO: messagex file exists."
-            msg="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_messagex")"
-            title="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_titlex")"
-            type="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_typex")"
+            msg="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_messagex")"
+            title="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_titlex")"
+            type="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_typex")"
             dispatch_x_active "$type" "$msg"
             msgdispatcher_delete_wrapper "messagex_done"
             msgdispatcher_delete_wrapper "titlex"
@@ -372,10 +373,10 @@ msgdispatcher_handler() {
       fi
       if [ "$file_name" = "${msgcollector_run_dir}/${msgdispatcher_identifier}_passivepopupqueuex_done" ]; then
          if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_passivepopupqueuex" ]; then
-            msg="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_passivepopupqueuex")"
-            title="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_passivepopupqueuextitle")"
+            msg="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_passivepopupqueuex")"
+            title="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_passivepopupqueuextitle")"
             ## TODO: do not use "_typex" to avoid conflicts with "messagex_done".
-            #type="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_typex")"
+            #type="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_typex")"
             type="info"
             if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_forceactive" ]; then
                ## TODO: --forceactive not yet implemented.
@@ -411,10 +412,10 @@ msgdispatcher_handler() {
 #             fi
 #             if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_${progressbaridx}_progressbartitlex" ]; then
 #                local progressbartitlex
-#                progressbartitlex="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_${progressbaridx}_progressbartitlex")"
+#                progressbartitlex="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_${progressbaridx}_progressbartitlex")"
 #             fi
 #             if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_${progressbaridx}_progressbarx" ]; then
-#                progressbarx="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_${progressbaridx}_progressbarx")"
+#                progressbarx="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_${progressbaridx}_progressbarx")"
 #             fi
 #
 #             unset animate
@@ -431,8 +432,8 @@ msgdispatcher_handler() {
       if [ "$file_name" = "${msgcollector_run_dir}/${msgdispatcher_identifier}_waitmessagecli_done" ]; then
          if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_waitmessagecli" ]; then
             true "INFO: waitmessagecli file exists."
-            msg="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_waitmessagecli")"
-            type="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_typecli")"
+            msg="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_waitmessagecli")"
+            type="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_typecli")"
             dispatch_cli "$msg"
             msgdispatcher_delete_wrapper "waitmessagecli_done"
             msgdispatcher_delete_wrapper "waitmessagecli"
@@ -444,8 +445,8 @@ msgdispatcher_handler() {
       fi
       if [ "$file_name" = "${msgcollector_run_dir}/${msgdispatcher_identifier}_messagecli_done" ]; then
          if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_messagecli" ]; then
-            msg="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_messagecli")"
-            type="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_typecli")"
+            msg="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_messagecli")"
+            type="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_typecli")"
             dispatch_cli "$msg"
             msgdispatcher_delete_wrapper "messagecli_done"
             msgdispatcher_delete_wrapper "messagecli"
@@ -485,7 +486,7 @@ msgdispatcher_delete_wrapper() {
    file_name="${msgcollector_run_dir}/${msgdispatcher_identifier}_${msgdispatcher_appendix}"
 
    if test -f "$file_name" ; then
-      safe-rm -f "$file_name"
+      safe-rm -f -- "$file_name"
    else
       true "INFO: file_name $file_name does not exist."
    fi
@@ -499,7 +500,7 @@ inotifywait_loop() {
 
    local temp_item last_two first_two progressbaridx
 
-   while read -r file_name; do
+   while read -r -- file_name; do
       msgdispatcher_handler
    done < "$inotifywait_subshell_fifo"
 }
