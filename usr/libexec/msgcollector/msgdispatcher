@@ -48,52 +48,12 @@ error_handler() {
    if [ ! -d ~/".msgcollector" ]; then
       mkdir --parents -- ~/".msgcollector"
    fi
-   echo "$0: BASH_COMMAND: $BASH_COMMAND | exit_code: $exit_code" | sponge -a -- ~/".msgcollector/msgdispatcher-error.log" >/dev/null
+   echo "$0: BASH_COMMAND: $BASH_COMMAND | exit_code: $last_exit_code" | sponge -a -- ~/".msgcollector/msgdispatcher-error.log" >/dev/null
 
    true
 }
 
 trap "error_handler" ERR
-
-ex_funct() {
-   true "$0: $FUNCNAME: INFO: Signal $SIGNAL_TYPE received. Cleaning up..."
-
-   if [ ! "$inotifywait_subshell_pid" = "" ]; then
-      kill -s sigterm -- "$inotifywait_subshell_pid" || true
-   fi
-
-   if [ -f "$inotifywait_subshell_fifo" ]; then
-      safe-rm --force -- "$inotifywait_subshell_fifo"
-   fi
-
-   true "$FUNCNAME: Signal $SIGNAL_TYPE received. Exiting."
-
-   exit "$EXIT_CODE"
-}
-
-trap_sighup() {
-   set -x
-   true
-   exit 0
-}
-
-trap "trap_sighup" SIGHUP
-
-trap_sigterm() {
-   SIGNAL_TYPE="SIGTERM"
-   EXIT_CODE="143"
-   ex_funct
-}
-
-trap "trap_sigterm" SIGTERM
-
-trap_sigint() {
-   SIGNAL_TYPE="SIGINT"
-   EXIT_CODE="130"
-   ex_funct
-}
-
-trap "trap_sigint" SIGINT ## ctrl + c
 
 parse_cmd_options() {
    ## Thanks to:
@@ -153,19 +113,12 @@ preparation() {
 
    if [ "$cli" = "1" ]; then
       inotifywait_subshell_fifo="${msgcollector_run_dir}/msgdispatcher_cli_subshell_fifo"
-      inotifywait_success_file="${msgcollector_run_dir}/msgdispatcher_cli_inotifywait_success"
    elif [ "$gui" = "1" ]; then
       inotifywait_subshell_fifo="${msgcollector_run_dir}/msgdispatcher_x_subshell_fifo"
-      inotifywait_success_file="${msgcollector_run_dir}/msgdispatcher_x_inotifywait_success"
    else
       echo "$$" | sponge -- "${msgcollector_run_dir}/msgdispatcher_piderror" >/dev/null
       exit 3
    fi
-
-   ## Care for race condition.
-   #if [ -f "$inotifywait_success_file" ]; then
-      #safe-rm --force -- "$inotifywait_success_file"
-   #fi
 
    inotifywait_folder="${msgcollector_run_dir}"
    test -d "$inotifywait_folder"
@@ -260,76 +213,17 @@ dispatch_x_passive() {
 }
 
 inotifywait_setup() {
-   ## Prevent race condition while inotifywait might not be started yet.
-   ## A subshell is used to manage the lifecycle of inotifywait and ensure it's properly monitored.
-   ## The use of a success file is crucial here to determine if inotifywait started correctly.
-
-   if [ ! "$inotifywait_subshell_pid" = "" ]; then
-      kill -s sigterm -- "$inotifywait_subshell_pid" || true
-   fi
-
    safe-rm --force -- "$inotifywait_subshell_fifo"
    mkfifo -- "$inotifywait_subshell_fifo"
-
-   {
-      inotifywait_subshell_error_handler() {
-         local exit_code="$?"
-         if [ ! "$1" = "" ]; then
-            error_text="exit_code: $exit_code | text: $1"
-         else
-            error_text="exit_code: $exit_code | BASH_COMMAND: $BASH_COMMAND"
-         fi
-         safe-rm --force -- "$inotifywait_success_file"
-         error_handler "$error_text"
-         exit 1
-      }
-
-      trap "inotifywait_subshell_error_handler" ERR
-
-      inotifywait_subshell_trap_sigterm() {
-         trap "error_handler" ERR
-         true "$0: $FUNCNAME: INFO: signal SIGTERM/SIGINT received. Cleaning up..."
-         if [ ! "$inotifywait_pid" = "" ]; then
-            kill -s sigterm -- "$inotifywait_pid"
-         fi
-         safe-rm --force -- "$inotifywait_success_file"
-         true "$0: $FUNCNAME: INFO: signal SIGTERM/SIGINT received. Exiting."
-         exit 143
-      }
-
-      trap "inotifywait_subshell_trap_sigterm" SIGTERM SIGINT
-
-      ## Start inotifywait in a subshell to continuously monitor the directory.
-      ## The subshell approach is used so that the script can both start inotifywait and then verify its setup status.
-      ## If the inotifywait process fails to set up, the success file won't be created.
-      inotifywait --quiet --recursive --monitor --event close_write --format "%w%f" -- "$inotifywait_folder" &
-      inotifywait_pid="$!"
-      touch "$inotifywait_success_file"
-      inotifywait_wait_exit_code="0"
-      true "INFO: Wait for the inotifywait pid..."
-      ## If it fails, handle the error gracefully.
-      wait "$inotifywait_pid" || { inotifywait_wait_exit_code="$?" ; true; };
-      ## Ideally, should never reach beyond this point.
-
-      ## This does not result in the script exiting.
-      ## This is because below inotifywait_subshell_pid does not wait to check the exit code of the subshell.
-      inotifywait_subshell_error_handler "Failed to set up inotifywait! inotifywait_folder: $inotifywait_folder | inotifywait_wait_exit_code: $inotifywait_wait_exit_code"
-      exit "$inotifywait_wait_exit_code"
-   } > "$inotifywait_subshell_fifo" &
-
-   ## Does not work:
-   #} | sponge -- "$inotifywait_subshell_fifo" &
-
-   inotifywait_subshell_pid="$!"
-   true "$0: $FUNCNAME (pid: $$): Started subshell for inotify with pid: $inotifywait_subshell_pid"
+   ## Start inotifywait in a sub process to continuously monitor the directory.
+   inotifywait --quiet --recursive --monitor --event close_write --format "%w%f" -- "$inotifywait_folder" > "$inotifywait_subshell_fifo" &
 }
 
 parse_existing_files() {
    ## Sleep to allow inotifywait to set up before processing any existing files.
    ## This prevents any race conditions where existing files might not be processed due to a delay in inotifywait setup.
-   sleep -- "2" &
    true "INFO: wait for parse_existing_files sleep 2 pid"
-   wait -- "$!"
+   sleep -- "2"
 
    for folder_name in "$inotifywait_folder/"*; do
       for file_name in "$folder_name/"*; do
@@ -496,11 +390,10 @@ msgdispatcher_delete_wrapper() {
 }
 
 inotifywait_loop() {
-   true "$0: $FUNCNAME (pid: $$): Starting loop."
+   true "$0: Starting loop."
 
-   local temp_item last_two first_two progressbaridx
-
-   while read -r -- file_name; do
+   while read -r file_name; do
+      true "file_name: $file_name"
       msgdispatcher_handler
    done < "$inotifywait_subshell_fifo"
 }
@@ -512,16 +405,17 @@ msgdispatcher_loop() {
       inotifywait_setup
       parse_existing_files
       inotifywait_loop
-      sleep 10
       true "INFO: wait for main loop sleep 10 pid"
-      wait "$!"
+      sleep 10
    done
 }
 
-source /usr/libexec/msgcollector/msgcollector_shared
 ## sets: ${msgcollector_run_dir}
+# shellcheck source=./usr/libexec/msgcollector/msgcollector_shared
+source /usr/libexec/msgcollector/msgcollector_shared
 folder_init
 
+# shellcheck source=./usr/libexec/msgcollector/msgwmctrl
 source /usr/libexec/msgcollector/msgwmctrl
 
 parse_cmd_options "$@"

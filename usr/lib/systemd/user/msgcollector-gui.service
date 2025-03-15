@@ -13,7 +13,7 @@ Description=msgcollector msgdispatcher
 [Service]
 Type=simple
 ExecStart=/usr/libexec/msgcollector/msgdispatcher
-SuccessExitStatus=143
+KillMode=control-group
 
 [Install]
 ## Not functional in Qubes.
