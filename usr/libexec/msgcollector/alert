@@ -1,4 +1,4 @@
-#!/usr/bin/python3 -u
+#!/usr/bin/python3 -su
 
 '''
 alert - Displays a dialog message box containing text from a YAML configuration
