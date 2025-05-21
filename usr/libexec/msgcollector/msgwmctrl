@@ -144,7 +144,7 @@ output_wait_for_window() {
 
       local grep_exit_code
       grep_exit_code="0"
-      echo "$wmctrl_list" | grep --quiet --fixed-strings -- "$title" || { grep_exit_code="$?" ; true; };
+      printf '%s\n' "$wmctrl_list" | grep --fixed-strings -- "$title" >/dev/null 2>/dev/null || { grep_exit_code="$?" ; true; };
 
       if [ "$grep_exit_code" = "0" ]; then
          true "Found window title \"$title\"."
