@@ -12,7 +12,7 @@ if [ ! "$XDG_SESSION_TYPE" = "tty" ]; then
 fi
 
 ## Do this only in /dev/tty1.
-if [ ! "$(tty)" = "/dev/tty1" ]; then
+if [ ! "$(tty 2>&1)" = "/dev/tty1" ]; then
    true "$0: INFO: Skip, because not running in /dev/tty1."
    return 0
    exit 0
