@@ -1,3 +1,23 @@
+commit 6f0833b588433a0ec9d0852ca714f0b1003b855f
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun May 25 15:28:05 2025 -0400
+
+    fix: unbreak msgcollector in case folder `/run/user/$(id -u)` does not exist
+    
+    (such as in a minimal environment, a chroot or SSH session with `UsePAM no`)
+
+commit 4c7a079ea89b207f03123a4cea2cd29a577bf83c
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun May 25 15:24:50 2025 -0400
+
+    refactoring
+
+commit 70e38971fc5fdfec7ca2d8f07c89656aeb7b8247
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed May 21 13:57:37 2025 +0000
+
+    bumped changelog version
+
 commit 929054a10855f561762d47135b6c7a8a5fa76e90
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Wed May 21 08:51:54 2025 -0400
