@@ -5,9 +5,15 @@
 
 folder_init() {
    msgcollector_run_id_folder="/run/user/$(id -u)"
-   msgcollector_run_dir="${msgcollector_run_id_folder}/msgcollector"
-   if ! test -d "${msgcollector_run_dir}" ; then
-      mkdir --parents "${msgcollector_run_dir}"
+   if test -d "${msgcollector_run_id_folder}" ; then
+      true "folder_init: INFO: msgcollector_run_id_folder exists."
+      msgcollector_run_dir="${msgcollector_run_id_folder}/msgcollector"
+      if ! test -d "${msgcollector_run_dir}" ; then
+         mkdir --parents -- "${msgcollector_run_dir}"
+      fi
+   else
+      true "folder_init: INFO: msgcollector_run_id_folder does not exist. Falling back to mktemp."
+      msgcollector_run_dir="$(mktemp --directory)"
    fi
 }
 
