@@ -4,7 +4,8 @@
 ## See the file COPYING for copying conditions.
 
 folder_init() {
-   msgcollector_run_dir="/run/user/$(id -u)/msgcollector"
+   msgcollector_run_id_folder="/run/user/$(id -u)"
+   msgcollector_run_dir="${msgcollector_run_id_folder}/msgcollector"
    if ! test -d "${msgcollector_run_dir}" ; then
       mkdir --parents "${msgcollector_run_dir}"
    fi
