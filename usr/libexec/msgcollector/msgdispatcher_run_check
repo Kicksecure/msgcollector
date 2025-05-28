@@ -87,7 +87,7 @@ output_func() {
    output_text=( "$@" )
 
    ## check ARG_MAX
-   if /bin/echo "$@" &>/dev/null ; then
+   if /usr/bin/true "$@" &>/dev/null ; then
       true "INFO: ARG_MAX test passed, ok."
    else
       true "WARNING: ARG_MAX test failed."
