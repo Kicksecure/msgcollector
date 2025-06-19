@@ -42,6 +42,9 @@ msgdispatcher_run_check() {
 }
 
 msgdispatcher_init() {
+   #arg_max_bytes="$(getconf ARG_MAX)"
+   arg_max_bytes=138300
+
    output_tool="/usr/libexec/msgcollector/msgcollector"
    output_general="output_func_general"
    output_x="output_func_x"
@@ -83,23 +86,49 @@ output_func_cli() {
 }
 
 output_func() {
-   local output_text
+   local output_text arg arg_count arg_string_length too_many_args too_many_bytes debug_information
    output_text=( "$@" )
 
-   ## check ARG_MAX
-   if /usr/bin/true "$@" &>/dev/null ; then
-      true "INFO: ARG_MAX test passed, ok."
-   else
-      true "WARNING: ARG_MAX test failed."
+   true "arg_count: $arg_count"
 
-      ## remove last parameter, presumably the MSG from "$@"
-      ## same in other words:
-      ## remove last parameter, presumably the message from args
-      ## https://stackoverflow.com/a/20398578/2605155
+   ## set arg_string_length with shorter xtrace.
+   {
+      local arg_string_length=0
+      for arg in "${output_text[@]}"; do
+         (( arg_string_length += ${#arg} + 1 ))
+      done
+   } 2>/dev/null
+
+   too_many_args=false
+   too_many_bytes=false
+
+   true "arg_string_length: $arg_string_length"
+   true "arg_max_bytes    : $arg_max_bytes"
+
+   if (( arg_string_length >= arg_max_bytes )); then
+      too_many_bytes=true
+      true "WARNING: ARG_MAX bytes exceeded: $arg_string_length >= $arg_max_bytes"
+   fi
+
+   ## safe conservative default
+   local arg_limit=4096
+   true "arg_count: $arg_count"
+   true "arg_limit: $arg_limit"
+   if (( arg_count >= arg_limit )); then
+      too_many_args=true
+      true "WARNING: Too many arguments: $arg_count >= $arg_limit"
+   fi
+
+   if [[ "$too_many_args" == true || "$too_many_bytes" == true ]]; then
+      # Remove last param (presumed to be error message string)
       unset "output_text[${#output_text[@]}-1]"
 
       debug_information="\
 ${FUNCNAME[0]} was called with too many arguments.
+arg_count         : $arg_count
+arg_string_length : $arg_string_length
+arg_limit         : $arg_limit
+arg_max_bytes     : $arg_max_bytes
 \${FUNCNAME[0]}: ${FUNCNAME[0]}
 \${FUNCNAME[1]}: ${FUNCNAME[1]}
 \${FUNCNAME[2]}: ${FUNCNAME[2]}
@@ -108,14 +137,14 @@ ${FUNCNAME[0]} was called with too many arguments.
 \${FUNCNAME[6]}: ${FUNCNAME[6]}
 \$0: $0" || true
 
-      output_text+=("ERROR: ARG_MAX exceeded!
+      output_text+=("ERROR: ARG_MAX or argument count exceeded!
 
 debug information:
 $debug_information")
    fi
 
-   true before: "$@ BEFORE"
-   true after : "${output_text[@]} AFTER"
+   #true before: "$@ BEFORE"
+   #true after : "${output_text[@]} AFTER"
 
    if [ "$output_func_verbose" = "true" ]; then
       echo "Running: bash -x $output_tool --identifier $IDENTIFIER ${1+$@}"
@@ -123,5 +152,6 @@ $debug_information")
    else
       $output_tool --identifier "$IDENTIFIER" "${output_text[@]}"
    fi
+
    return "$?"
 }
