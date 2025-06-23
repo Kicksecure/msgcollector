@@ -1,3 +1,15 @@
+commit 80686d97f28a8e8d8feca3a93f8103ca9562143d
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Jun 19 10:58:06 2025 -0400
+
+    improve ARG_MAX check
+
+commit 24652792106359232e00ac472405eaf02b0671a4
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed May 28 12:11:36 2025 +0000
+
+    bumped changelog version
+
 commit 3561d9082f65af33d34f1914dc4d9951f913fbef
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Wed May 28 08:05:36 2025 -0400
