@@ -38,9 +38,9 @@ error_handler() {
    /usr/libexec/msgcollector/msgdispatcher_dispatch_x "warning" "$0" "$msg" "0" "/usr/share/icons/icon-pack-dist/whonix.ico" &
 
    local stripped_msg
-   stripped_msg="$(/usr/libexec/msgcollector/striphtml "$msg")"
+   stripped_msg="$(/usr/libexec/helper-scripts/strip-html "$msg")"
    if [ "$stripped_msg" = "" ]; then
-      ## In case striphtml failed or is not available.
+      ## In case strip-html failed or is not available.
       echo "$msg" >&2
    else
       echo "$stripped_msg" >&2
