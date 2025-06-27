@@ -19,7 +19,8 @@ msgdispatcher_pid_check() {
          return 1
       fi
    else
-      error "$FUNCNAME: neither cli nor gui!"
+      1>&2 printf '%s\n' "$FUNCNAME: neither cli nor gui!"
+      return 1
    fi
 }
 
@@ -42,8 +43,19 @@ msgdispatcher_run_check() {
 }
 
 msgdispatcher_init() {
+   ## Individual arguments passed to a command in Linux have a maximum size of
+   ## 128 KiB, even if ARG_MAX is significantly larger. See
+   ## https://mina86.com/2021/the-real-arg-max-part-1/
+   ##
+   ## To further complicate things, Bash string processing works based on
+   ## characters, not bytes, so we have to take into account the possibility
+   ## that we've been passed a UTF-8 encoded string that is longer than it
+   ## appears. The longest a UTF-8 character in bytes can be is 4 bytes, so
+   ## we divide the 128 KiB max argument size by 4.
+   ##
    #arg_max_bytes="$(getconf ARG_MAX)"
-   arg_max_bytes=138300
+   #arg_max_bytes=138300
+   arg_max_bytes=32768
 
    output_tool="/usr/libexec/msgcollector/msgcollector"
    output_general="output_func_general"
@@ -85,73 +97,74 @@ output_func_cli() {
    output_func --onlyecho "$@"
 }
 
-output_func() {
-   local output_text arg arg_count arg_string_length too_many_args too_many_bytes debug_information
-   output_text=( "$@" )
-
-   true "arg_count: $arg_count"
-
-   ## set arg_string_length with shorter xtrace.
-   {
-      local arg_string_length=0
-      for arg in "${output_text[@]}"; do
-         (( arg_string_length += ${#arg} + 1 ))
-      done
-   } 2>/dev/null
-
-   too_many_args=false
-   too_many_bytes=false
-
-   true "arg_string_length: $arg_string_length"
-   true "arg_max_bytes    : $arg_max_bytes"
-
-   if (( arg_string_length >= arg_max_bytes )); then
-      too_many_bytes=true
-      true "WARNING: ARG_MAX bytes exceeded: $arg_string_length >= $arg_max_bytes"
-   fi
-
-   ## safe conservative default
-   local arg_limit=4096
-   true "arg_count: $arg_count"
-   true "arg_limit: $arg_limit"
-   if (( arg_count >= arg_limit )); then
-      too_many_args=true
-      true "WARNING: Too many arguments: $arg_count >= $arg_limit"
-   fi
-
-   if [[ "$too_many_args" == true || "$too_many_bytes" == true ]]; then
-      # Remove last param (presumed to be error message string)
-      unset "output_text[${#output_text[@]}-1]"
-
-      debug_information="\
-${FUNCNAME[0]} was called with too many arguments.
-arg_count         : $arg_count
-arg_string_length : $arg_string_length
-arg_limit         : $arg_limit
-arg_max_bytes     : $arg_max_bytes
-\${FUNCNAME[0]}: ${FUNCNAME[0]}
-\${FUNCNAME[1]}: ${FUNCNAME[1]}
-\${FUNCNAME[2]}: ${FUNCNAME[2]}
-\${FUNCNAME[3]}: ${FUNCNAME[4]}
-\${FUNCNAME[5]}: ${FUNCNAME[5]}
-\${FUNCNAME[6]}: ${FUNCNAME[6]}
-\$0: $0" || true
-
-      output_text+=("ERROR: ARG_MAX or argument count exceeded!
-
-debug information:
-$debug_information")
-   fi
-
-   #true before: "$@ BEFORE"
-   #true after : "${output_text[@]} AFTER"
-
+output_func_core() {
    if [ "$output_func_verbose" = "true" ]; then
       echo "Running: bash -x $output_tool --identifier $IDENTIFIER ${1+$@}"
-      bash -x $output_tool --identifier "$IDENTIFIER" "${output_text[@]}"
+      bash -x $output_tool --identifier "$IDENTIFIER" "$@"
    else
-      $output_tool --identifier "$IDENTIFIER" "${output_text[@]}"
+      $output_tool --identifier "$IDENTIFIER" "$@"
+   fi
+}
+
+output_func() {
+   local max_arg_count output_args output_settings message_str msg_idx \
+      cut_start_idx
+
+   max_arg_count=4096
+   output_args=( "$@" )
+   output_settings=( "${output_args[@]:0:${#output_args[@]}-1}" )
+   message_str="${output_args[${#output_args[@]}-1]}"
+   cut_start_idx=0
+
+   if (( ${#output_args[@]} > max_arg_count )); then
+      1>&2 printf '%s\n' "output_func settings contains too many argument!"
+      return 1
    fi
 
-   return "$?"
+   ## Split a string into chunks, using the newline character as the
+   ## separator. Create as large of chunks as possible.
+   while true; do
+      (( msg_idx = cut_start_idx + ( arg_max_bytes - 1 ) )) || true
+
+      if (( msg_idx >= ( ${#message_str} - 1 ) )); then
+         ## The index is pointing at the end of the string. Usually we leave
+         ## off the last character, but this time we want to keep it, thus we
+         ## aren't removing 1 from ${#message_str} here.
+         (( msg_idx = ${#message_str} )) || true
+
+         if [ "${message_str:msg_idx:1}" = $'\n' ]; then
+           ## OK, but if the last character is a newline we actually do want
+           ## to leave that off.
+           (( msg_idx-- )) || true
+         fi
+
+         if (( msg_idx <= cut_start_idx )); then
+            break
+         fi
+
+         output_func_core "${output_settings[@]}" \
+            "${message_str:cut_start_idx:msg_idx - cut_start_idx}" \
+               || return "$?"
+         break
+      fi
+
+      ## Search backwards for a newline.
+      while true; do
+         if (( msg_idx <= cut_start_idx )); then
+            1>&2 printf '%s\n' 'Cannot break massive argument into chunks!'
+            return 1
+         fi
+
+         if [ "${message_str:msg_idx:1}" = $'\n' ]; then
+            break
+         fi
+         (( msg_idx-- )) || true
+      done
+
+      output_func_core "${output_settings[@]}" \
+         "${message_str:cut_start_idx:msg_idx - cut_start_idx}" \
+            || return "$?"
+
+      (( cut_start_idx = msg_idx + 1 )) || true
+   done
 }
