@@ -100,30 +100,43 @@ output_func_cli() {
 output_func_core() {
    if [ "$output_func_verbose" = "true" ]; then
       echo "Running: bash -x $output_tool --identifier $IDENTIFIER ${1+$@}"
-      bash -x $output_tool --identifier "$IDENTIFIER" "$@"
+      bash -x "$output_tool" --identifier "$IDENTIFIER" "$@"
    else
-      $output_tool --identifier "$IDENTIFIER" "$@"
+      "$output_tool" --identifier "$IDENTIFIER" "$@"
    fi
 }
 
 output_func() {
    local max_arg_count output_args output_settings message_str msg_idx \
-      cut_start_idx
+      cut_start_idx max_loop_count loop_idx
+
+   if (( $# < 1 )); then
+      1>&2 printf '%s\n' "output_func requires at least one argument!"
+      return 1
+   fi
+
+   ## If we only got one argument, there's nothing to chunk, pass through the
+   ## call to output_func_core immediately.
+   if (( $# == 1 )); then
+     output_func_core "$@"
+     return "$?"
+   fi
 
    max_arg_count=4096
+   max_loop_count=100
    output_args=( "$@" )
    output_settings=( "${output_args[@]:0:${#output_args[@]}-1}" )
    message_str="${output_args[${#output_args[@]}-1]}"
    cut_start_idx=0
 
    if (( ${#output_args[@]} > max_arg_count )); then
-      1>&2 printf '%s\n' "output_func settings contains too many argument!"
+      1>&2 printf '%s\n' "output_func settings contains too many arguments!"
       return 1
    fi
 
    ## Split a string into chunks, using the newline character as the
    ## separator. Create as large of chunks as possible.
-   while true; do
+   for (( loop_idx = 0; loop_idx < max_loop_count; loop_idx++ )); do
       (( msg_idx = cut_start_idx + ( arg_max_bytes - 1 ) )) || true
 
       if (( msg_idx >= ( ${#message_str} - 1 ) )); then
@@ -167,4 +180,9 @@ output_func() {
 
       (( cut_start_idx = msg_idx + 1 )) || true
    done
+
+   if (( loop_idx == ( max_loop_count - 1 ) )); then
+      1>&2 prinf '%s\n' "output_func: Possible infinite loop hit!"
+      return 1
+   fi
 }
