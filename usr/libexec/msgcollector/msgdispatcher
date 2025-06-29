@@ -39,12 +39,7 @@ error_handler() {
 
    local stripped_msg
    stripped_msg="$(/usr/libexec/helper-scripts/strip-html "$msg")"
-   if [ "$stripped_msg" = "" ]; then
-      ## In case strip-html failed or is not available.
-      echo "$msg" >&2
-   else
-      echo "$stripped_msg" >&2
-   fi
+   printf '%s\n' "$stripped_msg"
    if [ ! -d ~/".msgcollector" ]; then
       mkdir --parents -- ~/".msgcollector"
    fi

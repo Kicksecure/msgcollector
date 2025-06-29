@@ -76,12 +76,7 @@ $error_text"
    else
       local stripped_msg
       stripped_msg="$(/usr/libexec/helper-scripts/strip-html "$MSG")"
-      if [ "$stripped_msg" = "" ]; then
-         ## In case strip-html failed or is not available.
-         echo "$MSG" >&2
-      else
-         echo "$stripped_msg" >&2
-      fi
+      printf '%s\n' "$stripped_msg" >&2
    fi
 
    ## }}}
