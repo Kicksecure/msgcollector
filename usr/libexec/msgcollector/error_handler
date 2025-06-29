@@ -75,7 +75,7 @@ $error_text"
       $output_cli ${output_opts[@]} --messagecli --typecli "error" --message "$MSG"
    else
       local stripped_msg
-      stripped_msg="$(/usr/libexec/helper-scripts/strip-html "$MSG")"
+      stripped_msg="$(/usr/bin/sanitize-string "$MSG")"
       printf '%s\n' "$stripped_msg" >&2
    fi
 
