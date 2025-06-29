@@ -1,3 +1,34 @@
+commit 80424b74d29a12d2cad21d1eebd75c7d09ccfede
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Jun 29 13:20:58 2025 -0400
+
+    mandatory strip-html
+
+commit fd7640de27aea9e493dbacec3c3ea9ec0e0b5437
+Merge: 5d383a2 5d77f79
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Jun 29 12:44:10 2025 -0400
+
+    Merge remote-tracking branch 'ArrayBolt3/arraybolt3/chunking'
+
+commit 5d77f79b8aeb807747e2d90514675660d0b2d3d7
+Author: Aaron Rainbolt <arraybolt3@ubuntu.com>
+Date:   Fri Jun 27 18:20:11 2025 -0500
+
+    Implement chunking for very long messages
+
+commit 9c3bcc449d97fb9b62c1fc0bd7c2c4969bff3022
+Author: Aaron Rainbolt <arraybolt3@ubuntu.com>
+Date:   Wed Jun 25 23:10:44 2025 -0500
+
+    Switch to using helper-scripts strip-html
+
+commit 5d383a26f6cd2646d4bce6814cd669578c6828dd
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon Jun 23 06:19:06 2025 +0000
+
+    bumped changelog version
+
 commit 80686d97f28a8e8d8feca3a93f8103ca9562143d
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Thu Jun 19 10:58:06 2025 -0400
