@@ -1,3 +1,35 @@
+commit 10da5985e9d7775da1ed041d37f1753d49b1ddf4
+Merge: 23ff48b 140f051
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Jul 2 13:54:49 2025 -0400
+
+    Merge remote-tracking branch 'ArrayBolt3/arraybolt3/sanitize-string'
+
+commit 23ff48b3d22472173fa6dfa7b690bf8a1484e46a
+Merge: 6ba5e74 14da764
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Jul 2 05:26:20 2025 -0400
+
+    Merge remote-tracking branch 'ArrayBolt3/arraybolt3/chunking'
+
+commit 140f0511e59247256179056aa2afc5fb69b6d031
+Author: Aaron Rainbolt <arraybolt3@ubuntu.com>
+Date:   Sun Jun 29 18:44:16 2025 -0500
+
+    Port strip-html calls to sanitize-string
+
+commit 14da764366c9d9b320ed686cf1306adbb0e12f9d
+Author: Aaron Rainbolt <arraybolt3@ubuntu.com>
+Date:   Sun Jun 29 17:46:52 2025 -0500
+
+    Polish chunking implementation
+
+commit 6ba5e744714d5c360f891d2408c9a8cc02d4aba4
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Jun 29 17:43:22 2025 +0000
+
+    bumped changelog version
+
 commit 80424b74d29a12d2cad21d1eebd75c7d09ccfede
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Sun Jun 29 13:20:58 2025 -0400
