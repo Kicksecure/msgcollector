@@ -531,7 +531,7 @@ collector() {
       write_to_file="${msgcollector_run_dir}/${identifier}_messagecli"
       if [ ! -z "$message" ]; then
          ## variable $message exists
-         message="$(/usr/libexec/helper-scripts/strip-html "$message")"
+         message="$(/usr/bin/sanitize-string "$message")"
          pretty_type_cli "$typecli"
          message="[$p_type] [$identifier] $message"
          echo "$message"
@@ -545,7 +545,7 @@ collector() {
       write_to_file="${msgcollector_run_dir}/${identifier}_waitmessagecli"
       if [ ! -z "$message" ]; then
          ## variable $message exists
-         message="$(/usr/libexec/helper-scripts/strip-html "$message")"
+         message="$(/usr/bin/sanitize-string "$message")"
          pretty_type_cli "$typecli"
          message="[$p_type] [$identifier] $message"
          echo "$message"
@@ -559,7 +559,7 @@ collector() {
       if [ "$message" = "" ]; then
          message="message was empty."
       fi
-      message="$(/usr/libexec/helper-scripts/strip-html "$message")"
+      message="$(/usr/bin/sanitize-string "$message")"
       if [ "$message" = "" ]; then
          message="message was empty after strip-html."
       fi
@@ -618,7 +618,7 @@ collector() {
          exit 4
       fi
       echo "$parentpid" > "${msgcollector_run_dir}/${identifier}_${progressbaridx}_parentpid"
-      message="$(/usr/libexec/helper-scripts/strip-html "$message")"
+      message="$(/usr/bin/sanitize-string "$message")"
       write_to_file="${msgcollector_run_dir}/${identifier}_${progressbaridx}_progressbarx"
       append_to_file
 
