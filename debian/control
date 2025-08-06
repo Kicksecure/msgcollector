@@ -9,7 +9,7 @@ Build-Depends: debhelper (>= 13.11.6), debhelper-compat (= 13), config-package-d
 Homepage: https://github.com/Kicksecure/msgcollector
 Vcs-Browser: https://github.com/Kicksecure/msgcollector
 Vcs-Git: https://github.com/Kicksecure/msgcollector.git
-Standards-Version: 4.6.2
+Standards-Version: 4.7.2
 Rules-Requires-Root: no
 
 Package: msgcollector
@@ -35,7 +35,7 @@ Description: Command Line Interface Messages Toolkit Library
 
 Package: msgcollector-gui
 Architecture: all
-Depends: msgcollector, wmctrl, python3-pyqt5, qtwayland5, zenity,
+Depends: msgcollector, wmctrl, python3-pyqt5, qtwayland5, yad,
  libnotify-bin | kde-baseapps-bin, mate-notification-daemon, x11-utils,
  gnome-colors-common, ${misc:Depends}
 Provides: ${diverted-files}
