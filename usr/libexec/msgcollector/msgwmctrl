@@ -13,12 +13,12 @@ fallbacks() {
       no_x="1"
    fi
 
-   ## Check if zenity is installed.
+   ## Check if yad is installed.
    ## - This is not the case for cli users,
-   ##   who removed zenity or custom builds which never had zenity installed.
-   if [ "$(command -v "zenity")" = "" ] || [ "$DISPLAY" = "" ]; then
-      ## zenity is not installed or no X server running.
-      zenity() {
+   ##   who removed yad or custom builds which never had yad installed.
+   if [ "$(command -v "yad")" = "" ] || [ "$DISPLAY" = "" ]; then
+      ## yad is not installed or no X server running.
+      yad() {
          ## dummy
          true
       }

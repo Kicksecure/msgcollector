@@ -93,14 +93,14 @@ progress_bar() {
    fi
 
    if [ -p "${msgcollector_run_dir}/${identifier}_${progressbaridx}_fifo" ]; then
-      if [ -f "${msgcollector_run_dir}/${identifier}_${progressbaridx}_zenityprogresspid" ]; then
-         zenity_progress_pid="$(cat "${msgcollector_run_dir}/${identifier}_${progressbaridx}_zenityprogresspid")"
-         ## Check if zenity is running.
+      if [ -f "${msgcollector_run_dir}/${identifier}_${progressbaridx}_yadprogresspid" ]; then
+         yad_progress_pid="$(cat "${msgcollector_run_dir}/${identifier}_${progressbaridx}_yadprogresspid")"
+         ## Check if yad is running.
          local ps_p_exit_code
          ps_p_exit_code="0"
-         ps -p "$zenity_progress_pid" >/dev/null 2>/dev/null || { ps_p_exit_code="$?"; true; };
+         ps -p "$yad_progress_pid" >/dev/null 2>/dev/null || { ps_p_exit_code="$?"; true; };
          if [ "$ps_p_exit_code" = "0" ]; then
-            true "zenity is running."
+            true "yad is running."
             ## For extra security against freezing while trying to write to a non-existing pipe, let's use timeout.
             ## || true to catch an error if the pipe no longer exists.
             timeout 1 /bin/bash -c "echo $progress" > "$fifo" || true
@@ -112,7 +112,7 @@ progress_bar() {
             true "ps_p_exit_code was not 0, was $ps_p_exit_code"
          fi
       else
-         true "zenityprogresspid does not exist: ${msgcollector_run_dir}/${identifier}_${progressbaridx}_zenityprogresspid"
+         true "yadprogresspid does not exist: ${msgcollector_run_dir}/${identifier}_${progressbaridx}_yadprogresspid"
       fi
    else
       true "fifo does not exist: ${msgcollector_run_dir}/${identifier}_${progressbaridx}_fifo"

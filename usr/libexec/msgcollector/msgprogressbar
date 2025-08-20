@@ -97,28 +97,28 @@ preparation() {
    fifo="${msgcollector_run_dir}/${identifier}_${progressbaridx}_fifo"
    progress_txt_file="${msgcollector_run_dir}/${identifier}_${progressbaridx}_progresstxt"
    parent_pid_file="${msgcollector_run_dir}/${identifier}_${progressbaridx}_parentpid"
-   zenity_progress_pid_file="${msgcollector_run_dir}/${identifier}_${progressbaridx}_zenityprogresspid"
+   yad_progress_pid_file="${msgcollector_run_dir}/${identifier}_${progressbaridx}_yadprogresspid"
 }
 
 cleanup_self() {
    trap "error_handler" ERR
 
-   true "$0 $FUNCNAME: killing zenity_progress_pid $zenity_progress_pid..."
-   kill -s sigterm "$zenity_progress_pid" >/dev/null 2>/dev/null || true
+   true "$0 $FUNCNAME: killing yad_progress_pid $yad_progress_pid..."
+   kill -s sigterm "$yad_progress_pid" >/dev/null 2>/dev/null || true
    safe-rm --force "$fifo"
    safe-rm --force "$progress_txt_file"
-   safe-rm --force "$zenity_progress_pid_file"
+   safe-rm --force "$yad_progress_pid_file"
    safe-rm --force "$parent_pid_file"
 }
 
 output_ex() {
    trap "error_handler" ERR
 
-   ## This function is called when the cancel button in zenity gets pressed or
+   ## This function is called when the cancel button in yad gets pressed or
    ## when $progress_txt_file contains 100.
 
    ## Debugging.
-   #echo "progress: $progress | caller: $PPID | $caller | killing $zenity_progress_pid" >> /home/user/progresslog
+   #echo "progress: $progress | caller: $PPID | $caller | killing $yad_progress_pid" >> /home/user/progresslog
 
    if [ -f "$parent_pid_file" ]; then
       "/usr/libexec/msgcollector/msgprogressbar_kill_helper" "${identifier}" "${progressbaridx}"
@@ -194,7 +194,7 @@ start_progress_bar() {
    fi
 
    ## Sanity test for $progress_txt_file_progress, because we use it without
-   ## quotes as argument for zenity below.
+   ## quotes as argument for yad below.
    ## Also matches $when progress_txt_file_progress is unset.
    if [[ "$progress_txt_file_progress" != *[!0-9]* ]]; then
       true "'$progress_txt_file_progress' is strictly numeric."
@@ -215,10 +215,10 @@ start_progress_bar() {
    ## sanity test
    test -p "$fifo"
 
-   ## Do not use < > inside zenity progress messages, zenity will mess that up.
-   ## zenity --auto-kill will result in zenity sending a sighup signal upon
+   ## Do not use < > inside yad progress messages, yad will mess that up.
+   ## yad --auto-kill will result in yad sending a sighup signal upon
    ## pressing of cancel button.
-   zenity \
+   yad \
       --display="$display" \
       --timeout "86400" \
       --no-markup \
@@ -229,11 +229,11 @@ start_progress_bar() {
       --progress \
       $percentage_maybe_add \
       --text "$message" \
-      < "$fifo" & zenity_progress_pid="$!"
+      < "$fifo" & yad_progress_pid="$!"
 
    exec 3>"$fifo"
 
-   echo "$zenity_progress_pid" > "$zenity_progress_pid_file"
+   echo "$yad_progress_pid" > "$yad_progress_pid_file"
 
    if [ "$lefttop" = "1" ]; then
       ## set progressbar variable to 1, so the progress bar window will not be
@@ -261,7 +261,7 @@ start_progress_bar() {
       ## Check if still running.
       local ps__p_exit_code
       ps__p_exit_code="0"
-      ps -p "$zenity_progress_pid" >/dev/null 2>/dev/null || { ps__p_exit_code="$?"; true; };
+      ps -p "$yad_progress_pid" >/dev/null 2>/dev/null || { ps__p_exit_code="$?"; true; };
       if [ ! "$ps__p_exit_code" = "0" ]; then
          cleanup_self
          exit 0
