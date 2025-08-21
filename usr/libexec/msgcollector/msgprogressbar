@@ -168,14 +168,6 @@ start_progress_bar() {
       local icon="/usr/share/icons/gnome/24x24/status/info.png"
    fi
 
-   if [ -f "${msgcollector_run_dir}/${identifier}_lefttop" ]; then
-      local lefttop="1"
-   fi
-
-   if [ "$display" = "" ]; then
-      display=":0"
-   fi
-
    if [ -f "$parent_pid_file" ]; then
       true "parent_pid_file $parent_pid_file exists."
    else
@@ -219,7 +211,6 @@ start_progress_bar() {
    ## yad --auto-kill will result in yad sending a sighup signal upon
    ## pressing of cancel button.
    yad \
-      --display="$display" \
       --timeout "86400" \
       --no-markup \
       --window-icon "$icon" \
@@ -234,15 +225,6 @@ start_progress_bar() {
    exec 3>"$fifo"
 
    echo "$yad_progress_pid" > "$yad_progress_pid_file"
-
-   if [ "$lefttop" = "1" ]; then
-      ## set progressbar variable to 1, so the progress bar window will not be
-      ## maximized by output_wmctrl.
-      progressbar="1"
-
-      ## provided by /usr/libexec/msgcollector/msgwmctrl
-      output_wmctrl_move_window_to_left_top "$progressbartitlex"
-   fi
 
    while true; do
       if [ -f "$progress_txt_file" ]; then
@@ -276,8 +258,8 @@ source /usr/libexec/msgcollector/msgcollector_shared
 ## sets: ${msgcollector_run_dir}
 folder_init
 
-source /usr/libexec/msgcollector/msgwmctrl
-fallbacks ## provided by /usr/libexec/msgcollector/msgwmctrl
+source /usr/libexec/msgcollector/msgfallbacks
+fallbacks ## provided by /usr/libexec/msgcollector/msgfallbacks
 parse_cmd_options "$@"
 preparation
 start_progress_bar
