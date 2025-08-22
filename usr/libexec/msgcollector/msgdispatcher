@@ -9,6 +9,8 @@ set -o pipefail
 set -o errtrace
 #trap 'sleep 1' DEBUG
 
+source /usr/libexec/helper-scripts/light_sleep.bsh
+
 error_handler() {
    local last_exit_code="$?"
    if [ ! "$1" = "" ]; then
@@ -407,8 +409,7 @@ msgdispatcher_loop() {
 
    while true; do
       systemd-notify --pid="$$" WATCHDOG=1
-      sleep -- 10 &
-      wait -- "$!"
+      light_sleep 10
       ## Check that pids are still running.
       kill -0 -- "$inotifywait_main_pid"
       kill -0 -- "$inotifywait_subshell_pid"
