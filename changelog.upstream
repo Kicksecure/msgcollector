@@ -1,3 +1,42 @@
+commit c4d53c6905ce3f845c0370fe9345da94b9238ab8
+Merge: 12c6d1e 9a0450a
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Aug 27 04:35:40 2025 -0400
+
+    Merge remote-tracking branch 'ArrayBolt3/arraybolt3/trixie'
+
+commit 9a0450ae92b7792dc581e52f4d6504fd9ba0e4ec
+Merge: e4de3f7 12c6d1e
+Author: Aaron Rainbolt <arraybolt3@ubuntu.com>
+Date:   Tue Aug 26 19:20:14 2025 -0500
+
+    Merge branch 'master' into arraybolt3/trixie
+
+commit 12c6d1ed5b72f999940bff8f584f6d094eb0ac29
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Aug 26 09:12:48 2025 +0000
+
+    bumped changelog version
+
+commit e4de3f75aba852440d3e414f626acd12f06249bd
+Author: Aaron Rainbolt <arraybolt3@ubuntu.com>
+Date:   Fri Aug 22 17:47:48 2025 -0500
+
+    Replace recurring 10-second sleep with light_sleep
+
+commit 68ae828aae7fbaf8a4ff62c33e08bf418d795527
+Merge: 579f24e 86421c1
+Author: Aaron Rainbolt <arraybolt3@ubuntu.com>
+Date:   Thu Aug 21 19:58:59 2025 -0500
+
+    Merge branch 'master' into arraybolt3/trixie
+
+commit 579f24eef53e6d616c9b60f8f7407e5d3af000fa
+Author: Aaron Rainbolt <arraybolt3@ubuntu.com>
+Date:   Thu Aug 21 18:30:58 2025 -0500
+
+    Remove Wayland-incompatible features from msgcollector
+
 commit 86421c1473a42036fb0549523293dc8dab32cf4e
 Merge: c170639 9bb3dbf
 Author: Patrick Schleizer <adrelanos@whonix.org>
