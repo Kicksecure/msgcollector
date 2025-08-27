@@ -9,6 +9,8 @@ set -o pipefail
 set -o errtrace
 #trap 'sleep 1' DEBUG
 
+source /usr/libexec/helper-scripts/light_sleep.bsh
+
 error_handler() {
    local last_exit_code="$?"
    if [ ! "$1" = "" ]; then
@@ -82,6 +84,7 @@ preparation() {
 
    true "XDG_SESSION_TYPE: $XDG_SESSION_TYPE"
    true "DISPLAY: $DISPLAY"
+   true "WAYLAND_DISPLAY: $WAYLAND_DISPLAY"
    if [ "$XDG_SESSION_TYPE" = "x11" ]; then
       gui=1
       cli=0
@@ -94,6 +97,9 @@ preparation() {
    elif [ ! "$DISPLAY" = "" ]; then
       gui=1
       cli=0
+   elif [ ! "$WAYLAND_DISPLAY" = "" ]; then
+      gui=1
+      cli=0
    elif [ "$XDG_SESSION_TYPE" = "tty" ]; then
       cli=1
       ## Do this only in /dev/tty1.
@@ -102,7 +108,7 @@ preparation() {
          exit 0
       fi
    else
-      echo "$0: INFO: XDG_SESSION_TYPE is neither x11 nor wayland nor tty, DISPLAY is not set either, exiting."
+      echo "$0: INFO: XDG_SESSION_TYPE is neither x11 nor wayland nor tty, DISPLAY and WAYLAND_DISPLAY are not set either, exiting."
       exit 0
    fi
 
@@ -172,11 +178,6 @@ dispatch_cli() {
 }
 
 dispatch_x_active() {
-   if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_lefttop" ]; then
-      local lefttop
-      lefttop="1"
-   fi
-
    local icon
    if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_icon" ]; then
       icon="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_icon")"
@@ -195,11 +196,11 @@ dispatch_x_active() {
    fi
 
    if [ "$verbose" = "1" ]; then
-      /usr/libexec/msgcollector/msgdispatcher_dispatch_x "$type" "$title" "$msg" "$lefttop" "$icon"
+      /usr/libexec/msgcollector/msgdispatcher_dispatch_x "$type" "$title" "$msg" "$icon"
    else
       ## Launching into background, so it doesn't block msgdispatcher until
       ## msgdispatcher_dispatch_x exits.
-      /usr/libexec/msgcollector/msgdispatcher_dispatch_x "$type" "$title" "$msg" "$lefttop" "$icon" &
+      /usr/libexec/msgcollector/msgdispatcher_dispatch_x "$type" "$title" "$msg" "$icon" &
    fi
 }
 
@@ -248,7 +249,6 @@ msgdispatcher_handler() {
             msgdispatcher_delete_wrapper "messagex_done"
             msgdispatcher_delete_wrapper "titlex"
             msgdispatcher_delete_wrapper "messagex"
-            msgdispatcher_delete_wrapper "lefttop"
             msgdispatcher_delete_wrapper "typex"
          else
             true "INFO: messagex file does NOT exist."
@@ -401,7 +401,7 @@ inotifywait_loop() {
 
 msgdispatcher_loop() {
    preparation
-   fallbacks ## provided by /usr/libexec/msgcollector/msgwmctrl
+   fallbacks ## provided by /usr/libexec/msgcollector/msgfallbacks
    inotifywait_setup
    parse_existing_files
    systemd-notify --pid="$$" --ready
@@ -409,8 +409,7 @@ msgdispatcher_loop() {
 
    while true; do
       systemd-notify --pid="$$" WATCHDOG=1
-      sleep -- 10 &
-      wait -- "$!"
+      light_sleep 10
       ## Check that pids are still running.
       kill -0 -- "$inotifywait_main_pid"
       kill -0 -- "$inotifywait_subshell_pid"
@@ -422,8 +421,8 @@ msgdispatcher_loop() {
 source /usr/libexec/msgcollector/msgcollector_shared
 folder_init
 
-# shellcheck source=./usr/libexec/msgcollector/msgwmctrl
-source /usr/libexec/msgcollector/msgwmctrl
+# shellcheck source=./usr/libexec/msgcollector/msgfallbacks
+source /usr/libexec/msgcollector/msgfallbacks
 
 parse_cmd_options "$@"
 msgdispatcher_loop

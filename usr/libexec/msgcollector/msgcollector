@@ -233,10 +233,6 @@ parse_cmd_options() {
                forceactive="1"
                shift
                ;;
-           --lefttop)
-               lefttop="1"
-               shift
-               ;;
            --parenttty)
                parenttty="$2"
                shift 2
@@ -599,12 +595,6 @@ collector() {
    fi
    ## }}
 
-   ## {{ --lefttop
-   if [ "$lefttop" = "1" ]; then
-      touch "${msgcollector_run_dir}/${identifier}_lefttop"
-   fi
-   ## }}
-
    ## {{ --parenttty
    if [ ! -z "$parenttty" ]; then
       echo "$parenttty" > "${msgcollector_run_dir}/${identifier}_parenttty"
@@ -806,7 +796,6 @@ forget() {
       "${msgcollector_run_dir}/${identifier}_messagecli_done"
       "${msgcollector_run_dir}/${identifier}_messagecli"
       "${msgcollector_run_dir}/${identifier}_forceactive"
-      "${msgcollector_run_dir}/${identifier}_lefttop"
       "${msgcollector_run_dir}/${identifier}_parenttty"
    )
 
