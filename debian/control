@@ -36,7 +36,7 @@ Description: Command Line Interface Messages Toolkit Library
 Package: msgcollector-gui
 Architecture: all
 Depends: msgcollector, python3-pyqt5, qtwayland5, yad,
- libnotify-bin | kde-baseapps-bin, mate-notification-daemon, x11-utils,
+ libnotify-bin | kde-baseapps-bin, lxqt-notificationd, x11-utils,
  gnome-colors-common, ${misc:Depends}
 Provides: ${diverted-files}
 Conflicts: ${diverted-files}
