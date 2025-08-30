@@ -1,3 +1,22 @@
+commit 3685f194d8e968664e67b23b8f6495aa60309974
+Merge: 2739374 0d8b9ce
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Aug 30 07:58:05 2025 -0400
+
+    Merge remote-tracking branch 'ArrayBolt3/arraybolt3/trixie'
+
+commit 0d8b9ce772887482fff8eba19ae9d18480d51a1a
+Author: Aaron Rainbolt <arraybolt3@ubuntu.com>
+Date:   Fri Aug 29 15:52:51 2025 -0500
+
+    Switch to LXQt notifier
+
+commit 27393745ae1fa9f0714082a06517ff9f60e878d2
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Aug 27 19:27:32 2025 +0000
+
+    bumped changelog version
+
 commit c4d53c6905ce3f845c0370fe9345da94b9238ab8
 Merge: 12c6d1e 9a0450a
 Author: Patrick Schleizer <adrelanos@whonix.org>

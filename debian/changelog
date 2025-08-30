@@ -1,3 +1,9 @@
+msgcollector (3:14.7-1) unstable; urgency=medium
+
+  * New upstream version (local package).
+
+ -- Patrick Schleizer <adrelanos@whonix.org>  Sat, 30 Aug 2025 14:18:26 +0000
+
 msgcollector (3:14.6-1) unstable; urgency=medium
 
   * New upstream version (local package).
