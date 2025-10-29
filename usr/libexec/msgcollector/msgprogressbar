@@ -3,7 +3,7 @@
 ## Copyright (C) 2012 - 2025 ENCRYPTED SUPPORT LLC <adrelanos@whonix.org>
 ## See the file COPYING for copying conditions.
 
-#set -x
+set -x
 #exec >  >(tee -a "/home/user/msgprogressbarlog")
 #exec 2> >(tee -a "/home/user/msgprogressbarlog" >&2)
 
@@ -104,7 +104,7 @@ cleanup_self() {
    trap "error_handler" ERR
 
    true "$0 $FUNCNAME: killing yad_progress_pid $yad_progress_pid..."
-   kill -s sigterm "$yad_progress_pid" >/dev/null 2>/dev/null || true
+   kill -s sigterm "$yad_progress_pid" >/dev/null 2>/dev/null || true "$0: sigterm on yad_progress_pid failed, probably OK."
    safe-rm --force "$fifo"
    safe-rm --force "$progress_txt_file"
    safe-rm --force "$yad_progress_pid_file"
@@ -226,11 +226,13 @@ start_progress_bar() {
 
    echo "$yad_progress_pid" > "$yad_progress_pid_file"
 
-   while true; do
+   while true "$0: main loop"; do
+      true "$0: main loop started"
       if [ -f "$progress_txt_file" ]; then
+         true "$0: progress_txt_file exists"
          ## Sometimes there is a race condition preventing the progressbar
          ## being closed. Let's use this alternative approach.
-         progress_txt_file_progress="$(cat "$progress_txt_file")"
+         progress_txt_file_progress="$(cat -- "$progress_txt_file")"
          if [ "$progress_txt_file_progress" = "100" ]; then
             cleanup_self
             exit 0
@@ -240,17 +242,16 @@ start_progress_bar() {
       ## Happens when zentiy reached 100% or when cancel button is pressed.
       ## This will call the output_sighup function.
 
-      ## Check if still running.
-      local ps__p_exit_code
-      ps__p_exit_code="0"
-      ps -p "$yad_progress_pid" >/dev/null 2>/dev/null || { ps__p_exit_code="$?"; true; };
-      if [ ! "$ps__p_exit_code" = "0" ]; then
+      if ps -p "$yad_progress_pid" &>/dev/null; then
+         true "$0: yad still running: yes"
+      else
+         true "$0: yad still running: no"
          cleanup_self
          exit 0
       fi
 
-      sleep "2" &
-      wait "$!"
+      sleep -- "2" &
+      wait -- "$!"
    done
 }
 
