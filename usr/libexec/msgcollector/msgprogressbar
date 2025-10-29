@@ -212,13 +212,15 @@ start_progress_bar() {
    ## Broken:
    ##    yad --auto-kill will result in yad sending a sighup signal upon
    ##    pressing of cancel button.
+   ##    Therefore using '--no-buttons'.
    yad \
       --timeout "86400" \
       --no-markup \
-      --window-icon "$icon" \
-      --title="$progressbartitlex" \
       --auto-kill \
       --auto-close \
+      --no-buttons \
+      --window-icon "$icon" \
+      --title="$progressbartitlex" \
       --progress \
       $percentage_maybe_add \
       --text "$message" \
@@ -236,8 +238,7 @@ start_progress_bar() {
          ## being closed. Let's use this alternative approach.
          progress_txt_file_progress="$(cat -- "$progress_txt_file")"
          if [ "$progress_txt_file_progress" = "100" ]; then
-            output_ex
-            exit 0
+            break
          fi
       fi
       ## Alternatively (most cases) waiting for SIGHUP.
@@ -248,8 +249,7 @@ start_progress_bar() {
          true "$0: yad still running: yes"
       else
          true "$0: yad still running: no"
-         output_ex
-         exit 0
+         break
       fi
 
       sleep -- "2" &
@@ -266,3 +266,4 @@ fallbacks ## provided by /usr/libexec/msgcollector/msgfallbacks
 parse_cmd_options "$@"
 preparation
 start_progress_bar
+cleanup_self
