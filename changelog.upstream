@@ -1,3 +1,33 @@
+commit 6ab70f85838202a4d62244b69605af3148441d82
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Oct 29 07:53:25 2025 -0400
+
+    fix
+
+commit 278825cab336814db7c07516c704d7693e62ac36
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Oct 29 06:11:56 2025 -0400
+
+    lower debugging
+
+commit 0c4c5213247c66938f6f297b42b816f3c5f41f8b
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Oct 29 06:11:14 2025 -0400
+
+    `/usr/libexec/msgcollector/msgprogressbar`: fix terminating parent program when progress bar was closed
+
+commit 26eb9d8ea031a87e6e2b0119f3a0d9fc5e3d697b
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Oct 29 05:59:59 2025 -0400
+
+    debugging
+
+commit 9719933389707258a3523e6bee2163fbadcb74ef
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Sep 9 15:56:45 2025 +0000
+
+    bumped changelog version
+
 commit 5724c2932bb7ef0c9be570a0434b376e8376ba06
 Merge: 27a491d 2ae73a8
 Author: Patrick Schleizer <adrelanos@whonix.org>
