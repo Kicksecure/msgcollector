@@ -208,8 +208,10 @@ start_progress_bar() {
    test -p "$fifo"
 
    ## Do not use < > inside yad progress messages, yad will mess that up.
-   ## yad --auto-kill will result in yad sending a sighup signal upon
-   ## pressing of cancel button.
+   ##
+   ## Broken:
+   ##    yad --auto-kill will result in yad sending a sighup signal upon
+   ##    pressing of cancel button.
    yad \
       --timeout "86400" \
       --no-markup \
@@ -234,19 +236,19 @@ start_progress_bar() {
          ## being closed. Let's use this alternative approach.
          progress_txt_file_progress="$(cat -- "$progress_txt_file")"
          if [ "$progress_txt_file_progress" = "100" ]; then
-            cleanup_self
+            output_ex
             exit 0
          fi
       fi
       ## Alternatively (most cases) waiting for SIGHUP.
-      ## Happens when zentiy reached 100% or when cancel button is pressed.
+      ## Happens when yad reached 100% or when cancel button is pressed.
       ## This will call the output_sighup function.
 
       if ps -p "$yad_progress_pid" &>/dev/null; then
          true "$0: yad still running: yes"
       else
          true "$0: yad still running: no"
-         cleanup_self
+         output_ex
          exit 0
       fi
 
