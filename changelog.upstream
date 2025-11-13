@@ -1,3 +1,147 @@
+commit ae25652e4edd233b6162e8c868718528fd02c68e
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Nov 13 06:48:07 2025 -0500
+
+    fix
+
+commit bb3277e68db9f5f75f34afc85095e4f8e84f3eb7
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Nov 13 06:46:13 2025 -0500
+
+    fix
+
+commit 6421c9e3a7b09f9b7ec430e257d9946226859a77
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Nov 13 06:41:34 2025 -0500
+
+    fix
+
+commit 8de773cd1ca9c3c6ed0e09282149d93001253e1e
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Nov 13 06:39:42 2025 -0500
+
+    refactoring
+
+commit 455a0b448b2423b1fd10f2f8bf69ea222af8a00b
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Nov 13 06:37:19 2025 -0500
+
+    printf
+
+commit 6ec6409731558379efbc156cf167a5fca2e0c72c
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Nov 13 06:36:22 2025 -0500
+
+    fix
+
+commit 1f4459d48dbac26353b71f2da4123cd24f51c0cc
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Nov 13 06:35:13 2025 -0500
+
+    fix
+
+commit e45c35df8499cee2a71c39bddafb26ffee06647d
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Nov 13 06:33:27 2025 -0500
+
+    msgprogressbar: use timeout
+
+commit 5957026f2eca3891550e0254d2612558adb06a09
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Nov 13 06:29:22 2025 -0500
+
+    debugging
+
+commit efd1b92cc32d868f3d203304a005d32913e58a00
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Nov 13 06:25:42 2025 -0500
+
+    `/usr/libexec/msgcollector/msgprogressbar`: handle signal `SIGINT`
+
+commit 056738d0b61eb2367e773e752710acd5914d42ef
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Nov 13 06:24:23 2025 -0500
+
+    refactoring
+
+commit b4e57b00072664df76814974f541995a7c135f06
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Nov 13 06:10:52 2025 -0500
+
+    use light_sleep
+
+commit 0107857f24350a671122bfd05b65b759829b8e31
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Nov 13 06:08:58 2025 -0500
+
+    use light_sleep
+
+commit eb568d49a7a8e46f517c31af373bbfe17d29f0aa
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Nov 13 05:58:51 2025 -0500
+
+    fix
+
+commit 319eca33c185a99531e3de489a520be15faa8c95
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Nov 13 05:48:55 2025 -0500
+
+    fix
+
+commit 7111ab04b3fc118f486718af3c30a817dbf01660
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Nov 13 05:48:18 2025 -0500
+
+    fix
+
+commit 34e5a2b0141cb99e4cba472e4ecaf5eaf2cfe4b7
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Nov 13 05:47:10 2025 -0500
+
+    fix
+
+commit dc63024714f14c83e1c17ec978173b91c82b11d6
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Nov 13 05:40:29 2025 -0500
+
+    comment
+
+commit 6e54eff24abe512f656732e21a818a3a96bdffea
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Nov 13 05:40:01 2025 -0500
+
+    comment
+
+commit ae2ada4e1bc2ce5b8bd65ba48c60d6cb4bc26de1
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Nov 13 05:37:38 2025 -0500
+
+    end-of-options
+
+commit c2c38b1549340c1dbdbaa73eca4788962d1b5c5b
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Nov 13 05:36:52 2025 -0500
+
+    stecho
+
+commit 2b03b5248834fdc1bed77097df215b2b6364ac93
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Nov 13 05:31:38 2025 -0500
+
+    KillSignal=SIGKILL
+
+commit 9dd5f905943dd5705af94ec2dde607e82a702bab
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Nov 13 05:26:32 2025 -0500
+
+    cleanup
+
+commit 3e4ac6a89300e89f03ae90b6ed336eefe82f31df
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Oct 29 12:11:10 2025 +0000
+
+    bumped changelog version
+
 commit 6ab70f85838202a4d62244b69605af3148441d82
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Wed Oct 29 07:53:25 2025 -0400
