@@ -27,7 +27,7 @@ if [ ! -f "${msgcollector_run_dir}/${identifier}_${progressbaridx}_parentpid" ];
    exit 0
 fi
 
-parentpid="$(cat "${msgcollector_run_dir}/${identifier}_${progressbaridx}_parentpid")"
+parentpid="$(cat -- "${msgcollector_run_dir}/${identifier}_${progressbaridx}_parentpid")"
 
 true "parentpid: '$parentpid'"
 
