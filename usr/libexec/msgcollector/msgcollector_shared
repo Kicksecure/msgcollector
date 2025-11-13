@@ -3,6 +3,8 @@
 ## Copyright (C) 2012 - 2025 ENCRYPTED SUPPORT LLC <adrelanos@whonix.org>
 ## See the file COPYING for copying conditions.
 
+source /usr/libexec/helper-scripts/light_sleep.bsh
+
 folder_init() {
    msgcollector_run_id_folder="/run/user/$(id -u)"
    if test -d "${msgcollector_run_id_folder}" ; then
@@ -28,6 +30,5 @@ loop_protection() {
       ## Timeout reached.
       exit 2
    fi
-   sleep 1 &
-   wait "$!"
+   light_sleep 1
 }
