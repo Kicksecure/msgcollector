@@ -140,6 +140,13 @@ output_sighup() {
 
 trap "output_sighup" SIGHUP
 
+output_sigint() {
+   output_signal_caught="SIGINT"
+   output_ex
+}
+
+trap "output_sigint" SIGINT
+
 output_sigterm() {
    output_signal_caught="SIGTERM"
    output_ex
