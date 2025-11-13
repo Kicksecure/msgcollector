@@ -242,7 +242,7 @@ start_progress_bar() {
          fi
       fi
       ## Alternatively (most cases) waiting for SIGHUP.
-      ## Happens when yad reached 100% or when cancel button is pressed.
+      ## Happens when 'yad' reached 100% or when cancel button is pressed.
       ## This will call the output_sighup function.
 
       if ps -p "$yad_progress_pid" &>/dev/null; then
