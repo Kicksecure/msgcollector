@@ -404,6 +404,7 @@ msgdispatcher_loop() {
    fallbacks ## provided by /usr/libexec/msgcollector/msgfallbacks
    inotifywait_setup
    parse_existing_files
+   systemctl --user --wait is-system-running >/dev/null
    systemd-notify --pid="$$" --ready
    inotifywait_loop
 
