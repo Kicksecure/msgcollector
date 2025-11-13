@@ -17,8 +17,17 @@ scriptname="$(basename -- "$BASH_SOURCE")"
 
 timeout_command=("timeout" "--kill-after" "1" "2")
 
+disable_traps() {
+   trap "" ERR
+   trap "" SIGHUP
+   trap "" SIGTERM
+   trap "" SIGINT
+}
+
 error_handler() {
    local exit_code="$?"
+
+   disable_traps
 
    local msg="\
 ###############################################################################
