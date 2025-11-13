@@ -95,7 +95,7 @@ progress_bar() {
    if [ -p "${msgcollector_run_dir}/${identifier}_${progressbaridx}_fifo" ]; then
       if [ -f "${msgcollector_run_dir}/${identifier}_${progressbaridx}_yadprogresspid" ]; then
          yad_progress_pid="$(cat "${msgcollector_run_dir}/${identifier}_${progressbaridx}_yadprogresspid")"
-         ## Check if yad is running.
+         ## Check if 'yad' is running.
          local ps_p_exit_code
          ps_p_exit_code="0"
          ps -p "$yad_progress_pid" >/dev/null 2>/dev/null || { ps_p_exit_code="$?"; true; };

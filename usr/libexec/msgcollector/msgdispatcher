@@ -125,7 +125,7 @@ preparation() {
    test -d "$inotifywait_folder"
 }
 
-## {{ Small wrapper to use either kdialog, notify-send or nothing.
+## {{ Small wrapper to use either 'kdialog', 'notify-send' or nothing.
 passive_popup_tool() {
    local time title text
    time="$1"
@@ -133,12 +133,12 @@ passive_popup_tool() {
    text="$3"
 
    ## Fallback.
-   ## notify-send does not work if $title is unset.
+   ## 'notify-send' does not work if $title is unset.
    if [ "$title" = "" ]; then
       title="$msgdispatcher_identifier"
    fi
 
-   ## notify-send timeout in milliseconds.
+   ## 'notify-send' timeout in milliseconds.
 
    if command -v "qubesdb-read" >/dev/null 2>&1 ; then
       if command -v "notify-send" >/dev/null 2>&1 ; then
@@ -147,11 +147,11 @@ passive_popup_tool() {
       fi
    fi
 
-   ## check if kdialog, notify-send or no passive popup tool is installed
+   ## check if 'kdialog', 'notify-send' or no passive popup tool is installed
    ## - that is not the case for CLI Custom-Workstation users
    ## - that may not be the case for Gnome users
    if command -v "kdialog" >/dev/null 2>&1 ; then
-      ## kdialog does not support end-of-options.
+      ## 'kdialog' does not support end-of-options.
       kdialog --title "$title" --passivepopup "$text" "$time"
    elif command -v "notify-send" >/dev/null 2>&1 ; then
       notify-send --expire-time "${time}000" -- "$title" "$text"
@@ -167,8 +167,8 @@ dispatch_cli() {
       local parenttty
       parenttty="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_parenttty")"
       if [ "$parenttty" = "/dev/tty1" ]; then
-         ## When for example systemcheck was run in tty1, then messages were
-         ## already echoed by msgcollector. No need to dispatch them again.
+         ## When for example 'systemcheck' was run in 'tty1', then messages were
+         ## already echoed by 'msgcollector'. No need to dispatch them again.
          true "Skipping, because parenttty is /dev/tty1."
          return 0
       fi
@@ -355,14 +355,14 @@ msgdispatcher_handler() {
 
 check() {
    if ! [[ "$2" =~ ^[0-9a-zA-Z_-]+$ ]]; then
-      echo "$0:
+      stecho "$0:
 \$1 (variable name): '$1'
 \$2 (variable content): '$2'
 Invalid character!" >&2
       exit 200
    fi
    if [ "$2" = "" ]; then
-      echo "$0:
+      stecho "$0:
 \$1 (variable name): '$1'
 \$2 (variable content): empty!" >&2
       exit 201

@@ -15,11 +15,11 @@ fallbacks() {
       no_gui="0"
    fi
 
-   ## Check if yad is installed.
+   ## Check if 'yad' is installed.
    ## - This is not the case for cli users,
-   ##   who removed yad or custom builds which never had yad installed.
+   ##   who removed yad or custom builds which never had 'yad' installed.
    if [ "$(command -v "yad")" = "" ] || [ "$no_gui" = "1" ]; then
-      ## yad is not installed or no X server running.
+      ## 'yad' is not installed or no Wayland / X server running.
       yad() {
          ## dummy
          true
@@ -27,7 +27,7 @@ fallbacks() {
    fi
 
    if [ "$(command -v "kdialog")" = "" ] || [ "$no_gui" = "1" ]; then
-      ## kdialog is not installed or no X server running.
+      ## kdialog is not installed or no Wayland / X server running.
       kdialog() {
          ## dummy
          true
@@ -35,7 +35,7 @@ fallbacks() {
    fi
 
    if [ "$(command -v "notify-send")" = "" ] || [ "$no_gui" = "1" ]; then
-      ## notify-send is not installed or no X server running.
+      ## notify-send is not installed or no Wayland / X server running.
       notify-send() {
          ## dummy
          true
