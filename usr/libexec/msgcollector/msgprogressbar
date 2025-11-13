@@ -9,6 +9,7 @@
 
 set -e
 set -o pipefail
+set -o errtrace
 
 source /usr/libexec/helper-scripts/light_sleep.bsh
 
@@ -40,8 +41,6 @@ error_handler() {
 trap "error_handler" ERR
 
 parse_cmd_options() {
-   trap "error_handler" ERR
-
    ## Thanks to:
    ## http://mywiki.wooledge.org/BashFAQ/035
 
@@ -95,7 +94,6 @@ parse_cmd_options() {
 }
 
 preparation() {
-   trap "error_handler" ERR
    fifo="${msgcollector_run_dir}/${identifier}_${progressbaridx}_fifo"
    progress_txt_file="${msgcollector_run_dir}/${identifier}_${progressbaridx}_progresstxt"
    parent_pid_file="${msgcollector_run_dir}/${identifier}_${progressbaridx}_parentpid"
@@ -103,7 +101,6 @@ preparation() {
 }
 
 cleanup_self() {
-   trap "error_handler" ERR
    if kill -0 -- "$yad_progress_pid" &>/dev/null; then
       true "$0: killing yad_progress_pid $yad_progress_pid..."
       if ! kill -s sigterm -- "$yad_progress_pid" &>/dev/null; then
@@ -119,8 +116,6 @@ cleanup_self() {
 }
 
 output_ex() {
-   trap "error_handler" ERR
-
    ## This function is called when the cancel button in yad gets pressed or
    ## when $progress_txt_file contains 100.
 
@@ -139,7 +134,6 @@ because $parent_pid_file does not exist."
 }
 
 output_sighup() {
-   trap "error_handler" ERR
    output_signal_caught="SIGHUP"
    output_ex
 }
@@ -147,7 +141,6 @@ output_sighup() {
 trap "output_sighup" SIGHUP
 
 output_sigterm() {
-   trap "error_handler" ERR
    output_signal_caught="SIGTERM"
    output_ex
 }
@@ -155,8 +148,6 @@ output_sigterm() {
 trap "output_sigterm" SIGTERM
 
 start_progress_bar() {
-   trap "error_handler" ERR
-
    if [ "$message" = "" ]; then
       message="Progress bar message is empty, please report this msgcollector bug!"
    fi
