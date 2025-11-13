@@ -3,7 +3,7 @@
 ## Copyright (C) 2012 - 2025 ENCRYPTED SUPPORT LLC <adrelanos@whonix.org>
 ## See the file COPYING for copying conditions.
 
-#set -x
+set -x
 #exec >  >(tee -a "/home/user/msgprogressbarlog")
 #exec 2> >(tee -a "/home/user/msgprogressbarlog" >&2)
 
@@ -102,9 +102,12 @@ preparation() {
 
 cleanup_self() {
    trap "error_handler" ERR
-
-   true "$0 $FUNCNAME: killing yad_progress_pid $yad_progress_pid..."
-   kill -s sigterm "$yad_progress_pid" >/dev/null 2>/dev/null || true "$0: sigterm on yad_progress_pid failed, probably OK."
+   if kill -0 -- "$yad_progress_pid" &>/dev/null; then
+      true "$0: killing yad_progress_pid $yad_progress_pid..."
+      kill -s sigterm -- "$yad_progress_pid" &>/dev/null || true "$0: sigterm on yad_progress_pid failed, probably OK."
+   else
+      true "$0: yad_progress_pid $yad_progress_pid no longer running, ok."
+   fi
    safe-rm --force "$fifo"
    safe-rm --force "$progress_txt_file"
    safe-rm --force "$yad_progress_pid_file"
