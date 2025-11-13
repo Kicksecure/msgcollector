@@ -170,7 +170,7 @@ start_progress_bar() {
 
    if [ -f "${msgcollector_run_dir}/${identifier}_icon" ]; then
       local icon
-      icon="$(cat "${msgcollector_run_dir}/${identifier}_icon")"
+      icon="$("${timeout_command[@]}" cat -- "${msgcollector_run_dir}/${identifier}_icon")"
    fi
 
    if [ "$icon" = "" ]; then
@@ -187,7 +187,7 @@ start_progress_bar() {
    if [ -f "$progress_txt_file" ]; then
       ## Sometimes there is a race condition preventing the progressbar
       ## being closed. Let's use this alternative approach.
-      progress_txt_file_progress="$(cat "$progress_txt_file")"
+      progress_txt_file_progress="$("${timeout_command[@]}" cat -- "$progress_txt_file")"
       if [ "$progress_txt_file_progress" = "100" ]; then
          true "Already 100%. Not even opening progress bar."
          cleanup_self
@@ -210,9 +210,9 @@ start_progress_bar() {
    fi
 
    ## Clean up eventual old progress bar.
-   safe-rm --force "$fifo"
+   "${timeout_command[@]}" safe-rm --force "$fifo"
 
-   mkfifo "$fifo"
+   "${timeout_command[@]}" mkfifo "$fifo"
 
    ## sanity test
    test -p "$fifo"
@@ -246,7 +246,7 @@ start_progress_bar() {
          true "$0: progress_txt_file exists"
          ## Sometimes there is a race condition preventing the progressbar
          ## being closed. Let's use this alternative approach.
-         progress_txt_file_progress="$(cat -- "$progress_txt_file")"
+         progress_txt_file_progress="$("${timeout_command[@]}" cat -- "$progress_txt_file")"
          if [ "$progress_txt_file_progress" = "100" ]; then
             break
          fi
