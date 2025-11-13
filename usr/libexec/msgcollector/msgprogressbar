@@ -104,7 +104,9 @@ cleanup_self() {
    trap "error_handler" ERR
    if kill -0 -- "$yad_progress_pid" &>/dev/null; then
       true "$0: killing yad_progress_pid $yad_progress_pid..."
-      kill -s sigterm -- "$yad_progress_pid" &>/dev/null || true "$0: sigterm on yad_progress_pid failed, probably OK."
+      if ! kill -s sigterm -- "$yad_progress_pid" &>/dev/null; then
+         kill -s sigkill -- "$yad_progress_pid" &>/dev/null
+      fi
    else
       true "$0: yad_progress_pid $yad_progress_pid no longer running, ok."
    fi
