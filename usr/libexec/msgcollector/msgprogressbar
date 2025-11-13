@@ -10,6 +10,8 @@
 set -e
 set -o pipefail
 
+source /usr/libexec/helper-scripts/light_sleep.bsh
+
 scriptname="$(basename "$BASH_SOURCE")"
 
 error_handler() {
@@ -257,8 +259,7 @@ start_progress_bar() {
          break
       fi
 
-      sleep -- "2" &
-      wait -- "$!"
+      light_sleep "2"
    done
 }
 
