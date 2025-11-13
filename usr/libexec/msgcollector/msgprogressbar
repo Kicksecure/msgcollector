@@ -101,13 +101,15 @@ preparation() {
 }
 
 cleanup_self() {
+   true "$0: Check if yad_progress_pid $yad_progress_pid is still running..."
    if kill -0 -- "$yad_progress_pid" &>/dev/null; then
+      true "$0: cleanup_self: yad still running: yes"
       true "$0: killing yad_progress_pid $yad_progress_pid..."
       if ! kill -s sigterm -- "$yad_progress_pid" &>/dev/null; then
          kill -s sigkill -- "$yad_progress_pid" &>/dev/null
       fi
    else
-      true "$0: yad_progress_pid $yad_progress_pid no longer running, ok."
+      true "$0: cleanup_self: yad still running: no"
    fi
    safe-rm --force "$fifo"
    safe-rm --force "$progress_txt_file"
@@ -251,9 +253,9 @@ start_progress_bar() {
       ## This will call the output_sighup function.
 
       if ps -p "$yad_progress_pid" &>/dev/null; then
-         true "$0: yad still running: yes"
+         true "$0: loop: yad still running: yes"
       else
-         true "$0: yad still running: no"
+         true "$0: loop: yad still running: no"
          break
       fi
 
