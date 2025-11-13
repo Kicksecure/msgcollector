@@ -14,6 +14,7 @@ Description=msgcollector msgdispatcher
 Type=notify
 ExecStart=/usr/libexec/msgcollector/msgdispatcher
 KillMode=control-group
+KillSignal=SIGKILL
 NotifyAccess=all
 WatchdogSec=30
 Restart=always
