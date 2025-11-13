@@ -40,8 +40,6 @@ error_handler() {
    exit 1
 }
 
-trap "error_handler" ERR
-
 parse_cmd_options() {
    ## Thanks to:
    ## http://mywiki.wooledge.org/BashFAQ/035
@@ -142,21 +140,15 @@ output_sighup() {
    output_ex
 }
 
-trap "output_sighup" SIGHUP
-
 output_sigint() {
    output_signal_caught="SIGINT"
    output_ex
 }
 
-trap "output_sigint" SIGINT
-
 output_sigterm() {
    output_signal_caught="SIGTERM"
    output_ex
 }
-
-trap "output_sigterm" SIGTERM
 
 start_progress_bar() {
    if [ "$message" = "" ]; then
@@ -264,6 +256,11 @@ start_progress_bar() {
       light_sleep "2"
    done
 }
+
+trap "error_handler" ERR
+trap "output_sighup" SIGHUP
+trap "output_sigterm" SIGTERM
+trap "output_sigint" SIGINT
 
 source /usr/libexec/msgcollector/msgcollector_shared
 ## sets: ${msgcollector_run_dir}
