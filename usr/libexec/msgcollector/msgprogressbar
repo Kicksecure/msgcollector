@@ -207,7 +207,7 @@ start_progress_bar() {
    ## sanity test
    test -p "$fifo"
 
-   ## Do not use < > inside yad progress messages, yad will mess that up.
+   ## Do not use '<' or '>' inside 'yad' progress messages, 'yad' will mess that up.
    ##
    ## Broken:
    ##    yad --auto-kill will result in yad sending a sighup signal upon
