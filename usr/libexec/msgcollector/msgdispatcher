@@ -404,7 +404,12 @@ msgdispatcher_loop() {
    fallbacks ## provided by /usr/libexec/msgcollector/msgfallbacks
    inotifywait_setup
    parse_existing_files
-   systemctl --user --wait is-system-running >/dev/null
+
+   ## Wait for system to be ready so 'systemd-notify' can be used.
+   ## Wait until systemctl at least reports 'degraded'.
+   ## But overwrite with '|| true' because msgdispatcher should still start.
+   systemctl --user --wait is-system-running &>/dev/null || true
+
    systemd-notify --pid="$$" --ready
    inotifywait_loop
 
