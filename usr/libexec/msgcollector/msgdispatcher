@@ -408,19 +408,25 @@ msgdispatcher_loop() {
    ## Wait for system to be ready so 'systemd-notify' can be used.
    ## Wait until systemctl at least reports 'degraded'.
    ## But overwrite with '|| true' because msgdispatcher should still start.
-   systemctl --user --wait is-system-running &>/dev/null || true
+   ## This might lead to an infinite wait because 'msgcollector-gui.service'
+   ## is a systemd user unit.
+   #systemctl --user --wait is-system-running &>/dev/null || true
 
-   systemd-notify --pid="$$" --ready
+   ## systemd-notify sometimes exists non-zero. Unknown how to reproduce.
+   $systemd_notify --pid="$$" --ready &>/dev/null || true
    inotifywait_loop
 
    while true; do
-      systemd-notify --pid="$$" WATCHDOG=1
+      $systemd_notify --pid="$$" WATCHDOG=1 &>/dev/null || true
       light_sleep 10
       ## Check that pids are still running.
       kill -0 -- "$inotifywait_main_pid"
       kill -0 -- "$inotifywait_subshell_pid"
    done
 }
+
+## sets: systemd_notify
+source /usr/libexec/helper-scripts/systemd-notify.bsh
 
 ## sets: ${msgcollector_run_dir}
 # shellcheck source=./usr/libexec/msgcollector/msgcollector_shared
