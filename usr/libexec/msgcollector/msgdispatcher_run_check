@@ -19,7 +19,7 @@ msgdispatcher_pid_check() {
          return 1
       fi
    else
-      1>&2 printf '%s\n' "$FUNCNAME: neither cli nor gui!"
+      1>&2 printf '%s\n' "msgdispatcher_pid_check: neither cli nor gui!"
       return 1
    fi
 }
@@ -164,7 +164,7 @@ output_func() {
       ## Search backwards for a newline.
       while true; do
          if (( msg_idx <= cut_start_idx )); then
-            1>&2 printf '%s\n' 'Cannot break massive argument into chunks!'
+            1>&2 printf '%s\n' 'output_func: Cannot break massive argument into chunks!'
             return 1
          fi
 
