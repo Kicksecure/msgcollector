@@ -195,6 +195,8 @@ dispatch_x_active() {
       type="info"
    fi
 
+   ## TODO: BUG: Can fail if too many arguments are passed.
+   ## Nov 23 06:43:10 work-main msgdispatcher[362757]: /usr/libexec/msgcollector/msgdispatcher: line 203: /usr/libexec/msgcollector/msgdispatcher_dispatch_x: Argument list too long
    if [ "$verbose" = "1" ]; then
       /usr/libexec/msgcollector/msgdispatcher_dispatch_x "$type" "$title" "$msg" "$icon"
    else
