@@ -17,10 +17,12 @@ true "$0: START"
 ## See also:
 ## /usr/lib/systemd/user/msgcollector-gui.service
 
-if [ "$(systemctl --user is-enabled msgcollector-gui.service)" == "masked" ]; then
+if [ "$(systemctl --user is-enabled msgcollector-gui.service 2>/dev/null)" == "masked" ]; then
   exit 0
 fi
 
-systemctl --user --no-pager --no-block start msgcollector-gui.service
+## Use '2>/dev/null' to hide messages such as:
+## > Warning: The unit file, source configuration file or drop-ins of msgcollector-gui.service changed on disk. Run 'systemctl --user daemon-reload' to reload units.
+systemctl --user --no-pager --no-block start msgcollector-gui.service 2>/dev/null
 
 true "$0: END"
