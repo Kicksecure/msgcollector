@@ -195,8 +195,15 @@ dispatch_x_active() {
       type="info"
    fi
 
-   ## TODO: BUG: Can fail if too many arguments are passed.
    ## Nov 23 06:43:10 work-main msgdispatcher[362757]: /usr/libexec/msgcollector/msgdispatcher: line 203: /usr/libexec/msgcollector/msgdispatcher_dispatch_x: Argument list too long
+   ## Avoid "Argument list too long" by truncating overly long messages.
+   ## This is character-based, not exact bytes, but good enough and simple.
+   local max_msg_chars=32768
+   if ((${#msg} > max_msg_chars)); then
+      msg="${msg:0:max_msg_chars}"
+      msg="${msg} [truncated]"
+   fi
+
    if [ "$verbose" = "1" ]; then
       /usr/libexec/msgcollector/msgdispatcher_dispatch_x "$type" "$title" "$msg" "$icon"
    else
