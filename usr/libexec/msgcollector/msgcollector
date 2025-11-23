@@ -461,7 +461,7 @@ collector() {
    ## {{ --typecli
    if [ "$messagecli" = "1" ]; then
       if [ -f "${msgcollector_run_dir}/${identifier}_typecli" ]; then
-         old_typecli="$(cat "${msgcollector_run_dir}/${identifier}_typecli")"
+         old_typecli="$(cat -- "${msgcollector_run_dir}/${identifier}_typecli")"
       fi
 
       if [ "$old_typecli" = "info" ]; then
@@ -490,7 +490,7 @@ collector() {
    ## {{ --typex
    if [ "$messagex" = "1" ]; then
       if [ -f "${msgcollector_run_dir}/${identifier}_typex" ]; then
-         old_typex="$(cat "${msgcollector_run_dir}/${identifier}_typex")"
+         old_typex="$(cat -- "${msgcollector_run_dir}/${identifier}_typex")"
       fi
 
       if [ "$old_typex" = "info" ]; then
@@ -704,7 +704,7 @@ return_status() {
       if [ -f "${msgcollector_run_dir}/${identifier}_${progressbaridx}_yadprogresspid" ]; then
          local pid
          ## || true to prevent race condition
-         yad_progress_pid="$(cat "${msgcollector_run_dir}/${identifier}_${progressbaridx}_yadprogresspid")" || true
+         yad_progress_pid="$(cat -- "${msgcollector_run_dir}/${identifier}_${progressbaridx}_yadprogresspid")" || true
          ## Check if still running.
          local ps__p_exit_code
          ps__p_exit_code="0"
@@ -735,7 +735,7 @@ return_status() {
       write_to_file="${msgcollector_run_dir}/${identifier}_typex"
       if [ -f "$write_to_file" ]; then
          local TYPE
-         TYPE="$(cat "$write_to_file")"
+         TYPE="$(cat -- "$write_to_file")"
          printf '%s\n' "$TYPE"
       fi
       exit 0
@@ -747,7 +747,7 @@ return_status() {
       write_to_file="${msgcollector_run_dir}/${identifier}_typecli"
       if [ -f "$write_to_file" ]; then
          local TYPE
-         TYPE="$(cat "$write_to_file")"
+         TYPE="$(cat -- "$write_to_file")"
          printf '%s\n' "$TYPE"
       fi
       exit 0
