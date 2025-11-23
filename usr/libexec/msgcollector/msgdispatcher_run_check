@@ -182,7 +182,7 @@ output_func() {
    done
 
    if (( loop_idx == ( max_loop_count - 1 ) )); then
-      1>&2 prinf '%s\n' "output_func: Possible infinite loop hit!"
+      1>&2 printf '%s\n' "output_func: Possible infinite loop hit!"
       return 1
    fi
 }
