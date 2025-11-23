@@ -63,7 +63,7 @@ error_handler() {
    ## This workaround is good enough.
    chmod +x ~/".msgcollector" || true
 
-   if ! touch  ~/".msgcollector/msgdispatcher-error.log" ; then
+   if ! touch -- ~/".msgcollector/msgdispatcher-error.log" ; then
       printf '%s\n' "$scriptname: skipping log to $home_var/.msgcollector/msgdispatcher-error.log since failed to 'touch' file." >&2
       exit 1
    fi
@@ -566,7 +566,7 @@ collector() {
 
    ## {{ --animate
    if [ "$animate" = "1" ]; then
-      touch "${msgcollector_run_dir}/${identifier}_${progressbaridx}_progressbarx_animate"
+      touch -- "${msgcollector_run_dir}/${identifier}_${progressbaridx}_progressbarx_animate"
    fi
 
    ## {{ --progressx
@@ -591,7 +591,7 @@ collector() {
 
    ## {{ --forceactive
    if [ "$forceactive" = "1" ]; then
-      touch "${msgcollector_run_dir}/${identifier}_forceactive"
+      touch -- "${msgcollector_run_dir}/${identifier}_forceactive"
    fi
    ## }}
 
@@ -645,7 +645,7 @@ $message" >> "$write_to_file"
 
    ## {{ --done
    if [ "$done" = "1" ]; then
-      touch "${write_to_file}_done"
+      touch -- "${write_to_file}_done"
    fi
    ## }}
 }
@@ -809,7 +809,7 @@ forget() {
    local file_name
    for file_name in "${file_list[@]}"; do
       if [ -e "$file_name" ]; then
-         safe-rm --force "$file_name"
+         safe-rm --force -- "$file_name"
       fi
    done
    unset file_name
