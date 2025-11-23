@@ -82,7 +82,7 @@ ps_p_parentpid: $ps_p_parentpid
 my_pstree: $my_pstree
 BASH_COMMAND: $BASH_COMMAND
 exit_code: $exit_code
-" | tee -a ~/".msgcollector/msgdispatcher-error.log" >/dev/null
+" | tee -a -- ~/".msgcollector/msgdispatcher-error.log" >/dev/null
 
    true "INFO: end of $0 error_handler, ok."
 
