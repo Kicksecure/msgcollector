@@ -201,7 +201,7 @@ dispatch_x_active() {
    local max_msg_chars=32768
    if ((${#msg} > max_msg_chars)); then
       msg="${msg:0:max_msg_chars}"
-      msg="${msg} [truncated]"
+      msg="${msg} [truncated - try command line interface (CLI) version for complete output]"
    fi
 
    if [ "$verbose" = "1" ]; then
