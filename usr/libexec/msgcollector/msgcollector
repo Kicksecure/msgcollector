@@ -43,13 +43,13 @@ error_handler() {
 ## exit_code: '$exit_code'
 ###############################################################################\
 "
-   echo "$msg" >&2
+   printf '%s\n' "$msg" >&2
 
    local home_var
    home_var=~/
 
    if ! test -w ~/ ; then
-      echo "$scriptname: skipping log to ~/.msgcollector/msgdispatcher-error.log since not writeable home_var: $home_var" >&2
+      printf '%s\n' "$scriptname: skipping log to ~/.msgcollector/msgdispatcher-error.log since not writeable home_var: $home_var" >&2
       exit 1
    fi
 
@@ -64,16 +64,16 @@ error_handler() {
    chmod +x ~/".msgcollector" || true
 
    if ! touch  ~/".msgcollector/msgdispatcher-error.log" ; then
-      echo "$scriptname: skipping log to $home_var/.msgcollector/msgdispatcher-error.log since failed to 'touch' file." >&2
+      printf '%s\n' "$scriptname: skipping log to $home_var/.msgcollector/msgdispatcher-error.log since failed to 'touch' file." >&2
       exit 1
    fi
 
    if [ ! -w  ~/".msgcollector/msgdispatcher-error.log" ]; then
-      echo "$scriptname: skipping log to ~/.msgcollector/msgdispatcher-error.log since not writeable file: $home_var/.msgcollector" >&2
+      printf '%s\n' "$scriptname: skipping log to ~/.msgcollector/msgdispatcher-error.log since not writeable file: $home_var/.msgcollector" >&2
       exit 1
    fi
 
-   echo "\
+   printf '%s\n' "\
 scriptname: $scriptname
 identifier: $identifier
 my_command_line_parameters: $my_command_line_parameters
@@ -119,7 +119,7 @@ parse_cmd_options() {
            --icon)
                icon="$2"
                if [ "$icon" = "" ]; then
-                  echo "$BASH_SOURCE ERROR: variable icon is empty."
+                  printf '%s\n' "$BASH_SOURCE ERROR: variable icon is empty."
                   exit 1
                fi
                shift 2
@@ -133,7 +133,7 @@ parse_cmd_options() {
                typecli="$2"
                shift 2
                if [ "$typecli" = "" ]; then
-                  echo "$BASH_SOURCE ERROR: variable typecli is empty."
+                  printf '%s\n' "$BASH_SOURCE ERROR: variable typecli is empty."
                   exit 1
                fi
                ;;
@@ -141,7 +141,7 @@ parse_cmd_options() {
                typex="$2"
                shift 2
                if [ "$typex" = "" ]; then
-                  echo "$BASH_SOURCE ERROR: variable typex is empty."
+                  printf '%s\n' "$BASH_SOURCE ERROR: variable typex is empty."
                   exit 1
                fi
                ;;
@@ -159,7 +159,7 @@ parse_cmd_options() {
                message="$2"
                shift 2
                if [ "$message" = "" ]; then
-                  echo "$BASH_SOURCE ERROR: variable message is empty."
+                  printf '%s\n' "$BASH_SOURCE ERROR: variable message is empty."
                   exit 1
                fi
                ;;
@@ -201,7 +201,7 @@ parse_cmd_options() {
                progressx="$2"
                shift 2
                if [ "$progressx" = "" ]; then
-                  echo "$BASH_SOURCE ERROR: variable progressx is empty."
+                  printf '%s\n' "$BASH_SOURCE ERROR: variable progressx is empty."
                   exit 1
                fi
                ;;
@@ -266,7 +266,7 @@ parse_cmd_options() {
                break
                ;;
            -*)
-               echo "$scriptname: unknown option: $1" >&2
+               printf '%s\n' "$scriptname: unknown option: $1" >&2
                exit 1
                ;;
            *)
@@ -279,7 +279,7 @@ parse_cmd_options() {
    ## will remain in the "$@" positional parameters.
 
    if [[ ! "$@" = "" ]]; then
-      echo "$scriptname: unknown option: $1" >&2
+      printf '%s\n' "$scriptname: unknown option: $1" >&2
       exit 3
    fi
 }
@@ -389,7 +389,7 @@ write_typecli_to_file() {
    if [ "$onlyecho" = "1" ]; then
       return 0
    fi
-   echo "$1" > "$2"
+   printf '%s\n' "$1" > "$2"
 }
 
 collector() {
@@ -397,7 +397,7 @@ collector() {
 
    ## {{ --identifier
    if [ "${identifier}" = "" ]; then
-      echo "$BASH_SOURCE ERROR: variable identifier is empty."
+      printf '%s\n' "$BASH_SOURCE ERROR: variable identifier is empty."
       exit 1
    fi
    ## }}
@@ -412,20 +412,20 @@ collector() {
       #test -w "${msgcollector_run_dir}/${identifier}_icon" || true "not writeable"
       #whoami
       ## NOTE: If not writeable, AppArmor issues?
-      echo "$icon" > "${msgcollector_run_dir}/${identifier}_icon"
+      printf '%s\n' "$icon" > "${msgcollector_run_dir}/${identifier}_icon"
    fi
    ## }}
 
    ## {{ --parentpid
    if [ "$parentpid" = "" ]; then
-      #echo "$BASH_SOURCE ERROR: variable parentpid is empty."
+      #printf '%s\n' "$BASH_SOURCE ERROR: variable parentpid is empty."
       #exit 1
       ## Small hack, so not all applications get killed when pressing the cancel button
       ## such as timesync.
       parentpid="0000000000"
    fi
    ## Not at this point to avoid useless files.
-   #echo "$parentpid" > "${msgcollector_run_dir}/${identifier}_${progressbaridx}_parentpid"
+   #printf '%s\n' "$parentpid" > "${msgcollector_run_dir}/${identifier}_${progressbaridx}_parentpid"
    ## }}
 
    ## {{ --titlecli
@@ -433,28 +433,28 @@ collector() {
       ## variable $titlecli exists
       ## TODO
       true "TODO: --titlecli not yet implemented in msgdispatcher"
-      #echo "$titlecli" > "${msgcollector_run_dir}/${identifier}_titlecli"
+      #printf '%s\n' "$titlecli" > "${msgcollector_run_dir}/${identifier}_titlecli"
    fi
    ## }}
 
    ## {{ --titlex
    if [ ! -z "$titlex" ]; then
       ## variable $titlex exists
-      echo "$titlex" > "${msgcollector_run_dir}/${identifier}_titlex"
+      printf '%s\n' "$titlex" > "${msgcollector_run_dir}/${identifier}_titlex"
    fi
    ## }}
 
    ## {{ --passivepopupqueuextitle
    if [ ! -z "$passivepopupqueuextitle" ]; then
       ## variable $passivepopupqueuextitle exists
-      echo "$passivepopupqueuextitle" > "${msgcollector_run_dir}/${identifier}_passivepopupqueuextitle"
+      printf '%s\n' "$passivepopupqueuextitle" > "${msgcollector_run_dir}/${identifier}_passivepopupqueuextitle"
    fi
    ## }}
 
    ## {{ --progressbartitlex
    if [ ! -z "$progressbartitlex" ]; then
       ## variable $progressbartitlex exists
-      echo "$progressbartitlex" > "${msgcollector_run_dir}/${identifier}_${progressbaridx}_progressbartitlex"
+      printf '%s\n' "$progressbartitlex" > "${msgcollector_run_dir}/${identifier}_${progressbaridx}_progressbartitlex"
    fi
    ## }}
 
@@ -496,20 +496,20 @@ collector() {
       if [ "$old_typex" = "info" ]; then
          if [ "$typex" = "error" ]; then
             ## Upgrade from info to error.
-            echo "error" > "${msgcollector_run_dir}/${identifier}_typex"
+            printf '%s\n' "error" > "${msgcollector_run_dir}/${identifier}_typex"
          elif [ "$typex" = "warning" ]; then
             ## Upgrade from info to warning.
-            echo "warning" > "${msgcollector_run_dir}/${identifier}_typex"
+            printf '%s\n' "warning" > "${msgcollector_run_dir}/${identifier}_typex"
          fi
       elif [ "$old_typex" = "warning" ]; then
          if [ "$typex" = "error" ]; then
             ## Upgrade from warning to error.
-            echo "error" > "${msgcollector_run_dir}/${identifier}_typex"
+            printf '%s\n' "error" > "${msgcollector_run_dir}/${identifier}_typex"
          fi
       elif [ "$old_typex" = "error" ]; then
          true
       else
-         echo "$typex" > "${msgcollector_run_dir}/${identifier}_typex"
+         printf '%s\n' "$typex" > "${msgcollector_run_dir}/${identifier}_typex"
       fi
    fi
    ## }}
@@ -530,7 +530,7 @@ collector() {
          message="$(/usr/bin/sanitize-string "$message")"
          pretty_type_cli "$typecli"
          message="[$p_type] [$identifier] $message"
-         echo "$message"
+         printf '%s\n' "$message"
       fi
       append_to_file
    fi
@@ -544,7 +544,7 @@ collector() {
          message="$(/usr/bin/sanitize-string "$message")"
          pretty_type_cli "$typecli"
          message="[$p_type] [$identifier] $message"
-         echo "$message"
+         printf '%s\n' "$message"
       fi
       append_to_file
    fi
@@ -578,7 +578,7 @@ collector() {
 
       ## Debugging.
       #caller="$(ps -p $PPID)" || true
-      #echo "msgcollector: progressx: $progressx | caller: $PPID | $caller" >> /home/user/progresslog
+      #printf '%s\n' "msgcollector: progressx: $progressx | caller: $PPID | $caller" >> /home/user/progresslog
 
       if [ "$verbose" = "1" ]; then
          bash -x /usr/libexec/msgcollector/msgprogress --identifier "$identifier" --progressbaridx "${progressbaridx}" --progress "$progressx"
@@ -597,7 +597,7 @@ collector() {
 
    ## {{ --parenttty
    if [ ! -z "$parenttty" ]; then
-      echo "$parenttty" > "${msgcollector_run_dir}/${identifier}_parenttty"
+      printf '%s\n' "$parenttty" > "${msgcollector_run_dir}/${identifier}_parenttty"
    fi
    ## }}
 
@@ -607,7 +607,7 @@ collector() {
          error "Variable progressbaridx is empty."
          exit 4
       fi
-      echo "$parentpid" > "${msgcollector_run_dir}/${identifier}_${progressbaridx}_parentpid"
+      printf '%s\n' "$parentpid" > "${msgcollector_run_dir}/${identifier}_${progressbaridx}_parentpid"
       message="$(/usr/bin/sanitize-string "$message")"
       write_to_file="${msgcollector_run_dir}/${identifier}_${progressbaridx}_progressbarx"
       append_to_file
@@ -629,17 +629,17 @@ append_to_file() {
    if [ ! -z "$message" ]; then
       ## variable $message exists
       if [ "$newlinecli" = "1" ]; then
-         echo "
+         printf '%s\n' "
 $message" >> "$write_to_file"
       elif [ "$messagex" = 1 ]; then
          if [ "$nonewlinex" = "1" ]; then
-            echo "$message" >> "$write_to_file"
+            printf '%s\n' "$message" >> "$write_to_file"
          else
-            echo "$message
+            printf '%s\n' "$message
 " >> "$write_to_file"
          fi
       else
-         echo "$message" >> "$write_to_file"
+         printf '%s\n' "$message" >> "$write_to_file"
       fi
    fi
 
@@ -655,7 +655,7 @@ return_status() {
 
    ## {{ --identifier
    if [ "${identifier}" = "" ]; then
-      echo "$BASH_SOURCE ERROR: variable identifier is empty."
+      printf '%s\n' "$BASH_SOURCE ERROR: variable identifier is empty."
       exit 1
    fi
    ## }}
@@ -736,7 +736,7 @@ return_status() {
       if [ -f "$write_to_file" ]; then
          local TYPE
          TYPE="$(cat "$write_to_file")"
-         echo "$TYPE"
+         printf '%s\n' "$TYPE"
       fi
       exit 0
    fi
@@ -748,7 +748,7 @@ return_status() {
       if [ -f "$write_to_file" ]; then
          local TYPE
          TYPE="$(cat "$write_to_file")"
-         echo "$TYPE"
+         printf '%s\n' "$TYPE"
       fi
       exit 0
    fi
@@ -833,7 +833,7 @@ forgetwaitcli() {
 }
 
 ## Debugging.
-#echo "$BASH_SOURCE $@
+#printf '%s\n' "$BASH_SOURCE $@
 #" >> "/home/user/msgcollector"
 
 parse_cmd_options "$@"
