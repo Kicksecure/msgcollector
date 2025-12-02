@@ -40,7 +40,7 @@ error_handler() {
    /usr/libexec/msgcollector/msgdispatcher_dispatch_x "warning" "$0" "$msg" "0" "/usr/share/icons/icon-pack-dist/whonix.ico" &
 
    local stripped_msg
-   stripped_msg="$(/usr/bin/sanitize-string "$msg")"
+   stripped_msg="$(/usr/bin/sanitize-string -- nolimit "$msg")"
    printf '%s\n' "$stripped_msg"
    if [ ! -d ~/".msgcollector" ]; then
       mkdir --parents -- ~/".msgcollector"
