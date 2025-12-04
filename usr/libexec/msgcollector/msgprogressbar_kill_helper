@@ -23,7 +23,13 @@ check() {
 
   if ! printf '%s\n' "$variable_to_check" | unicode-show >/dev/null; then
     stecho "$0: Invalid character! variable_to_check:" >&2
-    printf '%s\n' "$variable_to_check" | unicode-show >&2
+    printf '%s\n' "'$variable_to_check'" | unicode-show >&2
+    exit 1
+  fi
+
+  if ! [[ "$1" =~ ^[0-9a-zA-Z_-]+$ ]]; then
+    stecho "Invalid character! variable_to_check:" >&2
+    stecho "'$variable_to_check'" >&2
     exit 1
   fi
 }
