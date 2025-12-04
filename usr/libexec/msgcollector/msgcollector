@@ -568,6 +568,7 @@ collector() {
    if [ "$animate" = "1" ]; then
       touch -- "${msgcollector_run_dir}/${identifier}_${progressbaridx}_progressbarx_animate"
    fi
+   ## }}
 
    ## {{ --progressx
    if [ ! "$progressx" = "" ]; then
