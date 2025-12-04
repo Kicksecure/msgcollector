@@ -29,12 +29,12 @@ check() {
 }
 
 if ! [[ -v 1 ]]; then
-   stecho "$0: missing parameter 1!" >&2
-   exit 1
+  stecho "$0: missing parameter 1!" >&2
+  exit 1
 fi
 if ! [[ -v 2 ]]; then
-   stecho "$0: missing parameter 2!" >&2
-   exit 1
+  stecho "$0: missing parameter 2!" >&2
+  exit 1
 fi
 
 identifier="$1"
