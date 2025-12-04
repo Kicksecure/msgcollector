@@ -527,7 +527,12 @@ collector() {
       write_to_file="${msgcollector_run_dir}/${identifier}_messagecli"
       if [ ! -z "$message" ]; then
          ## variable $message exists
-         message="$(sanitize-string -- nolimit "$message")"
+         ## Cannot use 'sanitize-string' as it would remove terminal colors,
+         ## such as for login security check table.
+         ## Unfortunately, the application using 'msgcollector' needs provide sanitized strings.
+         #message="$(sanitize-string -- nolimit "$message")"
+         ## Instead, "only" use 'strip-markup'.
+         message="$(strip-markup "$message")"
          pretty_type_cli "$typecli"
          message="[$p_type] [$identifier] $message"
          printf '%s\n' "$message"
