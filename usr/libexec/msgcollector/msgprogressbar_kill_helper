@@ -29,11 +29,11 @@ check() {
 }
 
 if ! [[ -v 1 ]]; then
-  stecho "$0: missing parameter 1!" >&2
+  stecho "$0: ERROR: missing parameter 1!" >&2
   exit 1
 fi
 if ! [[ -v 2 ]]; then
-  stecho "$0: missing parameter 2!" >&2
+  stecho "$0: ERROR: missing parameter 2!" >&2
   exit 1
 fi
 
@@ -44,17 +44,17 @@ check "$identifier"
 check "$progressbaridx"
 
 if [ ! -f "${msgcollector_run_dir}/${identifier}_${progressbaridx}_parentpid" ]; then
-  true "INFO: parentpid file does not exist."
+  true "$0: INFO: parentpid file does not exist."
   exit 0
 fi
 
 parentpid="$(read_integer_file "${msgcollector_run_dir}/${identifier}_${progressbaridx}_parentpid")"
 
-true "parentpid: '$parentpid'"
+true "$0: INFO: parentpid: '$parentpid'"
 
 if ps -p "$parentpid" &>/dev/null; then
-  true "Sending signal sigusr2 to $parentpid."
+  true "$0: INFO: Sending signal sigusr2 to $parentpid."
   kill -s sigusr2 "$parentpid"
 else
-  true "Not sending signal sigusr2 to parentpid $parentpid, because it is already terminated."
+  true "$0: INFO: Not sending signal sigusr2 to parentpid $parentpid, because it is already terminated."
 fi
