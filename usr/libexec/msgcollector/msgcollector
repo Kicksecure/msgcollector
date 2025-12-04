@@ -527,7 +527,7 @@ collector() {
       write_to_file="${msgcollector_run_dir}/${identifier}_messagecli"
       if [ ! -z "$message" ]; then
          ## variable $message exists
-         message="$(/usr/bin/sanitize-string -- nolimit "$message")"
+         message="$(sanitize-string -- nolimit "$message")"
          pretty_type_cli "$typecli"
          message="[$p_type] [$identifier] $message"
          printf '%s\n' "$message"
@@ -541,7 +541,7 @@ collector() {
       write_to_file="${msgcollector_run_dir}/${identifier}_waitmessagecli"
       if [ ! -z "$message" ]; then
          ## variable $message exists
-         message="$(/usr/bin/sanitize-string -- nolimit "$message")"
+         message="$(sanitize-string -- nolimit "$message")"
          pretty_type_cli "$typecli"
          message="[$p_type] [$identifier] $message"
          printf '%s\n' "$message"
@@ -555,7 +555,7 @@ collector() {
       if [ "$message" = "" ]; then
          message="message was empty."
       fi
-      message="$(/usr/bin/sanitize-string -- nolimit "$message")"
+      message="$(sanitize-string -- nolimit "$message")"
       if [ "$message" = "" ]; then
          message="message was empty after sanitize-string."
       fi
@@ -608,7 +608,7 @@ collector() {
          exit 4
       fi
       printf '%s\n' "$parentpid" > "${msgcollector_run_dir}/${identifier}_${progressbaridx}_parentpid"
-      message="$(/usr/bin/sanitize-string -- nolimit "$message")"
+      message="$(sanitize-string -- nolimit "$message")"
       write_to_file="${msgcollector_run_dir}/${identifier}_${progressbaridx}_progressbarx"
       append_to_file
 
