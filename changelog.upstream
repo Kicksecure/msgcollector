@@ -1,3 +1,22 @@
+commit ffce50d921e4a40a19a67d02f948fb0a73a9e722
+Merge: 716b4c6 96403e2
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Dec 19 03:37:37 2025 -0500
+
+    Merge remote-tracking branch 'ArrayBolt3/arraybolt3/trixie'
+
+commit 96403e23a050f91ee2dc3606eebf4431fbaf9b51
+Author: Aaron Rainbolt <arraybolt3@ubuntu.com>
+Date:   Wed Dec 17 19:10:42 2025 -0600
+
+    Repeatedly try to signal to systemd that msgdispatcher is ready until it works
+
+commit 716b4c68b41533b46d74b91f2fcecc96ecb378c4
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Dec 4 09:31:32 2025 +0000
+
+    bumped changelog version
+
 commit 8e80e8b97014b709910a4c61c7b5fc118d4312c1
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Thu Dec 4 04:30:17 2025 -0500
