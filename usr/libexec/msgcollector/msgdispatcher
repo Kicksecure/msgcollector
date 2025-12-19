@@ -422,7 +422,9 @@ msgdispatcher_loop() {
    #systemctl --user --wait is-system-running &>/dev/null || true
 
    ## systemd-notify sometimes exists non-zero. Unknown how to reproduce.
-   "${systemd_notify[@]}" --pid="$$" --ready &>/dev/null || true
+   while ! "${systemd_notify[@]}" --pid="$$" --ready &>/dev/null; do
+      light_sleep 1
+   done
    inotifywait_loop
 
    while true; do
