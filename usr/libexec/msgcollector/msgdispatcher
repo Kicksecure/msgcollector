@@ -9,8 +9,6 @@ set -o pipefail
 set -o errtrace
 #trap 'sleep 1' DEBUG
 
-source /usr/libexec/helper-scripts/light_sleep.bsh
-
 error_handler() {
    local last_exit_code="$?"
    if [ ! "$1" = "" ]; then
@@ -34,18 +32,19 @@ error_handler() {
 <br></br>last_exit_code: '<code>$last_exit_code</code>'
 </p>"
 
-   ## Popup window with the message above.
-   ## /usr/share/icons/icon-pack-dist/whonix.ico might not exist, but
-   ## fortunately msgdispatcher_dispatch_x works anyway.
-   /usr/libexec/msgcollector/msgdispatcher_dispatch_x "warning" "$0" "$msg" "0" "/usr/share/icons/icon-pack-dist/whonix.ico" &
-
    local stripped_msg
    stripped_msg="$(sanitize-string -- nolimit "$msg")"
    printf '%s\n' "$stripped_msg"
+
    if [ ! -d ~/".msgcollector" ]; then
       mkdir --parents -- ~/".msgcollector"
    fi
    echo "$0: BASH_COMMAND: $BASH_COMMAND | exit_code: $last_exit_code" | sponge -a -- ~/".msgcollector/msgdispatcher-error.log" >/dev/null
+
+   ## Popup window with the message above.
+   ## /usr/share/icons/icon-pack-dist/whonix.ico might not exist, but
+   ## fortunately msgdispatcher_dispatch_x works anyway.
+   /usr/libexec/msgcollector/msgdispatcher_dispatch_x "warning" "$0" "$msg" "0" "/usr/share/icons/icon-pack-dist/whonix.ico" &
 
    true
 }
@@ -165,7 +164,7 @@ dispatch_cli() {
 
    if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_parenttty" ]; then
       local parenttty
-      parenttty="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_parenttty")"
+      parenttty="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_parenttty")" || true
       if [ "$parenttty" = "/dev/tty1" ]; then
          ## When for example 'systemcheck' was run in 'tty1', then messages were
          ## already echoed by 'msgcollector'. No need to dispatch them again.
@@ -180,7 +179,7 @@ dispatch_cli() {
 dispatch_x_active() {
    local icon
    if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_icon" ]; then
-      icon="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_icon")"
+      icon="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_icon")" || true
    else
       ## Fallback.
       if [ -f "/usr/share/icons/gnome/24x24/status/info.png" ]; then
@@ -251,9 +250,9 @@ msgdispatcher_handler() {
       if [ "$file_name" = "${msgcollector_run_dir}/${msgdispatcher_identifier}_messagex_done" ]; then
          if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_messagex" ]; then
             true "INFO: messagex file exists."
-            msg="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_messagex")"
-            title="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_titlex")"
-            type="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_typex")"
+            msg="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_messagex")" || true
+            title="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_titlex")" || true
+            type="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_typex")" || true
             dispatch_x_active "$type" "$msg"
             msgdispatcher_delete_wrapper "messagex_done"
             msgdispatcher_delete_wrapper "titlex"
@@ -270,10 +269,10 @@ msgdispatcher_handler() {
       fi
       if [ "$file_name" = "${msgcollector_run_dir}/${msgdispatcher_identifier}_passivepopupqueuex_done" ]; then
          if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_passivepopupqueuex" ]; then
-            msg="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_passivepopupqueuex")"
-            title="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_passivepopupqueuextitle")"
+            msg="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_passivepopupqueuex")" || true
+            title="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_passivepopupqueuextitle")" || true
             ## TODO: do not use "_typex" to avoid conflicts with "messagex_done".
-            #type="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_typex")"
+            #type="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_typex")" || true
             type="info"
             if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_forceactive" ]; then
                ## TODO: --forceactive not yet implemented.
@@ -310,10 +309,10 @@ msgdispatcher_handler() {
 #             fi
 #             if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_${progressbaridx}_progressbartitlex" ]; then
 #                local progressbartitlex
-#                progressbartitlex="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_${progressbaridx}_progressbartitlex")"
+#                progressbartitlex="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_${progressbaridx}_progressbartitlex")" || true
 #             fi
 #             if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_${progressbaridx}_progressbarx" ]; then
-#                progressbarx="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_${progressbaridx}_progressbarx")"
+#                progressbarx="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_${progressbaridx}_progressbarx")" || true
 #             fi
 #
 #             unset animate
@@ -331,8 +330,8 @@ msgdispatcher_handler() {
       if [ "$file_name" = "${msgcollector_run_dir}/${msgdispatcher_identifier}_waitmessagecli_done" ]; then
          if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_waitmessagecli" ]; then
             true "INFO: waitmessagecli file exists."
-            msg="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_waitmessagecli")"
-            type="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_typecli")"
+            msg="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_waitmessagecli")" || true
+            type="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_typecli")" || true
             dispatch_cli "$msg"
             msgdispatcher_delete_wrapper "waitmessagecli_done"
             msgdispatcher_delete_wrapper "waitmessagecli"
@@ -345,8 +344,8 @@ msgdispatcher_handler() {
       fi
       if [ "$file_name" = "${msgcollector_run_dir}/${msgdispatcher_identifier}_messagecli_done" ]; then
          if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_messagecli" ]; then
-            msg="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_messagecli")"
-            type="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_typecli")"
+            msg="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_messagecli")" || true
+            type="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_typecli")" || true
             dispatch_cli "$msg"
             msgdispatcher_delete_wrapper "messagecli_done"
             msgdispatcher_delete_wrapper "messagecli"
@@ -435,6 +434,8 @@ msgdispatcher_loop() {
       kill -0 -- "$inotifywait_subshell_pid"
    done
 }
+
+source /usr/libexec/helper-scripts/light_sleep.bsh
 
 ## sets: systemd_notify
 source /usr/libexec/helper-scripts/systemd-notify.bsh
