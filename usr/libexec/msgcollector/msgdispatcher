@@ -373,6 +373,7 @@ msgdispatcher_delete_wrapper() {
    validate_safe_filename "file_name"
 
    full_path="${msgcollector_run_dir}/${msgdispatcher_identifier}_${msgdispatcher_appendix}"
+   check_is_not_empty_and_only_one_line "full_path"
 
    if test -f "$full_path" ; then
       safe-rm -f -- "$full_path"
