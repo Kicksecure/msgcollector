@@ -227,7 +227,7 @@ inotifywait_setup() {
 parse_existing_files() {
    for file_name in "$inotifywait_folder/"*; do
       true "parse_existing_files: file_name: $file_name"
-      msgdispatcher_handler
+      msgdispatcher_handler || true
    done
 }
 
@@ -277,9 +277,9 @@ msgdispatcher_handler() {
             if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_forceactive" ]; then
                ## TODO: --forceactive not yet implemented.
                #dispatch_x_active "$type" "$msg"
-               dispatch_x_passive "$type" "$title" "$msg"
+               dispatch_x_passive "$type" "$title" "$msg" || true
             else
-               dispatch_x_passive "$type" "$title" "$msg"
+               dispatch_x_passive "$type" "$title" "$msg" || true
             fi
             msgdispatcher_delete_wrapper "forceactive"
             msgdispatcher_delete_wrapper "passivepopupqueuex_done"
@@ -402,7 +402,7 @@ inotifywait_loop() {
    ## Launching inotifywait_loop into the background.
    while read -r -- file_name; do
       true "file_name: $file_name"
-      msgdispatcher_handler
+      msgdispatcher_handler || true
    done < "$inotifywait_subshell_fifo" &
    inotifywait_subshell_pid="$!"
 }
