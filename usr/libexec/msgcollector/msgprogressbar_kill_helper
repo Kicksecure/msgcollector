@@ -18,8 +18,10 @@ source /usr/libexec/msgcollector/msgcollector_shared
 folder_init
 
 check() {
+  local variable_to_check
   variable_to_check="$1"
-  check_is_not_empty_and_only_one_line "variable_to_check"
+
+  check_is_not_empty_and_only_one_line variable_to_check
 
   if ! printf '%s\n' "$variable_to_check" | unicode-show >/dev/null; then
     stecho "$0: Invalid character! variable_to_check:" >&2
@@ -27,11 +29,7 @@ check() {
     exit 1
   fi
 
-  if ! [[ "$1" =~ ^[0-9a-zA-Z_-]+$ ]]; then
-    stecho "Invalid character! variable_to_check:" >&2
-    stecho "'$variable_to_check'" >&2
-    exit 1
-  fi
+  check_is_alpha_numeric variable_to_check
 }
 
 if ! [[ -v 1 ]]; then
@@ -49,12 +47,15 @@ progressbaridx="$2"
 check "$identifier"
 check "$progressbaridx"
 
-if [ ! -f "${msgcollector_run_dir}/${identifier}_${progressbaridx}_parentpid" ]; then
+full_path="${msgcollector_run_dir}/${identifier}_${progressbaridx}_parentpid"
+check_is_not_empty_and_only_one_line full_path
+
+if [ ! -f "$full_path" ]; then
   true "$0: INFO: parentpid file does not exist."
   exit 0
 fi
 
-parentpid="$(read_integer_file "${msgcollector_run_dir}/${identifier}_${progressbaridx}_parentpid")"
+parentpid="$(read_integer_file "$full_path")"
 
 true "$0: INFO: parentpid: '$parentpid'"
 
