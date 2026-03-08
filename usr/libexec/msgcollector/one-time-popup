@@ -4,94 +4,242 @@
 ## Copyright (C) 2014 - 2025 ENCRYPTED SUPPORT LLC <adrelanos@whonix.org>
 ## See the file COPYING for copying conditions.
 
+# pylint: disable=broad-exception-caught,invalid-name
+
 """
-This script creates a one-time popup message dialog using PyQt5. The popup will not be shown again if the user selects "Do not show this message again."
+This script creates a one-time popup message dialog using PyQt5. The popup
+will not be shown again if the user selects "Do not show this message again."
 
 Usage:
 /usr/libexec/msgcollector/one-time-popup <status_file> <title> <message>
 
 Arguments:
-1. status_file: Path to the status file used to track if the message should be shown again
+1. status_file: Path to the status file used to track if the message should be
+  shown again
 2. title: The window title
 3. message: The main message text
 
 Example:
-/usr/libexec/msgcollector/one-time-popup ~/testfolder/status-file "Test Title" "Test Message"
+/usr/libexec/msgcollector/one-time-popup \
+  ~/testfolder/status-file \
+  "Test Title" \
+  "Test Message"
 
-For more information, visit: https://forums.whonix.org/t/do-not-show-this-message-again-generic-one-time-popup/8066
+For more information, visit:
+https://forums.whonix.org/t/do-not-show-this-message-again-generic-one-time-popup/8066
 """
 
+import argparse
 import sys
 import signal
-import os
+import subprocess
+import traceback
 from pathlib import Path
-import argparse
-from PyQt5 import QtCore, QtWidgets
+from typing import NoReturn
+from types import FrameType
 
-def signal_handler(sig, frame):
-    sys.exit(128 + sig)
+from PyQt5 import QtCore, QtWidgets, QtGui
 
-class Notice(QtWidgets.QDialog):
-    def __init__(self, status_file, title, message):
-        super(Notice, self).__init__()
-        self.status_file = status_file
-        self.title = title
-        self.message = message
-        self.initUI()
 
-    def initUI(self):
-        cb = QtWidgets.QCheckBox('Do not show this message again.', self)
-        cb.move(25, 230)
-        cb.stateChanged.connect(self.checkState)
+class PopupWindow(QtWidgets.QDialog):
+    """
+    Shows an 'invasive' popup window for notifications that are important.
+    """
 
-        OKbtn = QtWidgets.QPushButton('OK', self)
-        OKbtn.clicked.connect(QtCore.QCoreApplication.instance().quit)
-        OKbtn.resize(OKbtn.sizeHint())
-        OKbtn.move(270, 260)
+    def __init__(
+        self,
+        status_path: Path,
+        title: str,
+        message: str,
+        parent: QtWidgets.QDialog | None = None,
+    ) -> None:
+        """
+        Creates and displays the popup message.
+        """
 
-        lb = QtWidgets.QLabel(self.message, self)
-        lb.setGeometry(0, 0, 550, 190)  # Window size -110.
-        lb.setWordWrap(True)
-        lb.move(25, 20)
+        self.status_path: Path = status_path
 
+        super().__init__(parent)
+        self.core_layout: QtWidgets.QVBoxLayout = QtWidgets.QVBoxLayout()
+
+        self.message_label: QtWidgets.QLabel = QtWidgets.QLabel(message)
+        self.message_label.setWordWrap(True)
+        self.core_layout.addWidget(self.message_label)
+
+        self.core_layout.addStretch()
+
+        self.check_box: QtWidgets.QCheckBox = QtWidgets.QCheckBox(
+            "Do not show this message again."
+        )
+        self.core_layout.addWidget(self.check_box)
+
+        self.button_layout: QtWidgets.QHBoxLayout = QtWidgets.QHBoxLayout()
+        self.button_layout.addStretch()
+        self.ok_button: QtWidgets.QPushButton = QtWidgets.QPushButton("OK")
+        self.ok_button.clicked.connect(self.on_ok_clicked)
+        self.button_layout.addWidget(self.ok_button)
+        self.button_layout.addStretch()
+        self.core_layout.addLayout(self.button_layout)
+
+        self.setWindowTitle(title)
+        self.setLayout(self.core_layout)
         self.resize(600, 300)
-        self.setWindowTitle(self.title)
         self.show()
 
-    def checkState(self, state):
-        status_folder = os.path.dirname(self.status_file)
-        Path(status_folder).mkdir(parents=True, exist_ok=True)
-        with open(self.status_file, "w") as f:
-            f.write(str(state))
+    # Overrides QDialog.closeEvent
+    # pylint: disable=unused-argument
+    def closeEvent(self, e: QtGui.QCloseEvent | None) -> None:
+        """
+        Treats a window close the same as an 'OK' button press.
+        """
 
-    def center(self):
-        qr = self.frameGeometry()
-        cp = QtWidgets.QDesktopWidget().availableGeometry().center()
-        qr.moveCenter(cp)
-        self.move(qr.topLeft())
+        self.on_ok_clicked()
 
-def main():
-    parser = argparse.ArgumentParser(description="Create a one-time popup message dialog using PyQt5.")
-    parser.add_argument('status_file', help="Path to the status file used to track if the message should be shown again")
-    parser.add_argument('title', help="The window title")
-    parser.add_argument('message', help="The main message text")
+    def on_ok_clicked(self) -> None:
+        """
+        Writes the checkbox state and exits when the 'OK' button is clicked.
+        """
 
-    args = parser.parse_args()
+        try:
+            if self.check_box.isChecked():
+                self.status_path.write_text("2\n", encoding="utf-8")
+            else:
+                self.status_path.write_text("0\n", encoding="utf-8")
+        except Exception:
+            print(
+                "ERROR: Unable to write checkbox state to "
+                + f"'{self.status_path}'! Details:",
+                file=sys.stderr,
+            )
+            traceback.print_exc(file=sys.stderr)
+            sys.exit(1)
+        sys.exit(0)
+
+
+# pylint: disable=unused-argument
+def signal_handler(sig: int, frame: FrameType | None) -> None:
+    """
+    Handle SIGINT and SIGTERM.
+    """
+
+    sys.exit(128 + sig)
+
+
+def show_passive_popup(status_path: Path, title: str, message: str) -> None:
+    """
+    Displays a passive popup.
+    """
+
+    try:
+        notify_send_rslt: str = subprocess.run(
+            [
+                "/usr/bin/notify-send",
+                "--action=SUPPRESS=Don't show again",
+                "--app-name=one-time-popup",
+                title,
+                message,
+            ],
+            check=True,
+            capture_output=True,
+            encoding="utf-8",
+        ).stdout.strip()
+    except Exception:
+        print(
+            "ERROR: Unable to show notify-send popup!",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+    try:
+        if notify_send_rslt == "SUPPRESS":
+            status_path.write_text("2\n", encoding="utf-8")
+        else:
+            status_path.write_text("0\n", encoding="utf-8")
+    except Exception:
+        print(
+            "ERROR: Unable to write checkbox state to "
+            + f"'{status_path}'! Details:",
+            file=sys.stderr,
+        )
+        traceback.print_exc(file=sys.stderr)
+        sys.exit(1)
+    sys.exit(0)
+
+
+def main() -> NoReturn:
+    """
+    Main function.
+    """
+
+    parser: argparse.ArgumentParser = argparse.ArgumentParser(
+        description="Create a one-time popup message dialog using PyQt5."
+    )
+    parser.add_argument(
+        "--passive",
+        help="Display a passive notification rather than a window",
+        action="store_true",
+    )
+    parser.add_argument(
+        "status_file",
+        help=(
+            "Path to the status file used to track if the message should be "
+            + "shown again"
+        ),
+    )
+    parser.add_argument("title", help="The window title")
+    parser.add_argument("message", help="The main message text")
+
+    args: argparse.Namespace = parser.parse_args()
 
     # Check if the message has already been dismissed
-    if os.path.exists(args.status_file):
-        sys.exit()
+    status_path: Path = Path(args.status_file)
+    if status_path.is_file():
+        try:
+            status_path_contents: str = status_path.read_text(
+                encoding="utf-8"
+            ).strip()
+        except Exception:
+            print(
+                "ERROR: Unable to check contents of status file "
+                + f"'{status_path}'! Details:",
+                file=sys.stderr,
+            )
+            traceback.print_exc(file=sys.stderr)
+            sys.exit(1)
+        ## "2" is the string value written to the file when the checkbox is
+        ## checked. In Qt5, this corresponds to Qt::CheckState::Checked.
+        ## Ideally, we would have used a more descriptive string here, but for
+        ## backwards compatibility reasons, "2" is what we use for "checked"
+        ## and "0" is what we use for "unchecked".
+        if status_path_contents == "2":
+            print(
+                f"Status file '{status_path}' exists and indicates the "
+                + "popup has been silenced, therefore not showing popup, OK."
+            )
+            sys.exit(0)
+    elif status_path.exists():
+        print(f"ERROR: '{status_path}' exists but is not a file!")
+        sys.exit(1)
 
-    app = QtWidgets.QApplication(sys.argv)
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
 
-    timer = QtCore.QTimer()
-    timer.start(500)
-    timer.timeout.connect(lambda: None)
+    if args.passive:
+        show_passive_popup(status_path, args.title, args.message)
+    else:
+        app: QtWidgets.QApplication = QtWidgets.QApplication(sys.argv)
 
-    ex = Notice(args.status_file, args.title, args.message)
-    app.exec_()
+        ## Hack to get the signal handler to trigger when a signal is received
+        timer: QtCore.QTimer = QtCore.QTimer()
+        timer.timeout.connect(lambda: None)
+        timer.start(500)
 
-if __name__ == '__main__':
+        # pylint: disable=unused-variable
+        popup_window: PopupWindow = PopupWindow(
+            status_path, args.title, args.message
+        )
+        app.exec_()
+    sys.exit(0)
+
+
+if __name__ == "__main__":
     main()
