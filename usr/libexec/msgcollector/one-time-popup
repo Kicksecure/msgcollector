@@ -101,6 +101,7 @@ class PopupWindow(QtWidgets.QDialog):
         """
 
         try:
+            self.status_path.parent.mkdir(parents=True, exist_ok=True)
             if self.check_box.isChecked():
                 self.status_path.write_text("2\n", encoding="utf-8")
             else:
@@ -150,6 +151,7 @@ def show_passive_popup(status_path: Path, title: str, message: str) -> None:
         )
         sys.exit(1)
     try:
+        status_path.parent.mkdir(parents=True, exist_ok=True)
         if notify_send_rslt == "SUPPRESS":
             status_path.write_text("2\n", encoding="utf-8")
         else:
