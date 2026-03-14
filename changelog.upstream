@@ -1,3 +1,36 @@
+commit 4cae1b2526931684569215e1792cad092a025d97
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Mar 14 06:32:19 2026 -0400
+
+    fix
+
+commit a932ec04c3b0a55edc85dcb9f26e003c9e5faf55
+Merge: 03651fe 8e68670
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Mar 14 06:25:09 2026 -0400
+
+    Merge remote-tracking branch 'ArrayBolt3/arraybolt3/trixie'
+
+commit 8e686700dc8babb1f4637e564a4c3adf21f15655
+Author: Aaron Rainbolt <arraybolt3@gmail.com>
+Date:   Sun Mar 8 14:02:32 2026 -0400
+
+    Rewrite one-time-popup, add passive notification support
+    
+    The previous version did not use layouts, which has historically been
+    problematic. It also would write a status file as soon as the user
+    checked or unchecked the "Do not show again" checkbox, and then did not
+    check the status file's value, meaning that if a user checked and
+    unchecked the box and then closed the popup, the popup would not be
+    shown again. The new version fixes these issues, passes pylint and mypy
+    checks, and has passive notification support.
+
+commit 03651feee6eb91d4fcbd5fe7218b1f35705a801f
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Feb 10 19:46:00 2026 +0000
+
+    bumped changelog version
+
 commit 6fb85de8ecb82cceb52c14bd0b89c08830f7f1b1
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Tue Feb 10 14:44:12 2026 -0500
