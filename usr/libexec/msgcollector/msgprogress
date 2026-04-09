@@ -89,7 +89,8 @@ progress_bar() {
       true "did already echo to progress_txt_file"
    else
       did_echo="1"
-      timeout 1 /bin/bash -c 'echo "$1"' -- "$progress" > "$progress_txt_file" || true
+      ## Use printf with positional arg to avoid shell injection via $progress.
+      timeout 1 /bin/bash -c 'printf "%s\n" "$1"' -- "$progress" > "$progress_txt_file" || true
    fi
 
    if [ -p "${msgcollector_run_dir}/${identifier}_${progressbaridx}_fifo" ]; then
@@ -103,7 +104,8 @@ progress_bar() {
             true "yad is running."
             ## For extra security against freezing while trying to write to a non-existing pipe, let's use timeout.
             ## || true to catch an error if the pipe no longer exists.
-            timeout 1 /bin/bash -c 'echo "$1"' -- "$progress" > "$fifo" || true
+            ## Use printf with positional arg to avoid shell injection via $progress.
+            timeout 1 /bin/bash -c 'printf "%s\n" "$1"' -- "$progress" > "$fifo" || true
             ## Debugging.
             #caller="$(ps -p $PPID)" || true
             #echo "progress: $progress | caller: $PPID | $caller" >> /home/user/progresslog
