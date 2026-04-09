@@ -210,9 +210,9 @@ start_progress_bar() {
    fi
 
    ## Clean up eventual old progress bar.
-   "${timeout_command[@]}" safe-rm --force "$fifo"
+   "${timeout_command[@]}" safe-rm --force -- "$fifo"
 
-   "${timeout_command[@]}" mkfifo "$fifo"
+   "${timeout_command[@]}" mkfifo -- "$fifo"
 
    ## sanity test
    test -p "$fifo"

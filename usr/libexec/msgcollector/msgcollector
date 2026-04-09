@@ -218,7 +218,7 @@ parse_cmd_options() {
                shift
                ;;
            --animate)
-               animate="1"
+               animate="--animate"
                shift
                ;;
            --nonewlinex)
@@ -570,7 +570,7 @@ collector() {
    ## }}
 
    ## {{ --animate
-   if [ "$animate" = "1" ]; then
+   if [ "$animate" = "--animate" ]; then
       touch -- "${msgcollector_run_dir}/${identifier}_${progressbaridx}_progressbarx_animate"
    fi
    ## }}

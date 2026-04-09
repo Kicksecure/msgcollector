@@ -145,7 +145,7 @@ output_func() {
          ## aren't removing 1 from ${#message_str} here.
          (( msg_idx = ${#message_str} )) || true
 
-         if [ "${message_str:msg_idx:1}" = $'\n' ]; then
+         if [ "${message_str:msg_idx-1:1}" = $'\n' ]; then
            ## OK, but if the last character is a newline we actually do want
            ## to leave that off.
            (( msg_idx-- )) || true
