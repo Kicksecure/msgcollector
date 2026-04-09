@@ -108,7 +108,7 @@ def main():
 
     args = parser.parse_args()
 
-    if not args.filename and args.section:
+    if not args.filename or not args.section:
         parser.usage()
         sys.exit(1)
 
