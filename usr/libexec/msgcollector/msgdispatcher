@@ -11,6 +11,7 @@ set -o errtrace
 
 error_handler() {
    local last_exit_code="$?"
+   trap - ERR
    if [ ! "$1" = "" ]; then
       error_text="$1"
    else
