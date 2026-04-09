@@ -335,6 +335,7 @@ msgdispatcher_handler() {
             dispatch_cli "$msg"
             msgdispatcher_delete_wrapper "waitmessagecli_done"
             msgdispatcher_delete_wrapper "waitmessagecli"
+            msgdispatcher_delete_wrapper "typecli"
          else
             true "INFO: waitmessagecli file does NOT exist."
             msgdispatcher_delete_wrapper "waitmessagecli_done"
@@ -349,6 +350,7 @@ msgdispatcher_handler() {
             dispatch_cli "$msg"
             msgdispatcher_delete_wrapper "messagecli_done"
             msgdispatcher_delete_wrapper "messagecli"
+            msgdispatcher_delete_wrapper "typecli"
          else
             msgdispatcher_delete_wrapper "messagecli_done"
          fi
