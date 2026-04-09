@@ -99,7 +99,7 @@ parse_cmd_options() {
    ## Thanks to:
    ## http://mywiki.wooledge.org/BashFAQ/035
 
-   true "${cyan}INFO:${cyan} parse_cmd_options msgcollector"
+   true "${cyan}INFO:${reset} parse_cmd_options msgcollector"
 
    while true; do
        case $1 in
@@ -791,8 +791,8 @@ forget() {
       "${msgcollector_run_dir}/${identifier}_${progressbaridx}_progressbartitlex"
       "${msgcollector_run_dir}/${identifier}_typecli"
       "${msgcollector_run_dir}/${identifier}_typex"
-      "${msgcollector_run_dir}/${identifier}_progressbarx_done"
-      "${msgcollector_run_dir}/${identifier}_progressbarx"
+      "${msgcollector_run_dir}/${identifier}_${progressbaridx}_progressbarx_done"
+      "${msgcollector_run_dir}/${identifier}_${progressbaridx}_progressbarx"
       "${msgcollector_run_dir}/${identifier}_passivepopupqueuex_done"
       "${msgcollector_run_dir}/${identifier}_passivepopupqueuex"
       "${msgcollector_run_dir}/${identifier}_messagex_done"
@@ -832,10 +832,10 @@ forgetwaitcli() {
    local file_name
    for file_name in "${file_list[@]}"; do
       if [ -e "$file_name" ]; then
-         safe-rm --force "$file_name"
+         safe-rm --force -- "$file_name"
       fi
    done
-   unset local file_name
+   unset file_name
 }
 
 ## Debugging.

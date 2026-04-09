@@ -60,7 +60,7 @@ class Messages():
 
                 self.icon = section.get('icon', None)
 
-                language = section.get(self.language, DEFAULT_LANG)
+                language = section.get(self.language, section.get(DEFAULT_LANG, {}))
 
                 self.title = language.get('title', None)
                 self.message = language.get('message', None)
