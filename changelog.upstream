@@ -1,3 +1,28 @@
+commit fa73cc38f738939c90dc56397240920ad84ea574
+Merge: 9cd6581 fc69e45
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Apr 11 03:38:51 2026 -0400
+
+    Merge remote-tracking branch 'ArrayBolt3/arraybolt3/trixie'
+
+commit fc69e4582ad00bd08a842d076d7e9d091fb088f9
+Author: Aaron Rainbolt <arraybolt3@gmail.com>
+Date:   Fri Apr 10 18:13:52 2026 -0400
+
+    Remove Emacs modelines
+
+commit 00765f407bb2022065c6c05b613e7d825dd3527c
+Author: Aaron Rainbolt <arraybolt3@gmail.com>
+Date:   Fri Apr 10 16:53:32 2026 -0400
+
+    Remove recursive flag from inotifywait in msgdispatcher (from Claude Code)
+
+commit 9cd6581e67afec92e4aa20fa85337c6208f82bde
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Mar 14 12:08:07 2026 +0000
+
+    bumped changelog version
+
 commit 4cae1b2526931684569215e1792cad092a025d97
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Sat Mar 14 06:32:19 2026 -0400
