@@ -220,7 +220,7 @@ inotifywait_setup() {
    safe-rm --force -- "$inotifywait_subshell_fifo"
    mkfifo -- "$inotifywait_subshell_fifo"
    ## Start inotifywait in a sub process to continuously monitor the directory.
-   inotifywait --quiet --recursive --monitor --event close_write --format "%w%f" -- "$inotifywait_folder" > "$inotifywait_subshell_fifo" &
+   inotifywait --quiet --monitor --event close_write --format "%w%f" -- "$inotifywait_folder" > "$inotifywait_subshell_fifo" &
    inotifywait_main_pid="$!"
 }
 
