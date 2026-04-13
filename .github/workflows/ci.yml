@@ -1,0 +1,162 @@
+## Copyright (C) 2012 - 2025 ENCRYPTED SUPPORT LLC <adrelanos@whonix.org>
+## See the file COPYING for copying conditions.
+
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  shellcheck:
+    name: ShellCheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install ShellCheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+
+      - name: Run ShellCheck on Bash scripts
+        run: |
+          exit_code=0
+          while IFS= read -r -d '' file; do
+            head_line="$(head -1 "$file")"
+            case "$head_line" in
+              *"/bin/bash"*|*"/bin/sh"*)
+                echo "Checking: $file"
+                ## SC1091: Not following sourced files (external dependencies).
+                ## SC1090: Not following dynamically sourced files.
+                ## SC2034: Variable appears unused (many are used by sourcing scripts).
+                ## SC2154: Variable referenced but not assigned (set by sourcing scripts).
+                ## SC2086: Double quote to prevent globbing - some unquoted vars are intentional.
+                shellcheck --shell=bash \
+                  --exclude=SC1091,SC1090,SC2034,SC2154,SC2086 \
+                  --severity=warning \
+                  "$file" || exit_code=1
+                ;;
+            esac
+          done < <(find usr/libexec/msgcollector etc/profile.d -type f -print0 2>/dev/null)
+          exit "$exit_code"
+
+  python-lint:
+    name: Python Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install linters
+        run: pip install pycodestyle pyflakes
+
+      - name: Run pyflakes
+        run: |
+          exit_code=0
+          for file in usr/libexec/msgcollector/alert \
+                      usr/libexec/msgcollector/generic_gui_message \
+                      usr/libexec/msgcollector/msgdispatcher_dispatch_x \
+                      usr/libexec/msgcollector/one-time-popup \
+                      usr/libexec/msgcollector/tb_updater_gui \
+                      usr/libexec/msgcollector/br_add; do
+            echo "Checking: $file"
+            pyflakes "$file" || exit_code=1
+          done
+          exit "$exit_code"
+
+      - name: Run pycodestyle
+        run: |
+          exit_code=0
+          for file in usr/libexec/msgcollector/alert \
+                      usr/libexec/msgcollector/generic_gui_message \
+                      usr/libexec/msgcollector/msgdispatcher_dispatch_x \
+                      usr/libexec/msgcollector/one-time-popup \
+                      usr/libexec/msgcollector/tb_updater_gui \
+                      usr/libexec/msgcollector/br_add; do
+            echo "Checking: $file"
+            ## E501: line too long - many existing lines exceed 79 chars.
+            ## W503/W504: line break before/after binary operator.
+            pycodestyle --max-line-length=120 --ignore=E501,W503,W504 "$file" || exit_code=1
+          done
+          exit "$exit_code"
+
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            bash \
+            make \
+            safe-rm \
+            moreutils \
+            procps \
+            inotify-tools
+
+      - name: Install helper-scripts
+        run: |
+          git clone --depth=1 https://github.com/Kicksecure/helper-scripts.git /tmp/helper-scripts
+          git clone --depth=1 https://github.com/Kicksecure/genmkfile.git /tmp/genmkfile
+          ## genmkfile is needed by helper-scripts for 'make install'.
+          sudo cp /tmp/genmkfile/usr/bin/genmkfile /usr/bin/genmkfile
+          sudo chmod +x /usr/bin/genmkfile
+          cd /tmp/helper-scripts
+          sudo genmkfile install
+
+      - name: Install msgcollector scripts
+        run: |
+          ## Install to system paths so scripts can source each other.
+          sudo cp -r usr/libexec/msgcollector /usr/libexec/msgcollector
+
+      - name: Set up run directory
+        run: |
+          sudo mkdir -p "/run/user/$(id -u)/msgcollector"
+          sudo chown -R "$(id -u):$(id -g)" "/run/user/$(id -u)"
+
+      - name: Run unit tests
+        run: bash tests/unit-tests.bash
+
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            bash \
+            make \
+            safe-rm \
+            moreutils \
+            procps \
+            inotify-tools
+
+      - name: Install helper-scripts
+        run: |
+          git clone --depth=1 https://github.com/Kicksecure/helper-scripts.git /tmp/helper-scripts
+          git clone --depth=1 https://github.com/Kicksecure/genmkfile.git /tmp/genmkfile
+          sudo cp /tmp/genmkfile/usr/bin/genmkfile /usr/bin/genmkfile
+          sudo chmod +x /usr/bin/genmkfile
+          cd /tmp/helper-scripts
+          sudo genmkfile install
+
+      - name: Install msgcollector scripts
+        run: |
+          sudo cp -r usr/libexec/msgcollector /usr/libexec/msgcollector
+
+      - name: Set up run directory
+        run: |
+          sudo mkdir -p "/run/user/$(id -u)/msgcollector"
+          sudo chown -R "$(id -u):$(id -g)" "/run/user/$(id -u)"
+
+      - name: Run integration tests
+        run: bash tests/integration-tests.bash

@@ -50,8 +50,9 @@ msgdispatcher_init() {
    ## To further complicate things, Bash string processing works based on
    ## characters, not bytes, so we have to take into account the possibility
    ## that we've been passed a UTF-8 encoded string that is longer than it
-   ## appears. The longest a UTF-8 character in bytes can be is 4 bytes, so
-   ## we divide the 128 KiB max argument size by 4.
+   ## appears. The longest a UTF-8 character in bytes can be is 4 bytes
+   ## (according to https://stackoverflow.com/a/9533324), so we divide the 128
+   ## KiB max argument size by 4.
    ##
    #arg_max_bytes="$(getconf ARG_MAX)"
    #arg_max_bytes=138300
@@ -145,7 +146,7 @@ output_func() {
          ## aren't removing 1 from ${#message_str} here.
          (( msg_idx = ${#message_str} )) || true
 
-         if [ "${message_str:msg_idx:1}" = $'\n' ]; then
+         if [ "${message_str:msg_idx-1:1}" = $'\n' ]; then
            ## OK, but if the last character is a newline we actually do want
            ## to leave that off.
            (( msg_idx-- )) || true
@@ -181,7 +182,7 @@ output_func() {
       (( cut_start_idx = msg_idx + 1 )) || true
    done
 
-   if (( loop_idx == ( max_loop_count - 1 ) )); then
+   if (( loop_idx >= max_loop_count )); then
       1>&2 printf '%s\n' "output_func: Possible infinite loop hit!"
       return 1
    fi

@@ -165,7 +165,7 @@ start_progress_bar() {
    fi
 
    if [ "$progressbartitlex" = "" ]; then
-      progressbartitlex="Variable progressbartitlex does not exist. Please report this bug!"
+      progressbartitlex="Variable progressbartitlex is empty. Please report this bug!"
    fi
 
    if [ -f "${msgcollector_run_dir}/${identifier}_icon" ]; then
@@ -197,7 +197,7 @@ start_progress_bar() {
 
    ## Sanity test for $progress_txt_file_progress, because we use it without
    ## quotes as argument for yad below.
-   ## Also matches $when progress_txt_file_progress is unset.
+   ## Also matches when $progress_txt_file_progress is unset.
    if [[ "$progress_txt_file_progress" != *[!0-9]* ]]; then
       true "'$progress_txt_file_progress' is strictly numeric."
    else
@@ -210,9 +210,9 @@ start_progress_bar() {
    fi
 
    ## Clean up eventual old progress bar.
-   "${timeout_command[@]}" safe-rm --force "$fifo"
+   "${timeout_command[@]}" safe-rm --force -- "$fifo"
 
-   "${timeout_command[@]}" mkfifo "$fifo"
+   "${timeout_command[@]}" mkfifo -- "$fifo"
 
    ## sanity test
    test -p "$fifo"
@@ -275,9 +275,16 @@ source /usr/libexec/msgcollector/msgcollector_shared
 ## sets: ${msgcollector_run_dir}
 folder_init
 
+## provides: check, is_whole_number
+source /usr/libexec/msgcollector/check
+
 source /usr/libexec/msgcollector/msgfallbacks
 fallbacks ## provided by /usr/libexec/msgcollector/msgfallbacks
 parse_cmd_options "$@"
+
+check "$identifier"
+check "$progressbaridx"
+
 preparation
 start_progress_bar
 cleanup_self

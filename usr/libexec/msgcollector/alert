@@ -60,7 +60,7 @@ class Messages():
 
                 self.icon = section.get('icon', None)
 
-                language = section.get(self.language, DEFAULT_LANG)
+                language = section.get(self.language, section.get(DEFAULT_LANG, {}))
 
                 self.title = language.get('title', None)
                 self.message = language.get('message', None)
@@ -89,7 +89,11 @@ class AlertMessageBox(QtWidgets.QMessageBox):
             self.setWindowTitle(message.title)
 
         if message.icon:
-            self.setIcon(getattr(QtWidgets.QMessageBox, message.icon))
+            allowed_icons = {'Information', 'Warning', 'Critical', 'Question', 'NoIcon'}
+            if message.icon in allowed_icons:
+                self.setIcon(getattr(QtWidgets.QMessageBox, message.icon))
+            else:
+                print(f"WARNING: Unknown icon type '{message.icon}', ignoring.", file=sys.stderr)
 
         if message.message:
             self.setText(message.message)
@@ -108,8 +112,8 @@ def main():
 
     args = parser.parse_args()
 
-    if not args.filename and args.section:
-        parser.usage()
+    if not args.filename or not args.section:
+        parser.print_help()
         sys.exit(1)
 
     app = QtWidgets.QApplication(sys.argv)
