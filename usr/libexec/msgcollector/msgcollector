@@ -403,8 +403,8 @@ collector() {
    ## - messagex: NOT sanitized (intentional - contains caller-constructed HTML for setHtml())
 
    ## {{ --identifier
-   if ! check identifier; then
-      printf '%s\n' "$BASH_SOURCE ERROR: variable 'identifier' is empty or invalid."
+   if ! check "$identifier"; then
+      printf '%s\n' "${BASH_SOURCE[0]} ERROR: variable 'identifier' is empty or invalid."
       exit 1
    fi
    ## }}
@@ -426,7 +426,7 @@ collector() {
 
    ## {{ --parentpid
    if [ "$parentpid" = "" ]; then
-      #printf '%s\n' "$BASH_SOURCE ERROR: variable parentpid is empty."
+      #printf '%s\n' "${BASH_SOURCE[0]} ERROR: variable parentpid is empty."
       #exit 1
       ## Small hack, so not all applications get killed when pressing the cancel button
       ## such as timesync.
@@ -593,7 +593,7 @@ collector() {
 
    ## {{ --progressx
    if [ ! "$progressx" = "" ]; then
-      if ! check progressbaridx; then
+      if ! check "$progressbaridx"; then
          error "Variable 'progressbaridx' is empty or invalid."
          exit 4
       fi
@@ -625,7 +625,7 @@ collector() {
 
    ## {{ --progressbarx
    if [ "$progressbarx" = "1" ]; then
-      if ! check progressbaridx; then
+      if ! check "$progressbaridx"; then
          error "Variable 'progressbaridx' is empty or invalid."
          exit 4
       fi
@@ -681,8 +681,8 @@ return_status() {
    trap "error_handler" ERR
 
    ## {{ --identifier
-   if ! check identifier; then
-      printf '%s\n' "$BASH_SOURCE ERROR: variable identifier is empty or invalid."
+   if ! check "$identifier"; then
+      printf '%s\n' "${BASH_SOURCE[0]} ERROR: variable identifier is empty or invalid."
       exit 1
    fi
    ## }}
@@ -717,7 +717,7 @@ return_status() {
 
    ## {{ --progressbarx
    if [ "$progressbarx" = "1" ]; then
-      if ! check progressbaridx; then
+      if ! check "$progressbaridx"; then
          error "Variable progressbaridx is empty or invalid."
          exit 4
       fi
@@ -863,7 +863,7 @@ forgetwaitcli() {
 }
 
 ## Debugging.
-#printf '%s\n' "$BASH_SOURCE $@
+#printf '%s\n' "${BASH_SOURCE[0]} $@
 #" >> "/home/user/msgcollector"
 
 parse_cmd_options "$@"

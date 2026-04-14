@@ -116,6 +116,7 @@ def main():
         sys.exit(1)
 
     app = QtWidgets.QApplication(sys.argv)
+    assert app
 
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
@@ -126,6 +127,7 @@ def main():
 
     message = Messages(args.section, args.filename)
     dialog = AlertMessageBox(message)
+    assert dialog
     sys.exit()
 
 

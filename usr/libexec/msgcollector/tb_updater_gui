@@ -206,8 +206,8 @@ def main():
     timer.timeout.connect(lambda: None)
 
     message = GuiMessage(args)
-
-    app.exec_()
+    if message is not None:
+        app.exec_()
 
 
 if __name__ == '__main__':
