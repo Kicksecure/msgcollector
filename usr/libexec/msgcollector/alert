@@ -28,7 +28,7 @@ import argparse
 import locale
 import yaml
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtWidgets
 
 DEFAULT_LANG = 'en'
 
@@ -46,7 +46,7 @@ class Messages():
 
         try:
             language = locale.getlocale()[0].split('_')[0]
-        except:
+        except Exception:
             language = DEFAULT_LANG
 
         self.language = language
@@ -68,12 +68,11 @@ class Messages():
                 self.title = "alert script by msgcollector"
                 self.message = "section " + section + " not found! [...............................]"
 
-        except:
+        except Exception:
             error_msg = "Unexpected error: " + str(sys.exc_info()[0])
             print(error_msg)
             self.title = "alert script by msgcollector"
             self.message = error_msg
-
 
 
 class AlertMessageBox(QtWidgets.QMessageBox):
@@ -128,6 +127,7 @@ def main():
     message = Messages(args.section, args.filename)
     dialog = AlertMessageBox(message)
     sys.exit()
+
 
 if __name__ == "__main__":
     main()

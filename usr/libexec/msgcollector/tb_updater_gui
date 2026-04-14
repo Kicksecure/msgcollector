@@ -30,8 +30,10 @@ import argparse
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+
 def signal_handler(sig, frame):
     sys.exit(128 + sig)
+
 
 class GuiMessage(QtWidgets.QDialog):
     def __init__(self, args):
@@ -147,8 +149,9 @@ class GuiMessage(QtWidgets.QDialog):
 
     def setSize(self):
         ## Size is returned
-        window_height = int((self.label.size().height() + self.text.document().size().height()
-                        + self.version_group.size().height() + 100))
+        window_height = int((self.label.size().height()
+                             + self.text.document().size().height()
+                             + self.version_group.size().height() + 100))
         maximum_height = int(QtWidgets.QDesktopWidget().availableGeometry().height() - 100)
         if window_height <= maximum_height:
             self.resize(800, window_height)
@@ -181,6 +184,7 @@ class GuiMessage(QtWidgets.QDialog):
         print("65536")
         sys.exit()
 
+
 def main():
     parser = argparse.ArgumentParser(description="Create a GUI message dialog using PyQt5.")
     parser.add_argument('message_type', choices=['info', 'warning', 'error'], help="Type of the message ('info', 'warning', or 'error')")
@@ -204,6 +208,7 @@ def main():
     message = GuiMessage(args)
 
     app.exec_()
+
 
 if __name__ == '__main__':
     main()

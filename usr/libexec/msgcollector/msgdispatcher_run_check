@@ -86,7 +86,7 @@ output_func_x() {
       output_func "$@"
       return "$?"
    fi
-   true "$0: $FUNCNAME: skipping because msgdispatcher_running_x is not set to true."
+   true "$0: ${FUNCNAME[0]}: skipping because msgdispatcher_running_x is not set to true."
 }
 
 output_func_cli() {
@@ -94,7 +94,7 @@ output_func_cli() {
       output_func "$@"
       return "$?"
    fi
-   true "$FUNCNAME: injecting --onlyecho."
+   true "${FUNCNAME[0]}: injecting --onlyecho."
    output_func --onlyecho "$@"
 }
 

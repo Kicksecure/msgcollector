@@ -12,10 +12,10 @@ error_handler() {
    local error_cause error_text
    error_text="$1"
    if [ "$error_text" = "" ]; then
-      error_cause="$FUNCNAME signal ERR detected with BASH_COMMAND:
+      error_cause="${FUNCNAME[0]} signal ERR detected with BASH_COMMAND:
 $bash_command_backup"
    else
-      error_cause="$FUNCNAME called with error_text:
+      error_cause="${FUNCNAME[0]} called with error_text:
 $error_text"
    fi
 

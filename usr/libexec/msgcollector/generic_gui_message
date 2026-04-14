@@ -28,13 +28,10 @@ import argparse
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QIcon, QPixmap
 
-try:
-    _fromUtf8 = QtCore.QString.fromUtf8
-except AttributeError:
-    _fromUtf8 = lambda s: s
 
 def signal_handler(sig, frame):
     sys.exit(128 + sig)
+
 
 class GuiMessage(QtWidgets.QDialog):
     def __init__(self, args):
@@ -148,6 +145,7 @@ class GuiMessage(QtWidgets.QDialog):
         print("65536")
         sys.exit()
 
+
 def main():
     parser = argparse.ArgumentParser(description="Create a GUI message dialog using PyQt5.")
     parser.add_argument('message_type', choices=['info', 'warning', 'error'], help="Type of the message ('info', 'warning', or 'error')")
@@ -169,6 +167,7 @@ def main():
     message = GuiMessage(args)
     message.show()
     app.exec_()
+
 
 if __name__ == '__main__':
     main()
