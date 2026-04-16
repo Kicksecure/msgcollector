@@ -21,7 +21,16 @@ error_handler() {
   echo "$0: ERROR: BASH_COMMAND '$BASH_COMMAND' exit code '$exit_code'." >&2
 }
 
+## provides: is_whole_number
+# shellcheck source=../../../../helper-scripts/usr/libexec/helper-scripts/strings.bsh
+source /usr/libexec/helper-scripts/strings.bsh
+
 while read -r line; do
+   ## Validate that the input is strictly numeric to prevent shell injection
+   ## through $percent when referenced by eval'd commands.
+   if ! is_whole_number "$line"; then
+      continue
+   fi
    percent="$line"
    eval $pv_echo_command
    eval $pv_wrapper_command

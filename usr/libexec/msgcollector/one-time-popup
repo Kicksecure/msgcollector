@@ -235,11 +235,14 @@ def main() -> NoReturn:
         timer.timeout.connect(lambda: None)
         timer.start(500)
 
-        # pylint: disable=unused-variable
+        ## Keep a Python reference to the PopupWindow so Qt does not
+        ## garbage-collect the widget (which routes events back to Python
+        ## slot methods) while the event loop is running.
         popup_window: PopupWindow = PopupWindow(
             status_path, args.title, args.message
         )
-        app.exec_()
+        if popup_window is not None:
+            app.exec_()
     sys.exit(0)
 
 

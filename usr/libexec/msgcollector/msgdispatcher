@@ -11,6 +11,7 @@ set -o errtrace
 
 error_handler() {
    local last_exit_code="$?"
+   trap - ERR
    if [ ! "$1" = "" ]; then
       error_text="$1"
    else
@@ -204,11 +205,11 @@ dispatch_x_active() {
    fi
 
    if [ "$verbose" = "1" ]; then
-      /usr/libexec/msgcollector/msgdispatcher_dispatch_x "$type" "$title" "$msg" "$icon"
+      /usr/libexec/msgcollector/msgdispatcher_dispatch_x "$type" "$title" "$msg" "0" "$icon"
    else
       ## Launching into background, so it doesn't block msgdispatcher until
       ## msgdispatcher_dispatch_x exits.
-      /usr/libexec/msgcollector/msgdispatcher_dispatch_x "$type" "$title" "$msg" "$icon" &
+      /usr/libexec/msgcollector/msgdispatcher_dispatch_x "$type" "$title" "$msg" "0" "$icon" &
    fi
 }
 
@@ -241,10 +242,18 @@ msgdispatcher_handler() {
    fi
    true "msgdispatcher_handler: Done file. Continue processing..."
 
-   ## Remove "_done".
+   ## Remove everything after the identifier.
    temp_item="${file_name%%_*}"
    ## Remove "${msgcollector_run_dir}/".
    msgdispatcher_identifier="${temp_item##*/}"
+
+   ## Validate early (before using in file paths). Use conditional to avoid
+   ## triggering error_handler in this long-running daemon.
+   if ! check_is_alpha_numeric "msgdispatcher_identifier" 2>/dev/null; then
+      true "msgdispatcher_handler: identifier is not alphanumeric, skipping."
+      true "----------"
+      return 0
+   fi
 
    if [ "$gui" = "1" ]; then
       if [ "$file_name" = "${msgcollector_run_dir}/${msgdispatcher_identifier}_messagex_done" ]; then
@@ -335,6 +344,7 @@ msgdispatcher_handler() {
             dispatch_cli "$msg"
             msgdispatcher_delete_wrapper "waitmessagecli_done"
             msgdispatcher_delete_wrapper "waitmessagecli"
+            msgdispatcher_delete_wrapper "typecli"
          else
             true "INFO: waitmessagecli file does NOT exist."
             msgdispatcher_delete_wrapper "waitmessagecli_done"
@@ -349,6 +359,7 @@ msgdispatcher_handler() {
             dispatch_cli "$msg"
             msgdispatcher_delete_wrapper "messagecli_done"
             msgdispatcher_delete_wrapper "messagecli"
+            msgdispatcher_delete_wrapper "typecli"
          else
             msgdispatcher_delete_wrapper "messagecli_done"
          fi

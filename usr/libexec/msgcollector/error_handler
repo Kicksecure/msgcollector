@@ -12,10 +12,10 @@ error_handler() {
    local error_cause error_text
    error_text="$1"
    if [ "$error_text" = "" ]; then
-      error_cause="$FUNCNAME signal ERR detected with BASH_COMMAND:
+      error_cause="${FUNCNAME[0]} signal ERR detected with BASH_COMMAND:
 $bash_command_backup"
    else
-      error_cause="$FUNCNAME called with error_text:
+      error_cause="${FUNCNAME[0]} called with error_text:
 $error_text"
    fi
 
@@ -69,10 +69,10 @@ $error_text"
       if [ "$TITLE" = "" ]; then
          TITLE="No TITLE defined yet."
       fi
-      $output_x ${output_opts[@]} --titlex "$TITLE"
-      $output_cli ${output_opts[@]} --titlecli "$TITLE"
-      $output_x ${output_opts[@]} --messagex --typex "error" --message "$MSG"
-      $output_cli ${output_opts[@]} --messagecli --typecli "error" --message "$MSG"
+      $output_x "${output_opts[@]}" --titlex "$TITLE"
+      $output_cli "${output_opts[@]}" --titlecli "$TITLE"
+      $output_x "${output_opts[@]}" --messagex --typex "error" --message "$MSG"
+      $output_cli "${output_opts[@]}" --messagecli --typecli "error" --message "$MSG"
    else
       local stripped_msg
       stripped_msg="$(sanitize-string -- nolimit "$MSG")"

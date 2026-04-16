@@ -9,7 +9,7 @@ set -o pipefail
 
 true "$0: START"
 
-scriptname="$(basename -- "$BASH_SOURCE")"
+scriptname="$(basename -- "${BASH_SOURCE[0]}")"
 
 error_handler() {
    local exit_code="$?"
@@ -91,7 +91,7 @@ exit_code: $exit_code
 
 trap "error_handler" ERR
 
-my_command_line_parameters="$@"
+my_command_line_parameters="$*"
 
 parse_cmd_options() {
    trap "error_handler" ERR
@@ -99,7 +99,7 @@ parse_cmd_options() {
    ## Thanks to:
    ## http://mywiki.wooledge.org/BashFAQ/035
 
-   true "${cyan}INFO:${cyan} parse_cmd_options msgcollector"
+   true "${cyan}INFO:${reset} parse_cmd_options msgcollector"
 
    while true; do
        case $1 in
@@ -119,7 +119,7 @@ parse_cmd_options() {
            --icon)
                icon="$2"
                if [ "$icon" = "" ]; then
-                  printf '%s\n' "$BASH_SOURCE ERROR: variable icon is empty."
+                  printf '%s\n' "${BASH_SOURCE[0]} ERROR: variable icon is empty."
                   exit 1
                fi
                shift 2
@@ -133,7 +133,7 @@ parse_cmd_options() {
                typecli="$2"
                shift 2
                if [ "$typecli" = "" ]; then
-                  printf '%s\n' "$BASH_SOURCE ERROR: variable typecli is empty."
+                  printf '%s\n' "${BASH_SOURCE[0]} ERROR: variable typecli is empty."
                   exit 1
                fi
                ;;
@@ -141,7 +141,7 @@ parse_cmd_options() {
                typex="$2"
                shift 2
                if [ "$typex" = "" ]; then
-                  printf '%s\n' "$BASH_SOURCE ERROR: variable typex is empty."
+                  printf '%s\n' "${BASH_SOURCE[0]} ERROR: variable typex is empty."
                   exit 1
                fi
                ;;
@@ -159,7 +159,7 @@ parse_cmd_options() {
                message="$2"
                shift 2
                if [ "$message" = "" ]; then
-                  printf '%s\n' "$BASH_SOURCE ERROR: variable message is empty."
+                  printf '%s\n' "${BASH_SOURCE[0]} ERROR: variable message is empty."
                   exit 1
                fi
                ;;
@@ -201,7 +201,7 @@ parse_cmd_options() {
                progressx="$2"
                shift 2
                if [ "$progressx" = "" ]; then
-                  printf '%s\n' "$BASH_SOURCE ERROR: variable progressx is empty."
+                  printf '%s\n' "${BASH_SOURCE[0]} ERROR: variable progressx is empty."
                   exit 1
                fi
                ;;
@@ -278,7 +278,7 @@ parse_cmd_options() {
    ## If there are input files (for example) that follow the options, they
    ## will remain in the "$@" positional parameters.
 
-   if [[ ! "$@" = "" ]]; then
+   if (( $# != 0 )); then
       printf '%s\n' "$scriptname: unknown option: $1" >&2
       exit 3
    fi
@@ -395,9 +395,16 @@ write_typecli_to_file() {
 collector() {
    trap "error_handler" ERR
 
+   ## Input sanitization summary:
+   ## - identifier, progressbaridx: validated alphanumeric via check() (path traversal prevention)
+   ## - icon, titlex, passivepopupqueuextitle, progressbartitlex: sanitize-string (plain text fields)
+   ## - messagecli: strip-markup only (preserves terminal colors, strips HTML)
+   ## - waitmessagecli, passivepopupqueuex, progressbarx message: sanitize-string
+   ## - messagex: NOT sanitized (intentional - contains caller-constructed HTML for setHtml())
+
    ## {{ --identifier
-   if [ "${identifier}" = "" ]; then
-      printf '%s\n' "$BASH_SOURCE ERROR: variable identifier is empty."
+   if ! check "$identifier"; then
+      printf '%s\n' "${BASH_SOURCE[0]} ERROR: variable 'identifier' is empty or invalid."
       exit 1
    fi
    ## }}
@@ -412,13 +419,14 @@ collector() {
       #test -w "${msgcollector_run_dir}/${identifier}_icon" || true "not writeable"
       #whoami
       ## NOTE: If not writeable, AppArmor issues?
+      icon="$(sanitize-string -- nolimit "$icon")"
       printf '%s\n' "$icon" > "${msgcollector_run_dir}/${identifier}_icon"
    fi
    ## }}
 
    ## {{ --parentpid
    if [ "$parentpid" = "" ]; then
-      #printf '%s\n' "$BASH_SOURCE ERROR: variable parentpid is empty."
+      #printf '%s\n' "${BASH_SOURCE[0]} ERROR: variable parentpid is empty."
       #exit 1
       ## Small hack, so not all applications get killed when pressing the cancel button
       ## such as timesync.
@@ -440,6 +448,7 @@ collector() {
    ## {{ --titlex
    if [ ! -z "$titlex" ]; then
       ## variable $titlex exists
+      titlex="$(sanitize-string -- nolimit "$titlex")"
       printf '%s\n' "$titlex" > "${msgcollector_run_dir}/${identifier}_titlex"
    fi
    ## }}
@@ -447,6 +456,7 @@ collector() {
    ## {{ --passivepopupqueuextitle
    if [ ! -z "$passivepopupqueuextitle" ]; then
       ## variable $passivepopupqueuextitle exists
+      passivepopupqueuextitle="$(sanitize-string -- nolimit "$passivepopupqueuextitle")"
       printf '%s\n' "$passivepopupqueuextitle" > "${msgcollector_run_dir}/${identifier}_passivepopupqueuextitle"
    fi
    ## }}
@@ -454,6 +464,7 @@ collector() {
    ## {{ --progressbartitlex
    if [ ! -z "$progressbartitlex" ]; then
       ## variable $progressbartitlex exists
+      progressbartitlex="$(sanitize-string -- nolimit "$progressbartitlex")"
       printf '%s\n' "$progressbartitlex" > "${msgcollector_run_dir}/${identifier}_${progressbaridx}_progressbartitlex"
    fi
    ## }}
@@ -515,6 +526,11 @@ collector() {
    ## }}
 
    ## {{ --messagex
+   ## NOTE: $message is intentionally NOT sanitized here.
+   ## messagex messages contain caller-constructed HTML (<p>, <span>, <br>, etc.)
+   ## that is rendered via setHtml() in msgdispatcher_dispatch_x.
+   ## sanitize-string would strip this HTML and break the GUI output.
+   ## Callers are responsible for providing safe HTML content.
    if [ "$messagex" = "1" ]; then
       pretty_type_x "$typex"
       write_to_file="${msgcollector_run_dir}/${identifier}_messagex"
@@ -527,11 +543,11 @@ collector() {
       write_to_file="${msgcollector_run_dir}/${identifier}_messagecli"
       if [ ! -z "$message" ]; then
          ## variable $message exists
-         ## Cannot use 'sanitize-string' as it would remove terminal colors,
+         ## NOTE: Cannot use 'sanitize-string' as it would remove terminal colors,
          ## such as for login security check table.
-         ## Unfortunately, the application using 'msgcollector' needs provide sanitized strings.
+         ## The application using 'msgcollector' needs to provide sanitized strings.
          #message="$(sanitize-string -- nolimit "$message")"
-         ## Instead, "only" use 'strip-markup'.
+         ## Instead, "only" use 'strip-markup' (strips HTML tags for CLI display).
          message="$(strip-markup "$message")"
          pretty_type_cli "$typecli"
          message="[$p_type] [$identifier] $message"
@@ -577,8 +593,8 @@ collector() {
 
    ## {{ --progressx
    if [ ! "$progressx" = "" ]; then
-      if [ "${progressbaridx}" = "" ]; then
-         error "Variable progressbaridx is empty."
+      if ! check "$progressbaridx"; then
+         error "Variable 'progressbaridx' is empty or invalid."
          exit 4
       fi
 
@@ -609,8 +625,8 @@ collector() {
 
    ## {{ --progressbarx
    if [ "$progressbarx" = "1" ]; then
-      if [ "${progressbaridx}" = "" ]; then
-         error "Variable progressbaridx is empty."
+      if ! check "$progressbaridx"; then
+         error "Variable 'progressbaridx' is empty or invalid."
          exit 4
       fi
       printf '%s\n' "$parentpid" > "${msgcollector_run_dir}/${identifier}_${progressbaridx}_parentpid"
@@ -619,7 +635,12 @@ collector() {
       append_to_file
 
       ## Cannot run from msgdispatcher due to user mismatch permission issues.
-      /usr/libexec/msgcollector/msgprogressbar --identifier "${identifier}" --progressbaridx "${progressbaridx}" --progressbartitlex "$progressbartitlex" --message "$message" $animate & disown
+      local animate_val
+      animate_val=''
+      if [ "$animate" = '1' ]; then
+         animate_val='--animate'
+      fi
+      /usr/libexec/msgcollector/msgprogressbar --identifier "${identifier}" --progressbaridx "${progressbaridx}" --progressbartitlex "$progressbartitlex" --message "$message" $animate_val & disown
    fi
    ## }}
 }
@@ -660,8 +681,8 @@ return_status() {
    trap "error_handler" ERR
 
    ## {{ --identifier
-   if [ "${identifier}" = "" ]; then
-      printf '%s\n' "$BASH_SOURCE ERROR: variable identifier is empty."
+   if ! check "$identifier"; then
+      printf '%s\n' "${BASH_SOURCE[0]} ERROR: variable identifier is empty or invalid."
       exit 1
    fi
    ## }}
@@ -696,8 +717,8 @@ return_status() {
 
    ## {{ --progressbarx
    if [ "$progressbarx" = "1" ]; then
-      if [ "${progressbaridx}" = "" ]; then
-         error "Variable progressbaridx is empty."
+      if ! check "$progressbaridx"; then
+         error "Variable progressbaridx is empty or invalid."
          exit 4
       fi
       write_to_file="${msgcollector_run_dir}/${identifier}_${progressbaridx}_progressbarx"
@@ -711,6 +732,9 @@ return_status() {
          local pid
          ## || true to prevent race condition
          yad_progress_pid="$(cat -- "${msgcollector_run_dir}/${identifier}_${progressbaridx}_yadprogresspid")" || true
+         if ! is_whole_number "$yad_progress_pid"; then
+            exit 1
+         fi
          ## Check if still running.
          local ps__p_exit_code
          ps__p_exit_code="0"
@@ -791,8 +815,8 @@ forget() {
       "${msgcollector_run_dir}/${identifier}_${progressbaridx}_progressbartitlex"
       "${msgcollector_run_dir}/${identifier}_typecli"
       "${msgcollector_run_dir}/${identifier}_typex"
-      "${msgcollector_run_dir}/${identifier}_progressbarx_done"
-      "${msgcollector_run_dir}/${identifier}_progressbarx"
+      "${msgcollector_run_dir}/${identifier}_${progressbaridx}_progressbarx_done"
+      "${msgcollector_run_dir}/${identifier}_${progressbaridx}_progressbarx"
       "${msgcollector_run_dir}/${identifier}_passivepopupqueuex_done"
       "${msgcollector_run_dir}/${identifier}_passivepopupqueuex"
       "${msgcollector_run_dir}/${identifier}_messagex_done"
@@ -832,14 +856,14 @@ forgetwaitcli() {
    local file_name
    for file_name in "${file_list[@]}"; do
       if [ -e "$file_name" ]; then
-         safe-rm --force "$file_name"
+         safe-rm --force -- "$file_name"
       fi
    done
-   unset local file_name
+   unset file_name
 }
 
 ## Debugging.
-#printf '%s\n' "$BASH_SOURCE $@
+#printf '%s\n' "${BASH_SOURCE[0]} $@
 #" >> "/home/user/msgcollector"
 
 parse_cmd_options "$@"
@@ -847,6 +871,9 @@ parse_cmd_options "$@"
 source /usr/libexec/msgcollector/msgcollector_shared
 ## sets: ${msgcollector_run_dir}
 folder_init
+
+## provides: check, is_whole_number
+source /usr/libexec/msgcollector/check
 
 if [ "$forget" = "1" ]; then
    forget
