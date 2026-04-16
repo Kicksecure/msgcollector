@@ -1,3 +1,400 @@
+commit 5063a14a4c1111dd7537bc09c78daa3b8aaebfef
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Apr 16 01:13:29 2026 -0400
+
+    CI version bump
+
+commit 39910396261b20c3891a231ec708b726fc5089c9
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Apr 16 01:12:19 2026 -0400
+
+    run tests only on CI
+
+commit 7860f61029ac791997d14311ac1bbe7c75bc5166
+Merge: 616795c 2d5f1a4
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Apr 16 01:09:39 2026 -0400
+
+    Merge remote-tracking branch 'ArrayBolt3/arraybolt3/trixie'
+
+commit 2d5f1a4523b1005490c0ab9c97f3f82d4592824d
+Author: Aaron Rainbolt <arraybolt3@gmail.com>
+Date:   Mon Apr 13 22:55:36 2026 -0400
+
+    Fix CI failure, unbreak several uses of 'check'
+
+commit aa03676da81dcf331b8fe6733711ef48b022f503
+Author: Aaron Rainbolt <arraybolt3@gmail.com>
+Date:   Mon Apr 13 22:25:53 2026 -0400
+
+    fix: resolve shellcheck and pyflakes/pycodestyle issues
+
+    Originally written by Claude Code, slightly modified. Original commit
+    message:
+
+    Fix real lint issues in scripts (not overrides):
+
+    ShellCheck (SC2128 $BASH_SOURCE/$FUNCNAME idiom):
+    - msgcollector, msgprogress, msgprogressbar: scriptname basename
+      uses "${BASH_SOURCE[0]}" instead of bare $BASH_SOURCE
+    - msgcollector: printf error messages use "${BASH_SOURCE[0]}"
+    - error_handler, msgdispatcher_run_check: use "${FUNCNAME[0]}"
+      instead of bare $FUNCNAME
+
+    ShellCheck (SC2124/SC2199 array-to-string in msgcollector):
+    - my_command_line_parameters="$@" -> my_command_line_parameters="$*"
+      (joining positional params as a single string for error reporting)
+    - if [[ ! "$@" = "" ]] -> if (( $# != 0 ))
+      (idiomatic positional-params count check)
+
+    Python (pyflakes unused-variable / unused-import):
+    - alert: remove unused QtGui import; drop unused 'app' and 'dialog'
+      locals (Qt/dialog lifetime handled by exec_() side effect); fix two
+      bare 'except:' to 'except Exception:'; remove extra blank line
+    - tb_updater_gui: drop unused 'message' local in main(); add blank
+      lines before def/class (E302/E305); fix continuation indent (E128)
+    - generic_gui_message: remove dead _fromUtf8 PyQt4 compat shim; add
+      blank lines before def/class (E302/E305)
+    - msgdispatcher_dispatch_x: add blank lines before def/class
+    - one-time-popup: replace unused-variable pylint disable with a real
+      reference (if popup_window is not None) so pyflakes accepts it;
+      document why the reference must stay alive for Qt event loop
+
+    CI config now only overrides E266 (## block comments), which is the
+    project-wide convention across all 18 files in usr/libexec/msgcollector/
+    - rationale documented in the CI yaml. ShellCheck runs at
+    --severity=warning with no pre-existing override codes.
+
+    Locally verified: 36 unit + 49 integration tests pass, shellcheck
+    clean at --severity=warning, pyflakes+pycodestyle clean on all 6
+    Python files.
+
+    https://claude.ai/code/session_01Ss6LC6ipqFHPYu9GpcX2fh
+
+commit babe4521de8287fb3484501a5bc45e06da0a62ab
+Author: Aaron Rainbolt <arraybolt3@gmail.com>
+Date:   Mon Apr 13 22:11:02 2026 -0400
+
+    ci: relax linting to not fail on pre-existing issues
+
+    Written by Claude Code and lightly modified. Original commit message
+    from Claude:
+
+    Local test run exposed CI failures caused entirely by pre-existing
+    style/lint issues in files we did not author (per the style guide's
+    'separate clean commit' rule, we shouldn't touch these):
+
+    - ShellCheck: pre-existing SC2128 ($BASH_SOURCE/$FUNCNAME idiom),
+      SC2124 (array-to-string), SC2199 (array in [[ ]]) in msgcollector,
+      msgprogress, msgprogressbar, error_handler, msgdispatcher_run_check.
+      Switch to --severity=error and exclude these warning codes.
+
+    - Python lint: pre-existing unused imports, bare excepts, block
+      comment style (##), blank-line issues, lambdas in alert, tb_updater_gui,
+      one-time-popup, etc. Mark python-lint as continue-on-error and
+      ignore the pre-existing codes so it runs informationally.
+
+    Also simplify helper-scripts install step: copy files directly
+    instead of running genmkfile install. genmkfile requires additional
+    build-time deps (rsync, make, genmkfile itself) that aren't worth
+    the complexity - a plain cp -r of /usr/libexec/helper-scripts,
+    /usr/lib/python3/dist-packages, and the /usr/bin tools works.
+
+    Verified locally: 36 unit tests + 49 integration tests, all pass.
+
+    https://claude.ai/code/session_01Ss6LC6ipqFHPYu9GpcX2fh
+
+commit 43d907b9cd08f56cd79ab1c1acbce63fec474b75
+Author: Aaron Rainbolt <arraybolt3@gmail.com>
+Date:   Mon Apr 13 19:46:19 2026 -0400
+
+    Modified and squashed commit of the following:
+
+    commit 6e05365c6e850a37620c730a33ce907d07594a8d
+    Author: Claude <noreply@anthropic.com>
+    Date:   Fri Apr 10 09:53:12 2026 +0000
+
+        style: apply project coding conventions to tests and check
+
+        Style fixes applied:
+        - set -o errexit/nounset/errtrace/pipefail (long form, all four)
+        - 2-space indentation for new files (per style guide for newer scripts)
+        - $0: prefix on all output lines (self-identification)
+        - ${variable} braces on all expansions
+        - local declarations separated from assignments
+        - grep &>/dev/null instead of grep -q (pipefail-safe)
+        - rm --force (long option)
+        - printf '%s\n' throughout (no echo)
+
+        Document in check file why 'local var="$1"' is intentionally split
+        into 'local var' + 'var="$1"' (local always returns 0, would clobber
+        $? if ever needed; matches project convention for all other variables).
+
+        https://claude.ai/code/session_01Ss6LC6ipqFHPYu9GpcX2fh
+
+    commit ac43e22f6d68b53cd9321caaa6add88edad49658
+    Author: Claude <noreply@anthropic.com>
+    Date:   Fri Apr 10 09:04:36 2026 +0000
+
+        add functional integration tests for normal (non-security) behavior
+
+        Add 29 new integration tests covering core msgcollector functionality:
+
+        - waitmessagecli: message creation, done marker, forgetwaitcli
+          (selective cleanup that preserves regular messagecli files)
+        - onlyecho mode: verifies no files are written in echo-only mode
+        - message append: multiple messages appending to same messagecli
+          and messagex files
+        - parentpid: works without --parentpid (default "0000000000")
+        - parenttty: TTY path stored and retrievable
+        - forceactive: flag file created and cleaned by forget
+        - typex escalation: info->error upgrade, no downgrade (GUI path)
+        - typeclistatus: CLI type status query returns correct value
+        - passivepopupqueuex done: done marker created for popup queue
+        - forget comprehensive: verifies all 13 file types cleaned
+        - pretty_type_x: info gets green INFO prefix, error gets ERROR prefix
+          in HTML output
+        - br_add: Python line-break conversion inserts <br /> tags
+        - Python argument parsing: msgdispatcher_dispatch_x rejects invalid
+          message_type, generic_gui_message rejects invalid message_type and
+          button_type, one-time-popup exits non-zero with missing args
+        - msgprogress: valid progress values (0, 50, 100) accepted,
+          progresstxt file written with correct content
+        - pv_wrapper: numeric values passed through correctly, single value
+          handling
+        - unknown option: msgcollector exits non-zero on unknown options
+
+        Total: 46 integration tests (was 17).
+
+        https://claude.ai/code/session_01Ss6LC6ipqFHPYu9GpcX2fh
+
+    commit f6ef95a0066b26a5d98882fb2ed7f453962f5d3b
+    Author: Claude <noreply@anthropic.com>
+    Date:   Fri Apr 10 08:26:09 2026 +0000
+
+        add CI testing: shellcheck, python lint, unit and integration tests
+
+        Add GitHub Actions CI workflow with 4 jobs:
+        - shellcheck: lint all bash scripts (warning severity)
+        - python-lint: pyflakes + pycodestyle on all Python scripts
+        - unit-tests: test input validation functions (check, is_whole_number,
+          check_is_alpha_numeric, validate_safe_filename), msgcollector
+          argument rejection, msgprogress numeric validation, pv_wrapper
+          stdin filtering, and alert icon allowlist
+        - integration-tests: test full message collection pipeline (messagecli,
+          messagex, titlex, icon, done markers, passivepopupqueuex), type
+          escalation (info->warning->error, no downgrade), forget cleanup,
+          status queries, and end-to-end path traversal blocking
+
+        Dependencies installed via git clone of Kicksecure/helper-scripts
+        and Kicksecure/genmkfile, then 'sudo genmkfile install'.
+
+        https://claude.ai/code/session_01Ss6LC6ipqFHPYu9GpcX2fh
+
+    commit d41a38e69ade62bd57c7166bdca0698abbaba952
+    Author: Claude <noreply@anthropic.com>
+    Date:   Thu Apr 9 19:29:13 2026 +0000
+
+        fix: use conditional check in msgdispatcher to avoid error_handler
+
+        msgdispatcher is a long-running daemon with set -e and errtrace.
+        A bare check_is_alpha_numeric call would trigger error_handler
+        (GUI popup + error log) on any non-alphanumeric identifier, which
+        can happen legitimately (e.g., glob not matching in empty directory
+        during parse_existing_files). Use conditional instead to silently
+        skip invalid identifiers.
+
+        https://claude.ai/code/session_01Ss6LC6ipqFHPYu9GpcX2fh
+
+    commit c2fc8771867cb5a4d43c9dcc9c2fffcf7bfe15bd
+    Author: Claude <noreply@anthropic.com>
+    Date:   Thu Apr 9 19:25:22 2026 +0000
+
+        fix: add missing check() calls, document sanitization decisions
+
+        Add check() / check_is_alpha_numeric validation for identifier and
+        progressbaridx in scripts that were missing it:
+        - msgprogress: add check for $identifier and $progressbaridx
+        - msgprogressbar: source check, add check for both variables
+        - msgdispatcher: add check_is_alpha_numeric on $msgdispatcher_identifier
+          immediately after extraction from filename (was only validated later
+          in msgdispatcher_delete_wrapper)
+
+        Document sanitization decisions in msgcollector collector():
+        - Add summary comment listing sanitization strategy per field
+        - Document why --messagex is intentionally NOT sanitized (caller HTML)
+        - Improve existing comments on --messagecli strip-markup usage
+
+        https://claude.ai/code/session_01Ss6LC6ipqFHPYu9GpcX2fh
+
+    commit 9b9e62390fbc6e1d00876e50b9470668e3b9ac1c
+    Author: Claude <noreply@anthropic.com>
+    Date:   Thu Apr 9 19:21:03 2026 +0000
+
+        fix: sanitize title and icon fields before writing to files
+
+        Four fields were written to msgcollector run directory files without
+        sanitize-string: titlex, passivepopupqueuextitle, progressbartitlex,
+        and icon. These are later consumed by GUI tools (setWindowTitle,
+        kdialog --title, yad --title, icon path). Apply sanitize-string to
+        all four.
+
+        Note: --messagex is intentionally NOT sanitized because callers
+        construct HTML messages that are rendered via setHtml(). The comment
+        on --messagecli already documents this design decision.
+
+        https://claude.ai/code/session_01Ss6LC6ipqFHPYu9GpcX2fh
+
+    commit 342d742ff99bddf86a32a7c0d4c804d2f8886009
+    Author: Claude <noreply@anthropic.com>
+    Date:   Thu Apr 9 19:14:47 2026 +0000
+
+        fix: revert eval quoting in pv_wrapper
+
+        The eval arguments must remain unquoted because callers like
+        tb-updater export multi-word commands that rely on word splitting
+        to produce the command + arguments for eval. The numeric validation
+        on $percent (via is_whole_number) is the actual security fix here.
+
+        https://claude.ai/code/session_01Ss6LC6ipqFHPYu9GpcX2fh
+
+    commit 321ba56da1c8dcec477e3da22de56f1d3218c730
+    Author: Claude <noreply@anthropic.com>
+    Date:   Thu Apr 9 19:08:10 2026 +0000
+
+        refactor: extract shared check function, reuse strings.bsh
+
+        Move the check() function from msgprogressbar_kill_helper into a new
+        shared file usr/libexec/msgcollector/check that sources strings.bsh
+        and provides check(), check_is_alpha_numeric, is_whole_number, etc.
+
+        - msgcollector: source check, replace inline regex with check() for
+          identifier/progressbaridx, use is_whole_number() for PID validation
+        - msgprogress: source check, use is_whole_number() for progress and
+          PID validation instead of inline regex
+        - msgprogressbar_kill_helper: source shared check instead of
+          duplicating the function and sourcing strings.bsh directly
+        - pv_wrapper: source strings.bsh, use is_whole_number() instead of
+          inline regex
+
+        https://claude.ai/code/session_01Ss6LC6ipqFHPYu9GpcX2fh
+
+    commit 21346c220a94ebe7fb83f4b469bfc260cbacb6f4
+    Author: Claude <noreply@anthropic.com>
+    Date:   Thu Apr 9 18:40:42 2026 +0000
+
+        fix: patch multiple security vulnerabilities found in audit
+
+        - pv_wrapper: validate stdin input is numeric before eval to prevent
+          shell injection via $percent variable
+        - pv_wrapper: quote eval arguments to prevent word splitting
+        - msgprogress: replace unsafe bash -c "echo $progress" with positional
+          argument passing to prevent shell injection
+        - msgprogress: validate $progress is numeric at entry point
+        - msgprogress: validate yad_progress_pid is numeric before ps -p
+        - msgcollector: validate $identifier and $progressbaridx contain only
+          safe characters [a-zA-Z0-9_-] to prevent path traversal attacks
+        - msgcollector: validate yad_progress_pid is numeric in return_status
+        - alert: restrict getattr on QMessageBox to known safe icon names to
+          prevent arbitrary attribute access from YAML config
+
+        https://claude.ai/code/session_01Ss6LC6ipqFHPYu9GpcX2fh
+
+    commit 5946a418ccdf8f3af74821486146f29f821b2549
+    Author: Claude <noreply@anthropic.com>
+    Date:   Thu Apr 9 19:12:03 2026 +0000
+
+        Use printf instead of echo in msgprogress to avoid echo pitfalls
+
+        Replace 'echo "$1"' with 'printf "%s\n" "$1"' in the bash -c
+        subshells. echo can misinterpret arguments starting with -e/-n/-E
+        as flags, while printf with %s is safe for arbitrary input.
+
+        https://claude.ai/code/session_012UqDLwUdSBFFAoBeQxqobW
+
+    commit b0255a0bf55ee6184529e1d53d99af0baad88338
+    Author: Claude <noreply@anthropic.com>
+    Date:   Thu Apr 9 19:08:55 2026 +0000
+
+        Fix malformed HTML, error handler recursion, and unquoted array expansion
+
+        - tb_updater_gui: fix malformed HTML in version label; stray closing
+          '</p>' should be opening '<p>', and non-standard '<p/>' should be '</p>'
+        - msgdispatcher: add 'trap - ERR' at start of error_handler to prevent
+          infinite recursion; with 'set -o errtrace', any failing command inside
+          the handler (sanitize-string, sponge) would re-trigger the ERR trap
+        - error_handler: quote ${output_opts[@]} to prevent word splitting if
+          any array element contains spaces
+
+        https://claude.ai/code/session_012UqDLwUdSBFFAoBeQxqobW
+
+    commit fb776890a4f782a0002cc41cc2300753e8c4be68
+    Author: Claude <noreply@anthropic.com>
+    Date:   Thu Apr 9 18:54:16 2026 +0000
+
+        Fix wrong boolean logic in alert argument validation
+
+        The check 'not args.filename and args.section' only triggers when
+        filename is falsy AND section is truthy, missing most invalid cases.
+        Changed to 'not args.filename or not args.section' to correctly exit
+        when either argument is missing.
+
+        https://claude.ai/code/session_012UqDLwUdSBFFAoBeQxqobW
+
+    commit 98d53b79660f7d8acdaedca548815322010fbca2
+    Author: Claude <noreply@anthropic.com>
+    Date:   Thu Apr 9 18:53:45 2026 +0000
+
+        Fix CLI typecli cleanup and off-by-one in loop exhaustion check
+
+        - msgdispatcher: add missing typecli cleanup in CLI dispatch path;
+          GUI path cleans up typex after dispatch but CLI path left typecli
+          as stale state between message batches
+        - msgdispatcher_run_check: fix off-by-one in output_func loop exhaustion
+          check; after for-loop exhaustion loop_idx equals max_loop_count, not
+          max_loop_count-1, so the old check gave a false positive on the last
+          successful iteration and missed actual exhaustion
+
+        https://claude.ai/code/session_012UqDLwUdSBFFAoBeQxqobW
+
+    commit 0597127a802fd4c092f2b56c03e4000325d839fb
+    Author: Claude <noreply@anthropic.com>
+    Date:   Thu Apr 9 18:43:57 2026 +0000
+
+        Fix 3 more bugs: animate flag, missing end-of-options, off-by-one
+
+        - msgcollector: fix --animate passing "1" instead of "--animate" to msgprogressbar,
+          so the animate flag was silently ignored as a stray positional arg
+        - msgprogressbar: add missing '--' end-of-options to safe-rm and mkfifo for
+          consistency with cleanup_self() in the same file
+        - msgdispatcher_run_check: fix off-by-one in output_func trailing newline check;
+          msg_idx is set to ${#message_str} (past end), so message_str:msg_idx:1 always
+          reads empty string and the newline stripping never triggers
+
+        https://claude.ai/code/session_012UqDLwUdSBFFAoBeQxqobW
+
+    commit 878fb29ad5c80dc4b73b887ee0d7d9b4f3140e95
+    Author: Claude <noreply@anthropic.com>
+    Date:   Thu Apr 9 18:38:50 2026 +0000
+
+        Fix 7 bugs across msgcollector, msgdispatcher, msgprogress, and alert
+
+        - msgcollector: fix 'unset local file_name' invalid bash syntax to 'unset file_name'
+        - msgcollector: fix color leak where ${cyan} was used instead of ${reset}
+        - msgcollector: fix forget() failing to clean up progressbarx files due to missing ${progressbaridx} in paths
+        - msgcollector: add missing '--' end-of-options to safe-rm in forgetwaitcli()
+        - msgdispatcher: fix dispatch_x_active() passing $icon as position arg instead of adding missing position arg "0"
+        - msgprogress: fix command injection via unquoted $progress in bash -c by using proper argument passing
+        - alert: fix language fallback crash when locale not found in YAML (string.get() AttributeError)
+
+        https://claude.ai/code/session_012UqDLwUdSBFFAoBeQxqobW
+
+commit 616795c70ff84a0127cea237fff3303b1bb1d6ee
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Apr 11 08:35:16 2026 +0000
+
+    bumped changelog version
+
 commit fa73cc38f738939c90dc56397240920ad84ea574
 Merge: 9cd6581 fc69e45
 Author: Patrick Schleizer <adrelanos@whonix.org>
@@ -41,7 +438,7 @@ Author: Aaron Rainbolt <arraybolt3@gmail.com>
 Date:   Sun Mar 8 14:02:32 2026 -0400
 
     Rewrite one-time-popup, add passive notification support
-    
+
     The previous version did not use layouts, which has historically been
     problematic. It also would write a status file as soon as the user
     checked or unchecked the "Do not show again" checkbox, and then did not
@@ -685,7 +1082,7 @@ Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Sun May 25 15:28:05 2025 -0400
 
     fix: unbreak msgcollector in case folder `/run/user/$(id -u)` does not exist
-    
+
     (such as in a minimal environment, a chroot or SSH session with `UsePAM no`)
 
 commit 4c7a079ea89b207f03123a4cea2cd29a577bf83c
@@ -759,7 +1156,7 @@ Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Sat Mar 15 03:07:39 2025 -0400
 
     port msgdispatcher process management to systemd for code simplification
-    
+
     https://forums.whonix.org/t/systemcheck-fails-for-unclear-reason/21424/19
 
 commit 9095e809ecfe9b68a645a7da12010b88efd4cde6
@@ -1121,7 +1518,7 @@ Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Tue Nov 12 09:34:40 2024 -0500
 
     port to systemd user service
-    
+
     port from /etc/xdg/autostart/msgdispatcher.desktop to /usr/lib/systemd/user/msgcollector-gui.service
 
 commit 7ad6e0aa18f797d09ecb751e7dd1d03023d54a7e
@@ -1219,11 +1616,11 @@ Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Tue Nov 12 07:05:59 2024 -0500
 
     give up setting /run/msgcollector folder to maximum 10 MB
-    
+
     mount requires root but msgcollector runs as user
-    
+
     hard to implement with sudo hardening
-    
+
     no security gain as other applications could run local DOS to create huge files
 
 commit 5656fe2ef107bd34b15c731b20b6ca05428b2200
@@ -1326,7 +1723,7 @@ Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Tue Aug 20 06:20:19 2024 -0400
 
     Merge pull request #4 from ben-grande/gnome-icons
-    
+
     Change icon directories
 
 commit 41c683c2ce446f91347fdd9c2efe259bfffac272
@@ -1466,7 +1863,7 @@ Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Sat Nov 11 13:41:31 2023 -0500
 
     change license to AGPL-3+
-    
+
     https://forums.whonix.org/t/license-change-to-agplv3/17455
 
 commit 01e4e1fc3bcf644695669ca94e76c5d1fcf8823b
@@ -1858,9 +2255,9 @@ Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Fri May 27 08:35:40 2022 -0400
 
     fix warning "tb_updater_gui:141: DeprecationWarning: an integer is required (got type float)"
-    
+
     Thanks to TNT_BOM_BOM for the bug report!
-    
+
     https://forums.whonix.org/t/tb-updater-gui-deprecationwarning-an-integer-is-required-got-type-float/13706
 
 commit d9b7f6c56d4db0249cf5c662a4a62ee92361924b
@@ -1904,7 +2301,7 @@ Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Thu Feb 17 05:46:28 2022 -0500
 
     fix for
-    
+
     DeprecationWarning: an integer is required (got type float).  Implicit conversion to integers using __int__ is deprecated, and may be removed in a future version of Python.
 
 commit 72b1f86cf12a21a4761c3bb05c8c7959fa28d14b
@@ -2074,9 +2471,9 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Tue Sep 29 06:33:58 2020 -0400
 
     fix msgcollector sudoers issue when qubes-core-agent-passwordless-root package was removed
-    
+
     Thanks to @TNT_BOOM_BOOM for the bug report!
-    
+
     https://forums.whonix.org/t/hardening-qubes-vms-by-removing-passwordless-root-will-give-boot-error-message/10350
 
 commit d411a1adb136dc46d409f6040a5428097e0caf26
@@ -2258,7 +2655,7 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Mon Sep 9 13:38:43 2019 +0000
 
     Do not show this message again. - Generic One Time Popup
-    
+
     /usr/lib/msgcollector/one-time-popup
 
 commit 724adc24d32e2613396fdb74c53a8b1095a37851
@@ -2308,7 +2705,7 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Tue Aug 27 14:18:09 2019 -0400
 
     /run/msgcollector add mount options nosuid,nodev,noexec
-    
+
     https://forums.whonix.org/t/re-mount-home-and-other-with-noexec-and-nosuid-among-other-useful-mount-options-for-better-security/7707
 
 commit 62a50e4de68b3fc0521aeab163969fc90348682c
@@ -2388,7 +2785,7 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Wed Aug 7 06:15:59 2019 +0000
 
     fix gui notification
-    
+
     thanks to @TNTBOMBOM for the bug report
 
 commit 1223ad62f741f2ae00840966c1764a2e1d1a08f8
@@ -2468,9 +2865,9 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Mon Jul 8 23:04:23 2019 +0000
 
     add sudoers exception
-    
+
     allow running /usr/lib/msgcollector/msgdispatcher_delete_wrapper
-    
+
     without root
 
 commit d99b842161deec2c8e92cf3ef44a24ce0c0fecb9
@@ -2604,7 +3001,7 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Sat Jul 6 13:48:03 2019 +0000
 
     permission hardening
-    
+
     https://forums.whonix.org/t/msgcollector-security-hardening/7625
 
 commit 1ec20f9fe5fa3caac34bef64d7c9ff0c7f4f7b6e
@@ -2762,18 +3159,18 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Fri Mar 1 14:32:39 2019 +0000
 
     add improved legal protections clauses
-    
+
     The license for software created by Whonix is the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version with additional terms applicable per GNU GPL version 3 section 7.
-    
+
     The additional terms are based on the Doom 3 license which is Debian refers to as `GPL-3+-with-id-software-additional-terms`, which is Debian DFSG [1] (The Debian Free Software Guidelines) approved and which is therefore suitable for Debian `main`. Whonix made applied minimal changes to it:
-    
+
     * Rewrite `The Doom 3 BFG Edition GPL Source Code` to the more common `this program` which is used throughout the GPL.
     * Added a "trump clause" [2], in other words, any conflicts or disputes between the additional terms and the GPLv3 shall be resolved in favor of the GPLv3 by adding `Notwithstanding any other provision of this License` (as mentioned in GPL FAQ [3]) at the beginning of the additional terms.
-    
+
     [1] https://www.debian.org/social_contract#guidelines
     [2] https://www.fsf.org/news/canonical-updated-licensing-terms
     [3] https://www.gnu.org/licenses/gpl-faq.html#v3Notwithstanding
-    
+
     For more considerations, see also:
     https://www.whonix.org/wiki/Dev/Licensing
 
@@ -2800,7 +3197,7 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Thu Aug 9 15:37:26 2018 +0000
 
     sudoers.d asterix hardening
-    
+
     https://github.com/QubesOS/qubes-issues/issues/2852
 
 commit 3afeff22beb7ca790135d62ec98033dae10ca7f6
@@ -2832,9 +3229,9 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Tue Jul 17 11:58:43 2018 +0000
 
     fix 'Connected to Tor.' message missing in Qubes-Whonix 14
-    
+
     depend on mate-notification-daemon
-    
+
     https://github.com/QubesOS/qubes-issues/issues/4098
 
 commit 791cb203b3f95631ca3470d6d1e714e9b1b61d75
@@ -2917,7 +3314,7 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Tue Feb 14 14:57:37 2017 +0000
 
     Merge pull request #2 from joysn/python3
-    
+
     More changes for porting to python3
 
 commit 8d5e92ac8e2b08ac2abfac2633842ca6a6c6faeb
@@ -2945,7 +3342,7 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Fri Feb 10 15:47:51 2017 +0000
 
     remove faketime from Build-Depends:
-    
+
     since no longer used for reproducible builds
 
 commit 8a4ac5e659246f2395a9ac12943856add142e2b7
@@ -3036,7 +3433,7 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Sun Nov 27 21:27:39 2016 +0100
 
     use return rather than continue
-    
+
     for Debian stretch / newer bash version compatibility
 
 commit 5bae0f60e5bc5b591696e188935257fb54c56595
@@ -3056,7 +3453,7 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Thu Aug 25 18:40:01 2016 +0000
 
     add support msgprogressbar when running under a different user account
-    
+
     https://phabricator.whonix.org/T533
 
 commit 64add9551b6f823308a89a23afce603f824f38fd
@@ -3064,7 +3461,7 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Thu Aug 25 02:17:55 2016 +0000
 
     fix run detection when running under different user
-    
+
     https://phabricator.whonix.org/T533
 
 commit 1a3e3b122436aaa3215bc36b2ab5292743b0f44a
@@ -3072,7 +3469,7 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Thu Jun 2 11:52:07 2016 +0000
 
     do not use tput if variable TERM is empty
-    
+
     https://phabricator.whonix.org/T505
 
 commit d4e422c98723382914115018857392f139210574
@@ -3098,12 +3495,12 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Mon Oct 19 16:57:15 2015 +0000
 
     use title instead of identifier for passive popups
-    
+
     This allows to show passive popups such as
-    
+
      [sys-whonix]
      Connected to Tor.
-    
+
     in Qubes.
 
 commit 87d0d8fa4f494a77dcf16b2a62e0eea82db6fc79
@@ -3894,7 +4291,7 @@ Author: troubadoour <trobador@riseup.net>
 Date:   Sat Sep 6 20:26:15 2014 +0000
 
     Auto resizing of the dialog eventually working.
-    
+
     Added a timer signal calling a setSize function to adjust the height of the dialog after setHtml.
     The height is limited to the available space. Vertical scroll bar when needed.
 
@@ -3970,7 +4367,7 @@ Author: troubadoour <trobador@riseup.net>
 Date:   Sat Aug 16 02:56:20 2014 +0000
 
     Revert "msgdispatcher_dispatch_x vertical size"
-    
+
     This reverts commit 722980bbbc15a30cd38dbcb5106a7f79f887c8f7.
 
 commit 9b88f40c28d9fca1dd8af99917fc9e004902d673
