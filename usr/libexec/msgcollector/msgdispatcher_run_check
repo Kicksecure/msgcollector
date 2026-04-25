@@ -139,11 +139,11 @@ output_func() {
 
    ## Split a string into chunks, using the newline character as the
    ## separator. Create as large of chunks as possible.
-   if ! [ -v arg_max_bytes ] || ! is_whole_number "$arg_max_bytes"; then
-     ## Guard against a malicious arg_max_bytes environment variable if
-     ## output_func gets called before msgdispatcher_init.
-     arg_max_bytes=32768
-   fi
+   [ -v arg_max_bytes ] || arg_max_bytes=32768
+   ## Guard against a malicious arg_max_bytes environment variable if
+   ## output_func gets called before msgdispatcher_init.
+   is_whole_number "$arg_max_bytes" || arg_max_bytes=32768
+
    for (( loop_idx = 0; loop_idx < max_loop_count; loop_idx++ )); do
       (( msg_idx = cut_start_idx + ( arg_max_bytes - 1 ) )) || true
 
