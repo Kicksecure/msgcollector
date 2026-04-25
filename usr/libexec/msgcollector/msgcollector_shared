@@ -4,6 +4,7 @@
 ## See the file COPYING for copying conditions.
 
 source /usr/libexec/helper-scripts/light_sleep.bsh
+source /usr/libexec/helper-scripts/strings.bsh
 
 folder_init() {
    msgcollector_run_id_folder="/run/user/$(id -u)"
@@ -20,7 +21,7 @@ folder_init() {
 }
 
 loop_protection() {
-   if [ "$loop_counter_protection" = "" ]; then
+   if ! is_whole_number "$loop_counter_protection"; then
       loop_counter_protection="0"
       ## Do not wait on first run of this function.
       return 0
