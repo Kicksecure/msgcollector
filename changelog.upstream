@@ -1,3 +1,35 @@
+commit a63f91079cb74b3383fc3517d5ead6102b6d11da
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Apr 25 05:11:27 2026 -0400
+
+    refactoring
+
+commit cac1e3278eb600cebc951bf3f18a88ad1ebd1006
+Merge: f06812c 73b4eea
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Apr 25 05:09:23 2026 -0400
+
+    Merge remote-tracking branch 'ArrayBolt3/arraybolt3/trixie'
+
+commit 73b4eead7d9ac340191defac270c499723431714
+Merge: 5708a98 f06812c
+Author: Aaron Rainbolt <arraybolt3@gmail.com>
+Date:   Fri Apr 24 20:25:48 2026 -0400
+
+    Merge branch 'master' into arraybolt3/trixie
+
+commit 5708a98562ba4200edef8ec3af56bacf003208c5
+Author: Aaron Rainbolt <arraybolt3@gmail.com>
+Date:   Fri Apr 24 20:01:49 2026 -0400
+
+    Bash arithmetic hardening
+
+commit f06812cb6421f1c708855c238dcd5834c051989f
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Apr 23 10:42:00 2026 +0000
+
+    bumped changelog version
+
 commit 783a18ddd4518a7c1855ac1aa4e0bf9eb1202ae0
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Thu Apr 23 06:35:45 2026 -0400
