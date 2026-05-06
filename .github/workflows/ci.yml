@@ -7,12 +7,18 @@ on:
   push:
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   shellcheck:
     name: ShellCheck
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+        with:
+          persist-credentials: false
 
       - name: Install ShellCheck
         run: sudo apt-get update && sudo apt-get install -y shellcheck
@@ -46,10 +52,12 @@ jobs:
     name: Python Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+        with:
+          persist-credentials: false
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
         with:
           python-version: "3.x"
 
@@ -96,6 +104,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Install system dependencies
         run: |
@@ -111,7 +121,15 @@ jobs:
         run: |
           ## Clone and install helper-scripts files directly (bypassing
           ## genmkfile to avoid additional build-time dependencies).
-          git clone --depth=1 https://github.com/Kicksecure/helper-scripts.git /tmp/helper-scripts
+          ## Clone helper-scripts from the same org as the workflow.
+          ## Resolves to org-ai-assisted/helper-scripts on org-ai-assisted runs,
+          ## Kicksecure/helper-scripts on Kicksecure runs, etc. Hard error if the
+          ## org does not have helper-scripts - no implicit upstream fallback (an
+          ## org choosing to host its own CI must explicitly fork helper-scripts;
+          ## a silent cross-org clone would be a supply-chain footgun).
+          git clone --depth=1 \
+              "https://github.com/${{ github.repository_owner }}/helper-scripts.git" \
+              /tmp/helper-scripts
           sudo cp -r /tmp/helper-scripts/usr/libexec/helper-scripts /usr/libexec/helper-scripts
           sudo cp -r /tmp/helper-scripts/usr/lib/python3/dist-packages/. \
             /usr/lib/python3/dist-packages/
@@ -138,6 +156,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Install system dependencies
         run: |
@@ -151,7 +171,15 @@ jobs:
 
       - name: Install helper-scripts
         run: |
-          git clone --depth=1 https://github.com/Kicksecure/helper-scripts.git /tmp/helper-scripts
+          ## Clone helper-scripts from the same org as the workflow.
+          ## Resolves to org-ai-assisted/helper-scripts on org-ai-assisted runs,
+          ## Kicksecure/helper-scripts on Kicksecure runs, etc. Hard error if the
+          ## org does not have helper-scripts - no implicit upstream fallback (an
+          ## org choosing to host its own CI must explicitly fork helper-scripts;
+          ## a silent cross-org clone would be a supply-chain footgun).
+          git clone --depth=1 \
+              "https://github.com/${{ github.repository_owner }}/helper-scripts.git" \
+              /tmp/helper-scripts
           sudo cp -r /tmp/helper-scripts/usr/libexec/helper-scripts /usr/libexec/helper-scripts
           sudo cp -r /tmp/helper-scripts/usr/lib/python3/dist-packages/. \
             /usr/lib/python3/dist-packages/
