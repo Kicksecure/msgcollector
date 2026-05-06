@@ -121,7 +121,14 @@ jobs:
         run: |
           ## Clone and install helper-scripts files directly (bypassing
           ## genmkfile to avoid additional build-time dependencies).
-          git clone --depth=1 https://github.com/Kicksecure/helper-scripts.git /tmp/helper-scripts
+          ## Prefer same-org helper-scripts (lets feature branches in helper-scripts
+          ## self-test alongside their consumers and avoids waiting
+          ## on a Kicksecure-master sync). Fall back to Kicksecure
+          ## upstream when same-org has no helper-scripts fork.
+          git clone --depth=1 \
+              "https://github.com/${{ github.repository_owner }}/helper-scripts.git" \
+              /tmp/helper-scripts 2>/dev/null \
+            || git clone --depth=1 https://github.com/Kicksecure/helper-scripts.git /tmp/helper-scripts
           sudo cp -r /tmp/helper-scripts/usr/libexec/helper-scripts /usr/libexec/helper-scripts
           sudo cp -r /tmp/helper-scripts/usr/lib/python3/dist-packages/. \
             /usr/lib/python3/dist-packages/
@@ -163,7 +170,14 @@ jobs:
 
       - name: Install helper-scripts
         run: |
-          git clone --depth=1 https://github.com/Kicksecure/helper-scripts.git /tmp/helper-scripts
+          ## Prefer same-org helper-scripts (lets feature branches in helper-scripts
+          ## self-test alongside their consumers and avoids waiting
+          ## on a Kicksecure-master sync). Fall back to Kicksecure
+          ## upstream when same-org has no helper-scripts fork.
+          git clone --depth=1 \
+              "https://github.com/${{ github.repository_owner }}/helper-scripts.git" \
+              /tmp/helper-scripts 2>/dev/null \
+            || git clone --depth=1 https://github.com/Kicksecure/helper-scripts.git /tmp/helper-scripts
           sudo cp -r /tmp/helper-scripts/usr/libexec/helper-scripts /usr/libexec/helper-scripts
           sudo cp -r /tmp/helper-scripts/usr/lib/python3/dist-packages/. \
             /usr/lib/python3/dist-packages/
