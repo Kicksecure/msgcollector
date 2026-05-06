@@ -121,14 +121,15 @@ jobs:
         run: |
           ## Clone and install helper-scripts files directly (bypassing
           ## genmkfile to avoid additional build-time dependencies).
-          ## Prefer same-org helper-scripts (lets feature branches in helper-scripts
-          ## self-test alongside their consumers and avoids waiting
-          ## on a Kicksecure-master sync). Fall back to Kicksecure
-          ## upstream when same-org has no helper-scripts fork.
+          ## Clone helper-scripts from the same org as the workflow.
+          ## Resolves to org-ai-assisted/helper-scripts on org-ai-assisted runs,
+          ## Kicksecure/helper-scripts on Kicksecure runs, etc. Hard error if the
+          ## org does not have helper-scripts - no implicit upstream fallback (an
+          ## org choosing to host its own CI must explicitly fork helper-scripts;
+          ## a silent cross-org clone would be a supply-chain footgun).
           git clone --depth=1 \
               "https://github.com/${{ github.repository_owner }}/helper-scripts.git" \
-              /tmp/helper-scripts 2>/dev/null \
-            || git clone --depth=1 https://github.com/Kicksecure/helper-scripts.git /tmp/helper-scripts
+              /tmp/helper-scripts
           sudo cp -r /tmp/helper-scripts/usr/libexec/helper-scripts /usr/libexec/helper-scripts
           sudo cp -r /tmp/helper-scripts/usr/lib/python3/dist-packages/. \
             /usr/lib/python3/dist-packages/
@@ -170,14 +171,15 @@ jobs:
 
       - name: Install helper-scripts
         run: |
-          ## Prefer same-org helper-scripts (lets feature branches in helper-scripts
-          ## self-test alongside their consumers and avoids waiting
-          ## on a Kicksecure-master sync). Fall back to Kicksecure
-          ## upstream when same-org has no helper-scripts fork.
+          ## Clone helper-scripts from the same org as the workflow.
+          ## Resolves to org-ai-assisted/helper-scripts on org-ai-assisted runs,
+          ## Kicksecure/helper-scripts on Kicksecure runs, etc. Hard error if the
+          ## org does not have helper-scripts - no implicit upstream fallback (an
+          ## org choosing to host its own CI must explicitly fork helper-scripts;
+          ## a silent cross-org clone would be a supply-chain footgun).
           git clone --depth=1 \
               "https://github.com/${{ github.repository_owner }}/helper-scripts.git" \
-              /tmp/helper-scripts 2>/dev/null \
-            || git clone --depth=1 https://github.com/Kicksecure/helper-scripts.git /tmp/helper-scripts
+              /tmp/helper-scripts
           sudo cp -r /tmp/helper-scripts/usr/libexec/helper-scripts /usr/libexec/helper-scripts
           sudo cp -r /tmp/helper-scripts/usr/lib/python3/dist-packages/. \
             /usr/lib/python3/dist-packages/
