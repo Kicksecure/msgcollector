@@ -1,3 +1,68 @@
+commit 744b05ca53bca4a8287206ac70594daa82afb59a
+Merge: ccb5d13 b6820d2
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed May 6 13:51:13 2026 -0400
+
+    Merge remote-tracking branch 'org-ai-assisted/claude/read-agents-meta-file-uKeT9'
+
+commit b6820d2893b6b11386d62b0b75fba4fd8821fe02
+Author: assisted-by-ai (Bot Account) <server@kicksecure.com>
+Date:   Wed May 6 08:16:18 2026 -0400
+
+    ci: SHA-pin actions/checkout + actions/setup-python
+
+commit 3bc8386ec2e3486d3698f5bf1b0bb543df0c9f2e
+Author: assisted-by-ai (Bot Account) <server@kicksecure.com>
+Date:   Wed May 6 08:03:04 2026 -0400
+
+    ci: clone helper-scripts from same org, no Kicksecure fallback
+
+    Per maintainer feedback: a silent fall-through to Kicksecure when
+    the same-org fork is missing reads as a supply-chain footgun (an
+    org could install its own CI fork of msgcollector to test a
+    modified version, while this workflow would silently pull
+    helper-scripts from a *different* org). Drop the fallback; an org
+    choosing to host its own CI of msgcollector must explicitly fork
+    helper-scripts too. The workflow now hard-errors with a clear
+    "repository not found" if it doesn't.
+
+commit fa5361bbf21e7e800c505e63390b588bcbcc850c
+Author: assisted-by-ai (Bot Account) <server@kicksecure.com>
+Date:   Wed May 6 07:37:10 2026 -0400
+
+    ci: clone genmkfile/helper-scripts/msgcollector from same org with Kicksecure fallback
+
+    Replace hardcoded `git clone https://github.com/Kicksecure/<pkg>.git`
+    with same-org-first + Kicksecure-fallback so feature branches in the
+    same org can self-test against each other and don't have to wait for
+    a Kicksecure-master sync. Resolves to:
+
+      - same-org `<pkg>` (e.g. org-ai-assisted/<pkg>) when present
+      - Kicksecure/<pkg> upstream when same-org fork is missing
+
+commit baa0a3fae1091036e887517e050c32201cba9ceb
+Author: assisted-by-ai (Bot Account) <server@kicksecure.com>
+Date:   Tue May 5 19:07:14 2026 -0400
+
+    ci: cancel-in-progress on workflow re-run
+
+    Add (or enable) concurrency: cancel-in-progress: true on workflow yml
+    files that lacked it. Re-pushed runs of the same workflow on the same
+    ref (re-tagged release, force-push, etc.) now cancel the in-flight
+    run instead of stacking.
+
+commit 5de147e2094827c65fbe802b0ed1dc8b93d48d5a
+Author: assisted-by-ai (Bot Account) <server@kicksecure.com>
+Date:   Tue May 5 17:52:22 2026 -0400
+
+    ci: add persist-credentials: false to all checkout steps
+
+commit ccb5d13946c46b2805495b86303e567a14dc2dac
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Apr 25 09:25:36 2026 +0000
+
+    bumped changelog version
+
 commit a63f91079cb74b3383fc3517d5ead6102b6d11da
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Sat Apr 25 05:11:27 2026 -0400
