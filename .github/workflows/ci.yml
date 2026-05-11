@@ -26,24 +26,19 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Prepare apt cache directory
-        run: |
-          sudo --non-interactive mkdir --parents -- /var/cache/apt/archives
-          sudo --non-interactive chown --recursive -- "$(id -u):$(id -g)" /var/cache/apt/archives
-
-      - name: Cache apt packages
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae  # v5.0.5
+      - name: Run shellcheck
+        uses: org-ai-assisted/developer-meta-files/.github/actions/shellcheck@master
         with:
-          path: /var/cache/apt/archives
-          key: ${{ runner.os }}-apt-shellcheck-${{ hashFiles('.github/workflows/ci.yml') }}
-          restore-keys: |
-            ${{ runner.os }}-apt-shellcheck-
-
-      - name: Install ShellCheck
-        run: sudo --non-interactive apt-get update && sudo --non-interactive apt-get install --yes shellcheck
-
-      - name: Run ShellCheck
-        run: ci/shellcheck-run.sh
+          paths: 'usr/libexec/msgcollector etc/profile.d'
+          ## SC1091/SC1090: external sourced files not followed.
+          ## SC2034: variables consumed by sourced libs via indirection
+          ##   (e.g. check_is_alpha_numeric reads ${!varname}).
+          ## SC2154: variables set by sourced helper libs
+          ##   (strings.bsh, msgcollector_shared, ...).
+          ## SC2086: intentional word-splitting in pv_wrapper eval and
+          ##   handful of callers that export multi-word commands.
+          excludes: 'SC1091,SC1090,SC2034,SC2154,SC2086'
+          shell: 'bash'
 
   python-lint:
     name: Python Lint
