@@ -34,9 +34,9 @@ readonly files=(
 )
 
 exit_code=0
-for file in "${files[@]}"; do
-   printf '%s\n' "Checking: ${file}"
-   pyflakes "${file}" || exit_code=1
+for file_name in "${files[@]}"; do
+   printf '%s\n' "Checking: ${file_name}"
+   pyflakes "${file_name}" || exit_code=1
 done
 
 exit "${exit_code}"

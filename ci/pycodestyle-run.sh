@@ -38,11 +38,11 @@ readonly files=(
 )
 
 exit_code=0
-for file in "${files[@]}"; do
-   printf '%s\n' "Checking: ${file}"
+for file_name in "${files[@]}"; do
+   printf '%s\n' "Checking: ${file_name}"
    pycodestyle --max-line-length=120 \
       --ignore=E501,W503,W504,E266 \
-      -- "${file}" || exit_code=1
+      -- "${file_name}" || exit_code=1
 done
 
 exit "${exit_code}"
