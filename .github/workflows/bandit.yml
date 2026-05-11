@@ -19,6 +19,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   bandit:
     uses: org-ai-assisted/developer-meta-files/.github/workflows/reusable-bandit.yml@master
@@ -28,6 +32,6 @@ jobs:
       ## with no extension (Debian libexec convention). bandit
       ## discovers files by '.py'; ci/python-prepare.sh creates clean
       ## '<name>.py' symlinks for each shebang-declared Python script.
-      prepare-command: bash ci/python-prepare.sh
+      prepare-command: ci/python-prepare.sh
     permissions:
       contents: read
