@@ -1,3 +1,124 @@
+commit 8951594677294613de1c36f407c03b65a312a203
+Merge: dba0bc7 7664262
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon May 11 15:04:57 2026 -0400
+
+    Merge remote-tracking branch 'refs/remotes/org-ai-assisted/master'
+
+commit 7664262d1999fe4b87c863100f114d007f17eb0d
+Author: assisted-by-ai (Bot Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Sun May 10 20:19:09 2026 -0400
+
+    ci.yml: use shellcheck composite; drop ci/shellcheck-run.sh (#13)
+
+    Composite migration.
+
+commit 7b8d476e0f2ea0f4f32d5eabdee86e6cf1eba0ec
+Author: assisted-by-ai (Bot Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Sun May 10 20:19:03 2026 -0400
+
+    ci: rename loop var 'file' -> 'file_name' (#14)
+
+    Avoid shadow of file(1) in pyflakes-run.sh and pycodestyle-run.sh.
+
+commit 07eacbd3c08387350db4cdeda608ab3847b66ee5
+Author: assisted-by-ai (Bot Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Sun May 10 20:18:52 2026 -0400
+
+    workflows: add concurrency blocks (#12)
+
+    1 cancellable (bandit).
+
+commit d122a5d1fc7137ef1a5ac8be76d3fae177f04bcd
+Author: assisted-by-ai (Bot Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Sun May 10 19:40:23 2026 -0400
+
+    ci.yml: add per-job timeout-minutes (#11)
+
+    shellcheck 10, python-lint 10, unit-tests 20, integration-tests 20.
+
+commit 7216ba65d845a86f8e98c6055cc40034b7e1fbfc
+Author: assisted-by-ai (Bot Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Sun May 10 19:20:21 2026 -0400
+
+    ci.yml: extract inline run blocks into ci/ scripts (#10)
+
+    4 new ci/ scripts replace inline run: blocks; apt-cache for shellcheck and tests; drop bash prefix on tests/*.bash.
+
+commit 562b78dca0b1046799f86452cae386543da27cb8
+Author: assisted-by-ai (Bot Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Sun May 10 19:19:41 2026 -0400
+
+    ci/python-prepare.sh: simplify shebang detection via git grep (#9)
+
+    57 -> 39 lines; replace per-file read+case with git grep; drive-by R-060/R-070 fixes.
+
+commit 827f43f6edeb33debae240a675db9332d372488d
+Author: assisted-by-ai (Bot Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Sun May 10 17:22:40 2026 -0400
+
+    bandit.yml: drop "bash" prefix on prepare-command; rely on shebang (#8)
+
+    ci/python-prepare.sh is mode 100755 with #!/bin/bash shebang.
+
+commit dba0bc78849efa94f67eba02aff1e0875b0f52c8
+Merge: 6b80a71 8577a68
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun May 10 15:42:45 2026 -0400
+
+    Merge remote-tracking branch 'org-ai-assisted/claude/restore-bandit-and-yaml-safe-load'
+
+commit 8577a680a9f4adabc6601fb989d8eb53186a76ff
+Author: assisted-by-ai (Bot Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Sun May 10 15:21:05 2026 -0400
+
+    restore bandit CI + alert: yaml.safe_load
+
+    Two coordinated fixes:
+
+    1. Restore .github/workflows/bandit.yml + ci/python-prepare.sh
+       (dropped during the upstream rebase to Whonix/msgcollector;
+       only ci.yml survived). bandit calls the org-wide reusable at
+       org-ai-assisted/developer-meta-files .github/workflows/
+       reusable-bandit.yml. python-prepare.sh creates '<name>.py'
+       symlinks for shebang-declared Python scripts so bandit
+       discovers them under their conventional name (msgcollector
+       ships its Python scripts at usr/libexec/msgcollector/ with no
+       extension, Debian libexec convention).
+
+    2. alert: yaml.load(stream, Loader=yaml.FullLoader) ->
+       yaml.safe_load(stream). Addresses bandit B506:yaml_load
+       (Medium severity) and matches the documented recommendation
+       for trusted-but-not-fully-trusted YAML config. FullLoader still
+       allows arbitrary object instantiation; safe_load returns plain
+       Python types only, which is sufficient for the alert config
+       schema (icon, language strings, message text).
+
+commit 6b80a71634b51de576d79b8d742635ab8cbf0398
+Merge: c7056ec d8ec5be
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun May 10 14:35:21 2026 -0400
+
+    Merge remote-tracking branch 'refs/remotes/org-ai-assisted/master'
+
+commit d8ec5bef5daa07a147173be3d41c01cf48318d5c
+Author: assisted-by-ai (Bot Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Sun May 10 14:11:36 2026 -0400
+
+    restore: re-apply session work (rebased away) (#6)
+
+    Re-applies session work lost during rebase: adds a top-level
+    'permissions: contents: read' block to .github/workflows/ci.yml.
+    Job-level expanded permissions (where present) remain unchanged.
+
+    Co-authored-by: claude-code <claude-code@anthropic.com>
+
+commit c7056ecf16b5502b361c6c81ef5007fee3f634eb
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu May 7 18:43:58 2026 +0000
+
+    bumped changelog version
+
 commit 744b05ca53bca4a8287206ac70594daa82afb59a
 Merge: ccb5d13 b6820d2
 Author: Patrick Schleizer <adrelanos@whonix.org>
