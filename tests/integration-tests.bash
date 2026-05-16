@@ -30,24 +30,21 @@ fail() {
   ERRORS="${ERRORS}  FAIL: $1"$'\n'
 }
 
-## On systemd-logind-enabled systems, /run/user/$(id -u)/ exists
-## and is owned by the user. GitHub Actions runners do not run
-## logind for the runner user, so /run/user/$(id -u)/ is absent
-## - folder_init would otherwise fall back to mktemp, which
-## skips the production code path the tests are intended to
-## exercise. Bootstrap the dir here (CI=true is the only context
-## this script runs in - see the guard at the top of the file)
-## so the subsequent folder_init() call takes the production
-## branch and creates /run/user/$(id -u)/msgcollector.
-if ! [ -d "/run/user/$(id -u)" ]; then
-  sudo --non-interactive mkdir --parents -- "/run/user/$(id -u)"
-  sudo --non-interactive chown --recursive -- "$(id -u):$(id -g)" "/run/user/$(id -u)"
-fi
+## Provide an isolated runtime dir for the tests via the same
+## XDG_RUNTIME_DIR mechanism that systemd-logind uses in
+## production. folder_init() in msgcollector_shared reads it and
+## passes the resolved path to every msgcollector subprocess
+## (env vars are inherited), so the test harness and the binary
+## under test share one directory without any sudo / chown / cp
+## bootstrap. On a logind-enabled host XDG_RUNTIME_DIR is already
+## set to /run/user/$(id -u); CI runners do not run logind for
+## the runner user, hence the explicit setup below.
+export XDG_RUNTIME_DIR="$(mktemp --directory)"
 
 ## Determine the run directory the same way msgcollector does.
 source /usr/libexec/msgcollector/msgcollector_shared
 folder_init
-## Now ${msgcollector_run_dir} is set (e.g., /run/user/<uid>/msgcollector or mktemp fallback).
+## ${msgcollector_run_dir} is now ${XDG_RUNTIME_DIR}/msgcollector.
 
 MSGCOLLECTOR="/usr/libexec/msgcollector/msgcollector"
 

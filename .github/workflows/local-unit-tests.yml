@@ -29,30 +29,10 @@ jobs:
         with:
           persist-credentials: false
 
-      ## Shared cache-key with local-integration-tests.yml: both
-      ## workflows install the same apt set, so the cache is
-      ## interchangeable. The hashFiles list covers BOTH workflows
-      ## so a change in either invalidates the cache; the keys
-      ## then re-converge once the change lands.
-      - name: Install system dependencies
-        uses: org-ai-assisted/developer-meta-files/.github/actions/apt-install-with-cache@master
-        with:
-          packages: 'bash safe-rm moreutils procps inotify-tools'
-          cache-key: ${{ runner.os }}-apt-msgcollector-tests-${{ hashFiles('.github/workflows/local-integration-tests.yml', '.github/workflows/local-unit-tests.yml', 'ci/install-helper-scripts.sh') }}
-
-      - name: Install helper-scripts
-        run: ci/install-helper-scripts.sh
-
-      ## Install msgcollector via genmkfile install (same pattern as
-      ## developer-meta-files/.github/workflows/local-org-tools-mock-
-      ## tests.yml). install-helper-scripts: 'false' because the
-      ## previous step handled helper-scripts via the custom
-      ## cp-based bypass (keeps build-time deps minimal - see
-      ## ci/install-helper-scripts.sh header).
-      - name: Install msgcollector via genmkfile install
+      - name: Install apt deps + genmkfile + helper-scripts + msgcollector
         uses: org-ai-assisted/developer-meta-files/.github/actions/install-deps@master
         with:
-          install-helper-scripts: 'false'
+          apt-packages: 'bash safe-rm moreutils procps inotify-tools'
           install-self: 'true'
 
       - name: Run unit tests
