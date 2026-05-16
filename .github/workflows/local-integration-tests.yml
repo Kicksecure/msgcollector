@@ -43,13 +43,22 @@ jobs:
       - name: Install helper-scripts
         run: ci/install-helper-scripts.sh
 
-      - name: Install msgcollector scripts
-        run: sudo --non-interactive cp --recursive -- usr/libexec/msgcollector /usr/libexec/msgcollector
+      ## Install msgcollector via genmkfile install (same pattern as
+      ## developer-meta-files/.github/workflows/local-org-tools-mock-
+      ## tests.yml). install-helper-scripts: 'false' because the
+      ## previous step handled helper-scripts via the custom
+      ## cp-based bypass (keeps build-time deps minimal - see
+      ## ci/install-helper-scripts.sh header).
+      - name: Install msgcollector via genmkfile install
+        uses: org-ai-assisted/developer-meta-files/.github/actions/install-deps@master
+        with:
+          install-helper-scripts: 'false'
+          install-self: 'true'
 
-      - name: Set up run directory
-        run: |
-          sudo --non-interactive mkdir --parents -- "/run/user/$(id -u)/msgcollector"
-          sudo --non-interactive chown --recursive -- "$(id -u):$(id -g)" "/run/user/$(id -u)"
+      ## Run-directory bootstrap (/run/user/<uid>) was previously
+      ## done here with sudo; it now lives in tests/integration-
+      ## tests.bash next to the folder_init call that consumes it.
+      ## Workflow stays orchestration-only.
 
       - name: Run integration tests
         run: tests/integration-tests.bash

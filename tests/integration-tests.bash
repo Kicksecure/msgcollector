@@ -30,6 +30,20 @@ fail() {
   ERRORS="${ERRORS}  FAIL: $1"$'\n'
 }
 
+## On systemd-logind-enabled systems, /run/user/$(id -u)/ exists
+## and is owned by the user. GitHub Actions runners do not run
+## logind for the runner user, so /run/user/$(id -u)/ is absent
+## - folder_init would otherwise fall back to mktemp, which
+## skips the production code path the tests are intended to
+## exercise. Bootstrap the dir here (CI=true is the only context
+## this script runs in - see the guard at the top of the file)
+## so the subsequent folder_init() call takes the production
+## branch and creates /run/user/$(id -u)/msgcollector.
+if ! [ -d "/run/user/$(id -u)" ]; then
+  sudo --non-interactive mkdir --parents -- "/run/user/$(id -u)"
+  sudo --non-interactive chown --recursive -- "$(id -u):$(id -g)" "/run/user/$(id -u)"
+fi
+
 ## Determine the run directory the same way msgcollector does.
 source /usr/libexec/msgcollector/msgcollector_shared
 folder_init
