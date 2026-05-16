@@ -30,10 +30,21 @@ fail() {
   ERRORS="${ERRORS}  FAIL: $1"$'\n'
 }
 
+## Provide an isolated runtime dir for the tests via the same
+## XDG_RUNTIME_DIR mechanism that systemd-logind uses in
+## production. folder_init() in msgcollector_shared reads it and
+## passes the resolved path to every msgcollector subprocess
+## (env vars are inherited), so the test harness and the binary
+## under test share one directory without any sudo / chown / cp
+## bootstrap. On a logind-enabled host XDG_RUNTIME_DIR is already
+## set to /run/user/$(id -u); CI runners do not run logind for
+## the runner user, hence the explicit setup below.
+export XDG_RUNTIME_DIR="$(mktemp --directory)"
+
 ## Determine the run directory the same way msgcollector does.
 source /usr/libexec/msgcollector/msgcollector_shared
 folder_init
-## Now ${msgcollector_run_dir} is set (e.g., /run/user/<uid>/msgcollector or mktemp fallback).
+## ${msgcollector_run_dir} is now ${XDG_RUNTIME_DIR}/msgcollector.
 
 MSGCOLLECTOR="/usr/libexec/msgcollector/msgcollector"
 
