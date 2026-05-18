@@ -1,3 +1,233 @@
+commit abda636d86f46d72957b9ead8186ddba2c6b2f6d
+Merge: 0330f71 3a24940
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun May 17 16:22:46 2026 -0400
+
+    Merge remote-tracking branch 'refs/remotes/org-ai-assisted/master'
+
+commit 3a24940b9f8c562e8eca2a729a0e4bb87b4c18b8
+Merge: 0330f71 f1b912f
+Author: assisted-by-ai (Bot Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Sun May 17 14:02:59 2026 -0400
+
+    Merge pull request #22 from org-ai-assisted/claude/fix-dependabot-action-UnL7w
+
+    dependabot.yml: drop docker block (sync to new canonical)
+
+commit f1b912f2e723e045b889904408a9fdee6e496410
+Author: Claude <noreply@anthropic.com>
+Date:   Sun May 17 17:59:46 2026 +0000
+
+    trim file commentary
+
+commit 38a72f014cb25d37161ec43878416579dcdd1476
+Author: Claude <noreply@anthropic.com>
+Date:   Sun May 17 17:43:21 2026 +0000
+
+    dependabot.yml: drop docker block (sync to new canonical)
+
+    The previous canonical at
+    developer-meta-files/consumer-templates/.github/dependabot.yml
+    carried a docker package-ecosystem block on the documented theory
+    that the block was a "harmless no-op" in repos without a
+    /Dockerfile. That theory was wrong: the dependabot-action errors
+    with `dependency_file_not_found` and aborts the whole job -
+    including the github-actions ecosystem run that shares it - so
+    this repo lost its github-actions Dependabot coverage too.
+
+    Sync to the new canonical, which carries github-actions only.
+
+    See org-ai-assisted/developer-meta-files PR #105 for the
+    canonical change and the docker-bearing-repo opt-out mechanism.
+
+commit 0330f719cbd2d567c248355067172b351a365cb1
+Merge: 7b4b656 8d1016a
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat May 16 17:14:26 2026 -0400
+
+    Merge remote-tracking branch 'refs/remotes/org-ai-assisted/master'
+
+commit 8d1016ad07878f4dfdb97789faab468edbab22ea
+Merge: 7b4b656 3e972f1
+Author: assisted-by-ai (Bot Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Sat May 16 13:46:40 2026 -0400
+
+    Merge pull request #21 from org-ai-assisted/claude/msgcollector-genmkfile-install-and-runtime-bootstrap
+
+    ci: route through XDG_RUNTIME_DIR + install-deps composite action (simplify)
+
+commit 3e972f1a64c3eaa98a86a1c0c83571b2a951a87f
+Author: assisted-by-ai (Bot Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Sat May 16 13:42:17 2026 -0400
+
+    ci: drop run-dir bootstrap and helper-scripts bypass; route through XDG_RUNTIME_DIR + install-deps
+
+    Two structural simplifications on top of the prior revision in this
+    PR; both replace test-specific duplicate code paths with the
+    production code path.
+
+    1. msgcollector_shared.folder_init() now honors XDG_RUNTIME_DIR
+
+       The folder_init() helper hardcoded /run/user/$(id -u) and fell
+       back to mktemp when that dir was missing - which made the
+       fallback per-process (each invocation got a fresh mktemp dir
+       and the test harness + msgcollector subprocesses ended up
+       writing to disjoint trees).
+
+       The systemd / XDG base-dir spec env var for the user's runtime
+       directory is XDG_RUNTIME_DIR; on a logind session it is
+       /run/user/$(id -u), and in containers / chroots / CI runners
+       the consumer may set it explicitly. folder_init now reads:
+
+          msgcollector_run_id_folder="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+
+       - One line of production code.
+       - Aligns msgcollector with the XDG Base Directory Specification.
+       - Production behavior unchanged on logind systems (XDG_RUNTIME_DIR
+         already points at /run/user/$(id -u) there).
+
+       tests/integration-tests.bash now does:
+
+          export XDG_RUNTIME_DIR="$(mktemp --directory)"
+          source /usr/libexec/msgcollector/msgcollector_shared
+          folder_init
+
+       No sudo, no chown, no /run/user/... touching. Env-var
+       inheritance carries the same path into every msgcollector
+       subprocess, so test + binary resolve to one shared dir
+       through the production code path.
+
+    2. install-deps composite action does the whole install flow
+
+       Drops the custom cp-based ci/install-helper-scripts.sh bypass
+       and the apt-install-with-cache step. Replaces both with one
+       install-deps call:
+
+          uses: org-ai-assisted/developer-meta-files/.github/actions/install-deps@master
+          with:
+            apt-packages: \'bash safe-rm moreutils procps inotify-tools\'
+            install-self: \'true\'
+
+       This runs apt-get install on the runtime deps, installs
+       genmkfile, installs helper-scripts via genmkfile (the action
+       default), and installs msgcollector via genmkfile install -
+       exactly the production install path the Debian package would
+       take. Drops ci/install-helper-scripts.sh (now dead code).
+
+    Both workflows shrink to checkout + install-deps + run-tests.
+
+commit e9f4aa4a3f003a7a7bfd02e7cc6cb94eb26086a0
+Author: assisted-by-ai (Bot Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Sat May 16 13:24:19 2026 -0400
+
+    ci: genmkfile install for msgcollector + move /run/user bootstrap into the test script
+
+    Two cleanups to the local-*-tests workflows:
+
+    1. Replace `sudo cp --recursive -- usr/libexec/msgcollector
+       /usr/libexec/msgcollector` with a call to the developer-meta-
+       files install-deps composite action with install-self: \'true\'.
+       This runs `sudo genmkfile install` in the workflow checkout -
+       the same install path the Debian package uses - so the test
+       environment matches production. Pattern mirrors developer-
+       meta-files/.github/workflows/local-org-tools-mock-tests.yml.
+
+       install-helper-scripts: \'false\' because the previous step
+       already handled helper-scripts via the custom cp-based
+       ci/install-helper-scripts.sh (which deliberately bypasses
+       genmkfile to keep build-time deps minimal - see that script\'s
+       header for the rationale).
+
+    2. Drop the "Set up run directory" workflow steps (`sudo mkdir
+       /run/user/<uid>/msgcollector` + chown). The bootstrap moves
+       into tests/integration-tests.bash right above the existing
+       folder_init() call that consumes it, so the test script and
+       the function under test share the same code path and the
+       workflow stays orchestration-only.
+
+       The bootstrap is wrapped in an existence-check so it is a
+       no-op when /run/user/<uid>/ already exists (the production
+       case on systemd-logind-enabled systems); the sudo path only
+       triggers when logind has not set the dir up (the GitHub
+       Actions runner case).
+
+       tests/unit-tests.bash does not reference msgcollector_run_dir
+       at all (it tests the check() function only), so no bootstrap
+       was needed there in the first place - the workflow step was
+       copy-paste from integration. Dropped in unit-tests.yml too.
+
+commit 7b4b6567a86581496b75238e877dbee40fc00a4d
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat May 16 06:08:34 2026 -0400
+
+    add .github/dependabot.yml
+
+commit 45d83d9cd763867906e171f272e81615af48ca3f
+Merge: 2eeddea 9c85e04
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat May 16 05:26:57 2026 -0400
+
+    Merge remote-tracking branch 'refs/remotes/org-ai-assisted/master'
+
+commit 9c85e043a13bff181be68f8ab953dc075f26cf9b
+Merge: 2eeddea f2d20dc
+Author: assisted-by-ai (Bot Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Sat May 16 04:42:44 2026 -0400
+
+    Merge pull request #20 from org-ai-assisted/claude/fix-cppcheck-tar-error-0qNYv
+
+    ci: use apt-install-with-cache composite action; drop broad restore-keys
+
+commit f2d20dcce1916c3f2adc2801a051946dd4c6b648
+Author: assisted-by-ai (Bot Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Fri May 15 20:00:10 2026 -0400
+
+    ci: use apt-install-with-cache composite action; drop broad restore-keys
+
+    The two local-* test workflows both used `path: /var/cache/apt/archives`
+    with `sudo chown -R` on the system dir and a broad `restore-keys:`
+    prefix. Three problems:
+
+    1. Same `tar: partial/: Permission denied` cache-save warning as the
+       developer-meta-files reusables (apt's _apt:root 0700 partial/
+       subdir is unreadable by the runner; chown doesn't help because
+       apt-get install recreates partial/ 0700 every run).
+
+    2. `restore-keys:` violates agents/github-actions.md G-A-007
+       ("no broad restore-keys, no pull_request_target + cache" -
+       cache-poisoning risk). The cache-key already includes
+       hashFiles() of the workflow + ci/install-helper-scripts.sh, so
+       a config change naturally invalidates; restore-keys would
+       defeat that.
+
+    3. Triplicated YAML across two near-identical workflows.
+
+    Fix: replace `Prepare apt cache directory` + `Cache apt packages`
+    + `Install system dependencies` with one composite-action call:
+
+      - uses: org-ai-assisted/developer-meta-files/.github/actions/apt-install-with-cache@master
+        with:
+          packages: \'bash safe-rm moreutils procps inotify-tools\'
+          cache-key: <hashFiles of both workflows + helper script>
+
+    The composite action caches `~/.apt-deb-cache` (runner-owned, no
+    system-dir permission gymnastics) and sudo-copies .debs in/out of
+    /var/cache/apt/archives around apt-get install. apt\'s normal
+    permission model is preserved.
+
+    Cache sharing between the two workflows is preserved: both pass
+    the same cache-key (same hashFiles inputs), so a cache populated
+    by one is hit by the other.
+
+    Depends on org-ai-assisted/developer-meta-files#92 (which adds
+    the composite action). This PR\'s CI will pass once #92 merges.
+
+commit 2eeddeab91d843ce12a0b5558cdef2d0556b0ca2
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri May 15 18:40:12 2026 +0000
+
+    bumped changelog version
+
 commit c0acba4ab6ce769f5e59a260b7817abe80f2cd4d
 Merge: d2fb30d e0d7476
 Author: Patrick Schleizer <adrelanos@whonix.org>
