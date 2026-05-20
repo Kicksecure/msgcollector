@@ -22,6 +22,7 @@ set -o errtrace
 shopt -s inherit_errexit
 shopt -s shift_verbose
 
+## TODO: Should ALLOW_LOCAL also be checked here?
 if [ "${CI:-}" != "true" ]; then
    printf '%s\n' \
       'error: this script must run with CI=true (GitHub Actions or equivalent).' >&2
