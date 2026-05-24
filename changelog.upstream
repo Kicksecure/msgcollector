@@ -1,8 +1,34 @@
+commit c699ab54c4fd2a0133471d2f8fc67dae3125a5ea
+Merge: f26d2bb 6577198
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun May 24 14:51:01 2026 -0400
+
+    Merge remote-tracking branch 'refs/remotes/ArrayBolt3/arraybolt3/trixie'
+
+commit 6577198f02b9f30756e709a28206475826de18d8
+Merge: 5c00f29 f26d2bb
+Author: Aaron Rainbolt <arraybolt3@gmail.com>
+Date:   Wed May 20 20:03:48 2026 -0400
+
+    Merge branch 'master' into arraybolt3/trixie
+
+commit f26d2bba8b2850787181dad1723b097df1958561
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed May 20 22:15:00 2026 +0000
+
+    bumped changelog version
+
 commit 1c9667bfcc0d77f48d9554d3cd41df0c10d5c744
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Wed May 20 16:57:02 2026 -0400
 
     genmkfile uch
+
+commit 5c00f2932ce8a1e8a059868277702ce166c23572
+Author: Aaron Rainbolt <arraybolt3@gmail.com>
+Date:   Wed May 20 01:00:46 2026 -0400
+
+    comment, TODOs
 
 commit 1f64a3cc6be877bf6ddb7b26ff3ed6b26a00cc0c
 Author: Patrick Schleizer <adrelanos@whonix.org>
