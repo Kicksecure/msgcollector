@@ -12,7 +12,7 @@ folder_init() {
    ## this is /run/user/$(id -u); in containers / chroots / CI
    ## runners that lack a logind setup, the consumer (e.g. the
    ## integration-test harness) can export an alternate path so
-   ## every msgcollector subprocess resolves to the same dir.
+   ## every msgcollector subprocess uses the same dir.
    msgcollector_run_id_folder="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
    if test -d "${msgcollector_run_id_folder}" ; then
       true "folder_init: INFO: msgcollector_run_id_folder exists."
