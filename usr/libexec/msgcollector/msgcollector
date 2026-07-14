@@ -563,6 +563,13 @@ collector() {
             -e "s/<font color=\"yellow\">/${yellow:-}/g" \
             -e "s/<font color=\"red\">/${red:-}/g" \
             -e "s#</font>#${reset:-}#g")"
+         ## Translate GUI hyperlinks (<a href="url">text</a>) to "text (url)" so
+         ## the CLI keeps the URL that strip-markup would otherwise drop. This
+         ## lets a check use ONE message for both channels (a GUI-clickable
+         ## anchor that reads as "text (url)" on the CLI) instead of a separate
+         ## plain-URL CLI string. Handles quoted or unquoted href. Run BEFORE
+         ## strip-markup.
+         message="$(printf '%s' "$message" | sed -E -e 's#<a href="?([^">]*)"?>([^<]*)</a>#\2 (\1)#g')"
          ## Instead, "only" use 'strip-markup' (strips HTML tags for CLI display).
          message="$(strip-markup "$message")"
          pretty_type_cli "$typecli"
