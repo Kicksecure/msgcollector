@@ -363,20 +363,29 @@ cli_links_to_footnotes() {
    ## under a trailing "Links:" section. This keeps URLs out of the flow text
    ## while preserving them (strip-markup would otherwise drop the href).
    ## Echoes the transformed message. Handles quoted or unquoted href.
-   local msg="$1" footer="" n=0 url text
+   local rest="$1" footer="" n=0 whole url text before after
    local re='<a href="?([^">]*)"?>([^<]*)</a>'
-   while [[ "$msg" =~ $re ]]; do
-      n=$(( n + 1 ))
+   ## Rewrite each <a href>...</a> to "text[N]", re-scanning so a reunited outer
+   ## anchor (from invalid nested input) is caught too. Every pass replaces one
+   ## anchor -- and thus one "</a>" -- with anchor-free text, so the "</a>" count
+   ## strictly decreases and the loop always terminates. (An earlier version
+   ## replaced the first LITERAL match rather than splitting on it, which could
+   ## fail to advance and loop forever on crafted input like
+   ## '<a href="<a href=">x</a>'.)
+   while [[ "$rest" =~ $re ]]; do
+      whole="${BASH_REMATCH[0]}"
       url="${BASH_REMATCH[1]}"
       text="${BASH_REMATCH[2]}"
-      ## Quote the match so it is replaced literally, not as a glob pattern.
-      msg="${msg/"${BASH_REMATCH[0]}"/${text}[${n}]}"
+      before="${rest%%"$whole"*}"   # text before the first occurrence
+      after="${rest#*"$whole"}"     # text after it
+      n=$(( n + 1 ))
+      rest="${before}${text}[${n}]${after}"
       footer="${footer}[${n}] ${url}"$'\n'
    done
    if [ "$n" -gt 0 ]; then
-      printf '%s\n\nLinks:\n%s' "$msg" "$footer"
+      printf '%s\n\nLinks:\n%s' "$rest" "$footer"
    else
-      printf '%s' "$msg"
+      printf '%s' "$rest"
    fi
 }
 
