@@ -322,6 +322,13 @@ true && {
     under=$(    tput smul   || tput us      ) # Start underline
     eunder=$(   tput rmul   || tput ue      ) # End   underline
     reset=$(    tput sgr0   || tput me      ) # Reset cursor
+    ## SGR-only reset for TEXT color. 'tput sgr0' appends a Shift-In (0x0f) to
+    ## also reset the charset, which then trails every colored token on the CLI
+    ## (visible in logs / pipes / 'cat -v'). Text coloring never shifts the
+    ## charset, so a plain ESC[0m is the correct reset here. Kept separate from
+    ## $reset (still used, with its SI, by the alt-charset progress-bar drawing).
+    ## Tied to $reset so it stays empty when the terminal has no color.
+    [ -z "$reset" ] || color_reset=$'\033[0m'
     blink=$(    tput blink  || tput mb      ) # Start blinking
     italic=$(   tput sitm   || tput ZH      ) # Start italic
     eitalic=$(  tput ritm   || tput ZR      ) # End   italic
@@ -350,17 +357,49 @@ true && {
 } 2>/dev/null ||:
 }
 
+cli_links_to_footnotes() {
+   ## Convert GUI hyperlinks in a CLI message to footnotes: each
+   ## <a href="url">text</a> becomes "text[N]" inline, and the URLs are listed
+   ## under a trailing "Links:" section. This keeps URLs out of the flow text
+   ## while preserving them (strip-markup would otherwise drop the href).
+   ## Echoes the transformed message. Handles quoted or unquoted href.
+   local rest="$1" footer="" n=0 whole url text before after
+   local re='<a href="?([^">]*)"?>([^<]*)</a>'
+   ## Rewrite each <a href>...</a> to "text[N]", re-scanning so a reunited outer
+   ## anchor (from invalid nested input) is caught too. Every pass replaces one
+   ## anchor -- and thus one "</a>" -- with anchor-free text, so the "</a>" count
+   ## strictly decreases and the loop always terminates. (An earlier version
+   ## replaced the first LITERAL match rather than splitting on it, which could
+   ## fail to advance and loop forever on crafted input like
+   ## '<a href="<a href=">x</a>'.)
+   while [[ "$rest" =~ $re ]]; do
+      whole="${BASH_REMATCH[0]}"
+      url="${BASH_REMATCH[1]}"
+      text="${BASH_REMATCH[2]}"
+      before="${rest%%"$whole"*}"   # text before the first occurrence
+      after="${rest#*"$whole"}"     # text after it
+      n=$(( n + 1 ))
+      rest="${before}${text}[${n}]${after}"
+      footer="${footer}[${n}] ${url}"$'\n'
+   done
+   if [ "$n" -gt 0 ]; then
+      printf '%s\n\nLinks:\n%s' "$rest" "$footer"
+   else
+      printf '%s' "$rest"
+   fi
+}
+
 pretty_type_cli() {
    trap "error_handler" ERR
 
    if [ "$1" = "info" ]; then
-      p_type="${green}INFO${reset}"
+      p_type="${green}INFO${color_reset:-}"
    elif [ "$1" = "warning" ]; then
-      p_type="${red}WARNING${reset}"
+      p_type="${red}WARNING${color_reset:-}"
    elif [ "$1" = "error" ]; then
-      p_type="${red}${bold}ERROR${reset}"
+      p_type="${red}${bold}ERROR${color_reset:-}"
    else
-      p_type="${red}???${reset}"
+      p_type="${red}???${color_reset:-}"
    fi
 }
 
@@ -562,14 +601,14 @@ collector() {
             -e "s/<font color=\"orange\">/${yellow:-}/g" \
             -e "s/<font color=\"yellow\">/${yellow:-}/g" \
             -e "s/<font color=\"red\">/${red:-}/g" \
-            -e "s#</font>#${reset:-}#g")"
-         ## Translate GUI hyperlinks (<a href="url">text</a>) to "text (url)" so
-         ## the CLI keeps the URL that strip-markup would otherwise drop. This
-         ## lets a check use ONE message for both channels (a GUI-clickable
-         ## anchor that reads as "text (url)" on the CLI) instead of a separate
-         ## plain-URL CLI string. Handles quoted or unquoted href. Run BEFORE
-         ## strip-markup.
-         message="$(printf '%s' "$message" | sed -E -e 's#<a href="?([^">]*)"?>([^<]*)</a>#\2 (\1)#g')"
+            -e "s#</font>#${color_reset:-}#g")"
+         ## Translate GUI hyperlinks (<a href="url">text</a>) to footnote form:
+         ## the link text stays inline as "text[N]" and the URLs are listed under
+         ## a "Links:" section below the message, so a URL never clutters the
+         ## flow text (a message with several links used to read like
+         ## "Login (url) Security Check (Colors (url))"). Keeps the URL that
+         ## strip-markup would otherwise drop. Run BEFORE strip-markup.
+         message="$(cli_links_to_footnotes "$message")"
          ## Translate GUI line breaks (<br>, <br/>, <br />) to real newlines, so a
          ## single HTML message keeps its line breaks on the CLI too. strip-markup
          ## would otherwise drop <br> and run the lines together. The <br></br>
