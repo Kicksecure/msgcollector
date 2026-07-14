@@ -29,6 +29,21 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QIcon, QPixmap
 
 
+class SafeTextBrowser(QtWidgets.QTextBrowser):
+    """
+    Defense-in-depth QTextBrowser that refuses to load ANY resource.
+
+    Messages are rendered via setText()/setHtml() from caller-constructed
+    HTML. Refusing every resource load guarantees a message can never trigger
+    a network or filesystem fetch (e.g. '<img src="http://...">'), even if an
+    unsanitized value reaches the widget. Legitimate messages contain only
+    text and links, never embedded resources.
+    """
+
+    def loadResource(self, resource_type, url):
+        return None
+
+
 def signal_handler(sig, frame):
     sys.exit(128 + sig)
 
@@ -85,7 +100,7 @@ class GuiMessage(QtWidgets.QDialog):
         self.label.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
         self.gridLayout.addWidget(self.label, 0, 0)
 
-        self.text = QtWidgets.QTextBrowser(self)
+        self.text = SafeTextBrowser(self)
         self.text.setMinimumSize(535, 0)
         self.text.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
         self.text.setFrameShape(QtWidgets.QFrame.NoFrame)
