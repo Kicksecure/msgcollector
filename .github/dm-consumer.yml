@@ -1,0 +1,10 @@
+## Copyright (C) 2026 - 2026 ENCRYPTED SUPPORT LLC <adrelanos@whonix.org>
+## See the file COPYING for copying conditions.
+
+## AI-Assisted
+
+## Per-repo parameters for developer-meta-files consumer workflows, read at
+## workflow runtime. python3-pyqt5 is needed by the dist-ai msgcollector-tests
+## SafeTextBrowser validator (offscreen Qt); hypothesis by the property tests.
+dist-ai-tests:
+  apt-packages: "python3 python3-pytest python3-hypothesis python3-pyqt5"
