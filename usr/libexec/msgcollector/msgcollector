@@ -3,6 +3,12 @@
 ## Copyright (C) 2012 - 2025 ENCRYPTED SUPPORT LLC <adrelanos@whonix.org>
 ## See the file COPYING for copying conditions.
 
+## style-ok: no-strict
+## errexit ('set -e') and pipefail ARE set below. nounset is intentionally
+## omitted: msgcollector reads many optional CLI fields (icon, titlecli,
+## typecli, progressbaridx, ...) that are legitimately unset, and enabling
+## nounset would abort on them. The gate's R-010 strict-triple does not fit.
+
 #set -x
 set -e
 set -o pipefail
@@ -547,6 +553,16 @@ collector() {
          ## such as for login security check table.
          ## The application using 'msgcollector' needs to provide sanitized strings.
          #message="$(sanitize-string -- nolimit "$message")"
+         ## Translate GUI color tags (<font color="...">) to terminal ANSI
+         ## colors so a single HTML message renders colored in BOTH the GUI and
+         ## the CLI. Must run BEFORE strip-markup (which strips all tags); the
+         ## inserted ANSI escapes contain no HTML metacharacters and survive it.
+         message="$(printf '%s' "$message" | sed \
+            -e "s/<font color=\"green\">/${green:-}/g" \
+            -e "s/<font color=\"orange\">/${yellow:-}/g" \
+            -e "s/<font color=\"yellow\">/${yellow:-}/g" \
+            -e "s/<font color=\"red\">/${red:-}/g" \
+            -e "s#</font>#${reset:-}#g")"
          ## Instead, "only" use 'strip-markup' (strips HTML tags for CLI display).
          message="$(strip-markup "$message")"
          pretty_type_cli "$typecli"
