@@ -570,6 +570,11 @@ collector() {
          ## plain-URL CLI string. Handles quoted or unquoted href. Run BEFORE
          ## strip-markup.
          message="$(printf '%s' "$message" | sed -E -e 's#<a href="?([^">]*)"?>([^<]*)</a>#\2 (\1)#g')"
+         ## Translate GUI line breaks (<br>, <br/>, <br />) to real newlines, so a
+         ## single HTML message keeps its line breaks on the CLI too. strip-markup
+         ## would otherwise drop <br> and run the lines together. The <br></br>
+         ## closing half is left for strip-markup to remove. Run BEFORE strip-markup.
+         message="$(printf '%s' "$message" | sed -E -e 's#<br ?/?>#\n#g')"
          ## Instead, "only" use 'strip-markup' (strips HTML tags for CLI display).
          message="$(strip-markup "$message")"
          pretty_type_cli "$typecli"
