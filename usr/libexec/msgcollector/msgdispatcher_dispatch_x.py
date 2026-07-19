@@ -8,7 +8,7 @@ This script creates a GUI message dialog using PyQt5. It allows the user to spec
 the type of message, title, and content, as well as customize the icon and position of the dialog.
 
 Usage:
-/usr/libexec/msgcollector/msgdispatcher_dispatch_x <message_type> <title> <message> <position> [icon]
+/usr/libexec/msgcollector/msgdispatcher_dispatch_x.py <message_type> <title> <message> <position> [icon]
 
 Arguments:
 1. message_type: 'info', 'warning', or 'error'
@@ -18,7 +18,7 @@ Arguments:
 5. icon (optional): Path to a custom icon (defaults to a specific icon if not provided)
 
 Example:
-/usr/libexec/msgcollector/msgdispatcher_dispatch_x warning "Warning Title" "This is a warning message." "1" "/path/to/custom/icon.svg"
+/usr/libexec/msgcollector/msgdispatcher_dispatch_x.py warning "Warning Title" "This is a warning message." "1" "/path/to/custom/icon.svg"
 """
 
 import os

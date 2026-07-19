@@ -7,7 +7,7 @@
 This script creates a GUI message dialog using PyQt5.
 
 Usage:
-/usr/libexec/msgcollector/generic_gui_message <message_type> <title> <message> <question> <button_type>
+/usr/libexec/msgcollector/generic_gui_message.py <message_type> <title> <message> <question> <button_type>
 
 Arguments:
 1. message_type: 'info', 'warning', or 'error'
@@ -17,8 +17,8 @@ Arguments:
 5. button_type: 'ok' for a single OK button, 'yesno' for Yes and No buttons
 
 Examples:
-/usr/libexec/msgcollector/generic_gui_message warning "Alert" "This is a warning message." "Do you want to continue?" yesno
-/usr/libexec/msgcollector/generic_gui_message info "Info" "This is an info message with a link: <a href='https://www.example.com'>Click here</a>" "" ok
+/usr/libexec/msgcollector/generic_gui_message.py warning "Alert" "This is a warning message." "Do you want to continue?" yesno
+/usr/libexec/msgcollector/generic_gui_message.py info "Info" "This is an info message with a link: <a href='https://www.example.com'>Click here</a>" "" ok
 """
 
 import os

@@ -452,7 +452,7 @@ printf '%s\n' "$0: === alert icon allowlist tests ==="
 test_alert_icon_allowlist() {
   ## Verify the allowlist is present in the source code.
   if grep "allowed_icons.*Information.*Warning.*Critical" \
-    usr/libexec/msgcollector/alert &>/dev/null; then
+    usr/libexec/msgcollector/alert.py &>/dev/null; then
     pass "alert has icon allowlist"
   else
     fail "alert missing icon allowlist"
