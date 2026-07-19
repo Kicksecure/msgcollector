@@ -1,10 +1,1 @@
-#!/usr/bin/python3 -su
-
-## Copyright (C) 2014 troubadour <trobador@riseup.net>
-## Copyright (C) 2014 - 2025 ENCRYPTED SUPPORT LLC <adrelanos@whonix.org>
-## See the file COPYING for copying conditions.
-
-import sys
-in_ = sys.argv[1]
-out = '<br />\n'.join(in_.split('\n'))
-print(out)
+br_add.py
