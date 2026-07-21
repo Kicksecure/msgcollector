@@ -385,7 +385,7 @@ pretty_type_x() {
    if [ "$first_three" = "<p>" ]; then
       local message_length remaining_chars message_without_p
       message_length="${#message}"
-      remaining_chars="$(( $message_length -3 ))"
+      remaining_chars="$(( message_length - 3 ))"
       message_without_p="${message:3:$remaining_chars}"
       if [ "$1" = "info" ]; then
          message="$msgINFO $message_without_p"
@@ -451,7 +451,7 @@ collector() {
    ## }}
 
    ## {{ --titlecli
-   if [ ! -z "$titlecli" ]; then
+   if [ -n "$titlecli" ]; then
       ## variable $titlecli exists
       ## TODO
       true "TODO: --titlecli not yet implemented in msgdispatcher"
@@ -460,7 +460,7 @@ collector() {
    ## }}
 
    ## {{ --titlex
-   if [ ! -z "$titlex" ]; then
+   if [ -n "$titlex" ]; then
       ## variable $titlex exists
       titlex="$(sanitize-string -- nolimit "$titlex")"
       printf '%s\n' "$titlex" > "${msgcollector_run_dir}/${identifier}_titlex"
@@ -468,7 +468,7 @@ collector() {
    ## }}
 
    ## {{ --passivepopupqueuextitle
-   if [ ! -z "$passivepopupqueuextitle" ]; then
+   if [ -n "$passivepopupqueuextitle" ]; then
       ## variable $passivepopupqueuextitle exists
       passivepopupqueuextitle="$(sanitize-string -- nolimit "$passivepopupqueuextitle")"
       printf '%s\n' "$passivepopupqueuextitle" > "${msgcollector_run_dir}/${identifier}_passivepopupqueuextitle"
@@ -476,7 +476,7 @@ collector() {
    ## }}
 
    ## {{ --progressbartitlex
-   if [ ! -z "$progressbartitlex" ]; then
+   if [ -n "$progressbartitlex" ]; then
       ## variable $progressbartitlex exists
       progressbartitlex="$(sanitize-string -- nolimit "$progressbartitlex")"
       printf '%s\n' "$progressbartitlex" > "${msgcollector_run_dir}/${identifier}_${progressbaridx}_progressbartitlex"
@@ -555,7 +555,7 @@ collector() {
    ## {{ --messagecli
    if [ "$messagecli" = "1" ]; then
       write_to_file="${msgcollector_run_dir}/${identifier}_messagecli"
-      if [ ! -z "$message" ]; then
+      if [ -n "$message" ]; then
          ## variable $message exists
          ## NOTE: Cannot use 'sanitize-string' as it would remove terminal colors,
          ## such as for login security check table.
@@ -596,7 +596,7 @@ collector() {
    ## {{ --waitmessagecli
    if [ "$waitmessagecli" = "1" ]; then
       write_to_file="${msgcollector_run_dir}/${identifier}_waitmessagecli"
-      if [ ! -z "$message" ]; then
+      if [ -n "$message" ]; then
          ## variable $message exists
          message="$(sanitize-string -- nolimit "$message")"
          pretty_type_cli "$typecli"
@@ -654,7 +654,7 @@ collector() {
    ## }}
 
    ## {{ --parenttty
-   if [ ! -z "$parenttty" ]; then
+   if [ -n "$parenttty" ]; then
       printf '%s\n' "$parenttty" > "${msgcollector_run_dir}/${identifier}_parenttty"
    fi
    ## }}
@@ -689,7 +689,7 @@ append_to_file() {
       return 0
    fi
 
-   if [ ! -z "$message" ]; then
+   if [ -n "$message" ]; then
       ## variable $message exists
       if [ "$newlinecli" = "1" ]; then
          printf '%s\n' "
