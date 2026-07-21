@@ -7,7 +7,7 @@
 This script creates a GUI message dialog using PyQt5.
 
 Usage:
-/usr/libexec/msgcollector/generic_gui_message <message_type> <title> <message> <question> <button_type>
+/usr/libexec/msgcollector/generic_gui_message.py <message_type> <title> <message> <question> <button_type>
 
 Arguments:
 1. message_type: 'info', 'warning', or 'error'
@@ -17,8 +17,8 @@ Arguments:
 5. button_type: 'ok' for a single OK button, 'yesno' for Yes and No buttons
 
 Examples:
-/usr/libexec/msgcollector/generic_gui_message warning "Alert" "This is a warning message." "Do you want to continue?" yesno
-/usr/libexec/msgcollector/generic_gui_message info "Info" "This is an info message with a link: <a href='https://www.example.com'>Click here</a>" "" ok
+/usr/libexec/msgcollector/generic_gui_message.py warning "Alert" "This is a warning message." "Do you want to continue?" yesno
+/usr/libexec/msgcollector/generic_gui_message.py info "Info" "This is an info message with a link: <a href='https://www.example.com'>Click here</a>" "" ok
 """
 
 import os
@@ -27,6 +27,21 @@ import signal
 import argparse
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QIcon, QPixmap
+
+
+class SafeTextBrowser(QtWidgets.QTextBrowser):
+    """
+    Defense-in-depth QTextBrowser that refuses to load ANY resource.
+
+    Messages are rendered via setText()/setHtml() from caller-constructed
+    HTML. Refusing every resource load guarantees a message can never trigger
+    a network or filesystem fetch (e.g. '<img src="http://...">'), even if an
+    unsanitized value reaches the widget. Legitimate messages contain only
+    text and links, never embedded resources.
+    """
+
+    def loadResource(self, resource_type, url):
+        return None
 
 
 def signal_handler(sig, frame):
@@ -85,7 +100,7 @@ class GuiMessage(QtWidgets.QDialog):
         self.label.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
         self.gridLayout.addWidget(self.label, 0, 0)
 
-        self.text = QtWidgets.QTextBrowser(self)
+        self.text = SafeTextBrowser(self)
         self.text.setMinimumSize(535, 0)
         self.text.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
         self.text.setFrameShape(QtWidgets.QFrame.NoFrame)

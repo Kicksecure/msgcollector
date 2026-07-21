@@ -8,7 +8,7 @@ This script creates a GUI message dialog using PyQt5, intended to confirm downlo
 and display information about currently installed and available versions.
 
 Usage:
-/usr/libexec/msgcollector/msgdispatcher_dispatch_x <message_type> <title> <installed_version> <online_versions> <message> <question> <button_type>
+/usr/libexec/msgcollector/msgdispatcher_dispatch_x.py <message_type> <title> <installed_version> <online_versions> <message> <question> <button_type>
 
 Arguments:
 1. message_type: 'info', 'warning', or 'error'
@@ -20,7 +20,7 @@ Arguments:
 7. button_type: 'ok' for a single OK button, 'yesno' for Yes and No buttons
 
 Example:
-/usr/libexec/msgcollector/msgdispatcher_dispatch_x warning "Update Available" "1.0" "1.1,1.2" "A new version is available." "Do you want to update?" yesno
+/usr/libexec/msgcollector/msgdispatcher_dispatch_x.py warning "Update Available" "1.0" "1.1,1.2" "A new version is available." "Do you want to update?" yesno
 """
 
 import os

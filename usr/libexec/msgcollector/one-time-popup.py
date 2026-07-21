@@ -11,7 +11,7 @@ This script creates a one-time popup message dialog using PyQt5. The popup
 will not be shown again if the user selects "Do not show this message again."
 
 Usage:
-/usr/libexec/msgcollector/one-time-popup <status_file> <title> <message>
+/usr/libexec/msgcollector/one-time-popup.py <status_file> <title> <message>
 
 Arguments:
 1. status_file: Path to the status file used to track if the message should be
@@ -20,7 +20,7 @@ Arguments:
 3. message: The main message text
 
 Example:
-/usr/libexec/msgcollector/one-time-popup \
+/usr/libexec/msgcollector/one-time-popup.py \
   ~/testfolder/status-file \
   "Test Title" \
   "Test Message"

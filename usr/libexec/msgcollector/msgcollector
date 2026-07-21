@@ -3,6 +3,12 @@
 ## Copyright (C) 2012 - 2025 ENCRYPTED SUPPORT LLC <adrelanos@whonix.org>
 ## See the file COPYING for copying conditions.
 
+## style-ok: no-strict
+## errexit ('set -e') and pipefail ARE set below. nounset is intentionally
+## omitted: msgcollector reads many optional CLI fields (icon, titlecli,
+## typecli, progressbaridx, ...) that are legitimately unset, and enabling
+## nounset would abort on them. The gate's R-010 strict-triple does not fit.
+
 #set -x
 set -e
 set -o pipefail
@@ -295,66 +301,61 @@ colors() {
       return 0
    fi
 
-## The checks [[ -t 2 ]] and [[ $TERM != *-m ]] have been deactivated, because
-## at the time msgcollector gets its first messages, there might be no
-## terminal. We need those colors anyway, because they get stored in the files.
-
-## Thanks to:
-## http://mywiki.wooledge.org/BashFAQ/037
-## Variables for terminal requests.
-#[[ -t 2 ]]
-true && {
-    alt=$(      tput smcup  || tput ti      ) # Start alt display
-    ealt=$(     tput rmcup  || tput te      ) # End   alt display
-    hide=$(     tput civis  || tput vi      ) # Hide cursor
-    show=$(     tput cnorm  || tput ve      ) # Show cursor
-    save=$(     tput sc                     ) # Save cursor
-    load=$(     tput rc                     ) # Load cursor
-    bold=$(     tput bold   || tput md      ) # Start bold
-    stout=$(    tput smso   || tput so      ) # Start stand-out
-    estout=$(   tput rmso   || tput se      ) # End stand-out
-    under=$(    tput smul   || tput us      ) # Start underline
-    eunder=$(   tput rmul   || tput ue      ) # End   underline
-    reset=$(    tput sgr0   || tput me      ) # Reset cursor
-    blink=$(    tput blink  || tput mb      ) # Start blinking
-    italic=$(   tput sitm   || tput ZH      ) # Start italic
-    eitalic=$(  tput ritm   || tput ZR      ) # End   italic
-#[[ $TERM != *-m ]]
-true && {
-    red=$(      tput setaf 1|| tput AF 1    )
-    green=$(    tput setaf 2|| tput AF 2    )
-    yellow=$(   tput setaf 3|| tput AF 3    )
-    blue=$(     tput setaf 4|| tput AF 4    )
-    magenta=$(  tput setaf 5|| tput AF 5    )
-    cyan=$(     tput setaf 6|| tput AF 6    )
+   ## Terminal color/attribute variables (green, red, yellow, reset, bold, eel,
+   ## ebl, ...) come from helper-scripts' get_colors, which emits plain ESC[...m
+   ## sequences -- no tput, and crucially no Shift-In (0x0f) that 'tput sgr0'
+   ## appends to also reset the charset and that would then trail every colored
+   ## token in redirected CLI output. ASSUME_TERM_PRESENT keeps the previous
+   ## behaviour of defining colors whenever TERM is set (they are stored in the
+   ## message files for later display), independent of whether stderr is a tty.
+   ASSUME_TERM_PRESENT=true
+   source /usr/libexec/helper-scripts/get_colors.sh
+   get_colors
 }
-    white=$(    tput setaf 7|| tput AF 7    )
-    default=$(  tput op                     )
-    eed=$(      tput ed     || tput cd      )   # Erase to end of display
-    eel=$(      tput el     || tput ce      )   # Erase to end of line
-    ebl=$(      tput el1    || tput cb      )   # Erase to beginning of line
-    ewl=$eel$ebl                                # Erase whole line
-    draw=$(     tput -S <<< '   enacs
-                                smacs
-                                acsc
-                                rmacs' || { \
-                tput eA; tput as;
-                tput ac; tput ae;         } )   # Drawing characters
-    back=$'\b'
-} 2>/dev/null ||:
+
+cli_links_to_footnotes() {
+   ## Convert GUI hyperlinks in a CLI message to footnotes: each
+   ## <a href="url">text</a> becomes "text[N]" inline, and the URLs are listed
+   ## under a trailing "Links:" section. This keeps URLs out of the flow text
+   ## while preserving them (strip-markup would otherwise drop the href).
+   ## Echoes the transformed message. Handles quoted or unquoted href.
+   local rest="$1" footer="" n=0 whole url text before after
+   local re='<a href="?([^">]*)"?>([^<]*)</a>'
+   ## Rewrite each <a href>...</a> to "text[N]", re-scanning so a reunited outer
+   ## anchor (from invalid nested input) is caught too. Every pass replaces one
+   ## anchor -- and thus one "</a>" -- with anchor-free text, so the "</a>" count
+   ## strictly decreases and the loop always terminates. (An earlier version
+   ## replaced the first LITERAL match rather than splitting on it, which could
+   ## fail to advance and loop forever on crafted input like
+   ## '<a href="<a href=">x</a>'.)
+   while [[ "$rest" =~ $re ]]; do
+      whole="${BASH_REMATCH[0]}"
+      url="${BASH_REMATCH[1]}"
+      text="${BASH_REMATCH[2]}"
+      before="${rest%%"$whole"*}"   # text before the first occurrence
+      after="${rest#*"$whole"}"     # text after it
+      n=$(( n + 1 ))
+      rest="${before}${text}[${n}]${after}"
+      footer="${footer}[${n}] ${url}"$'\n'
+   done
+   if [ "$n" -gt 0 ]; then
+      printf '%s\n\nLinks:\n%s' "$rest" "$footer"
+   else
+      printf '%s' "$rest"
+   fi
 }
 
 pretty_type_cli() {
    trap "error_handler" ERR
 
    if [ "$1" = "info" ]; then
-      p_type="${green}INFO${reset}"
+      p_type="${green}INFO${reset:-}"
    elif [ "$1" = "warning" ]; then
-      p_type="${red}WARNING${reset}"
+      p_type="${red}WARNING${reset:-}"
    elif [ "$1" = "error" ]; then
-      p_type="${red}${bold}ERROR${reset}"
+      p_type="${red}${bold}ERROR${reset:-}"
    else
-      p_type="${red}???${reset}"
+      p_type="${red}???${reset:-}"
    fi
 }
 
@@ -547,6 +548,28 @@ collector() {
          ## such as for login security check table.
          ## The application using 'msgcollector' needs to provide sanitized strings.
          #message="$(sanitize-string -- nolimit "$message")"
+         ## Translate GUI color tags (<font color="...">) to terminal ANSI
+         ## colors so a single HTML message renders colored in BOTH the GUI and
+         ## the CLI. Must run BEFORE strip-markup (which strips all tags); the
+         ## inserted ANSI escapes contain no HTML metacharacters and survive it.
+         message="$(printf '%s' "$message" | sed \
+            -e "s/<font color=\"green\">/${green:-}/g" \
+            -e "s/<font color=\"orange\">/${yellow:-}/g" \
+            -e "s/<font color=\"yellow\">/${yellow:-}/g" \
+            -e "s/<font color=\"red\">/${red:-}/g" \
+            -e "s#</font>#${reset:-}#g")"
+         ## Translate GUI hyperlinks (<a href="url">text</a>) to footnote form:
+         ## the link text stays inline as "text[N]" and the URLs are listed under
+         ## a "Links:" section below the message, so a URL never clutters the
+         ## flow text (a message with several links used to read like
+         ## "Login (url) Security Check (Colors (url))"). Keeps the URL that
+         ## strip-markup would otherwise drop. Run BEFORE strip-markup.
+         message="$(cli_links_to_footnotes "$message")"
+         ## Translate GUI line breaks (<br>, <br/>, <br />) to real newlines, so a
+         ## single HTML message keeps its line breaks on the CLI too. strip-markup
+         ## would otherwise drop <br> and run the lines together. The <br></br>
+         ## closing half is left for strip-markup to remove. Run BEFORE strip-markup.
+         message="$(printf '%s' "$message" | sed -E -e 's#<br ?/?>#\n#g')"
          ## Instead, "only" use 'strip-markup' (strips HTML tags for CLI display).
          message="$(strip-markup "$message")"
          pretty_type_cli "$typecli"
