@@ -35,6 +35,32 @@ def signal_handler(sig, frame):
     sys.exit(128 + sig)
 
 
+def select_qt_platform(environ):
+    """Choose a Qt QPA platform for a Wayland session when none is pinned.
+
+    Qt5 defaults to the "xcb" platform even inside a Wayland session. When
+    no X server (or XWayland) is reachable -- for example this dialog is
+    launched from a .desktop shortcut on a Wayland-only Kicksecure/Whonix
+    session -- xcb aborts the process with no window, and a caller running
+    under "set -o errexit" (update-torbrowser) then dies silently. Prefer
+    Wayland with an xcb fallback so the dialog appears under both session
+    types.
+
+    Returns the platform string to set, or None to leave Qt's own default
+    in place: when QT_QPA_PLATFORM is already pinned (e.g. by
+    sandbox-update-torbrowser) or when this is not a Wayland session.
+    """
+    if environ.get("QT_QPA_PLATFORM"):
+        return None
+    ## A Wayland session is signalled by WAYLAND_DISPLAY, or by
+    ## XDG_SESSION_TYPE=wayland even with WAYLAND_DISPLAY unset (libwayland then
+    ## defaults to the "wayland-0" socket) -- msgdispatcher routes both to the
+    ## GUI path, so both must get the fallback.
+    if environ.get("WAYLAND_DISPLAY") or environ.get("XDG_SESSION_TYPE") == "wayland":
+        return "wayland;xcb"
+    return None
+
+
 class GuiMessage(QtWidgets.QDialog):
     def __init__(self, args):
         super(GuiMessage, self).__init__()
@@ -196,6 +222,10 @@ def main():
     parser.add_argument('button_type', choices=['ok', 'yesno'], help="Type of the button ('ok' for a single OK button, 'yesno' for Yes and No buttons)")
 
     args = parser.parse_args()
+
+    qt_platform = select_qt_platform(os.environ)
+    if qt_platform:
+        os.environ["QT_QPA_PLATFORM"] = qt_platform
 
     app = QtWidgets.QApplication(sys.argv)
     signal.signal(signal.SIGINT, signal_handler)
