@@ -318,7 +318,10 @@ cli_links_to_footnotes() {
    ## <a href="url">text</a> becomes "text[N]" inline, and the URLs are listed
    ## under a trailing "Links:" section. This keeps URLs out of the flow text
    ## while preserving them (strip-markup would otherwise drop the href).
-   ## Echoes the transformed message. Handles quoted or unquoted href.
+   ## An anchor whose text is already the URL is the exception: it is emitted
+   ## as the bare URL inline with no footnote, since a footnote would only
+   ## repeat that same URL. Echoes the transformed message. Handles quoted or
+   ## unquoted href.
    local rest="$1" footer="" n=0 whole url text before after
    local re='<a href="?([^">]*)"?>([^<]*)</a>'
    ## Rewrite each <a href>...</a> to "text[N]", re-scanning so a reunited outer
@@ -334,6 +337,16 @@ cli_links_to_footnotes() {
       text="${BASH_REMATCH[2]}"
       before="${rest%%"$whole"*}"   # text before the first occurrence
       after="${rest#*"$whole"}"     # text after it
+      if [ "$text" = "$url" ]; then
+         ## Link text is the URL itself, so a footnote would print the same
+         ## URL twice -- inline as "url[N]" and again under "Links:". Emit the
+         ## bare URL inline instead: no number, no footer entry. (text comes
+         ## from the [^<]* group, so it holds no '<'; when text == url the url
+         ## is therefore anchor-free too, keeping the loop's termination and
+         ## idempotency invariants intact.)
+         rest="${before}${url}${after}"
+         continue
+      fi
       n=$(( n + 1 ))
       rest="${before}${text}[${n}]${after}"
       footer="${footer}[${n}] ${url}"$'\n'
