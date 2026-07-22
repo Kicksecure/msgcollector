@@ -6,11 +6,6 @@
 ## Per-repo parameters for developer-meta-files consumer workflows, read at
 ## workflow runtime. python3-pyqt5 is needed by the dist-ai msgcollector-tests
 ## SafeTextBrowser validator (offscreen Qt); hypothesis by the property tests.
-## qtwayland5 + labwc + wtype are needed by the real-dialog Wayland test
-## (test_gui_dialog_wayland.py): it launches each PyQt5 confirmation dialog
-## under the real 'wayland' Qt plugin on a headless labwc (wlroots) compositor
-## and confirms it with wtype -- no stubbing, no offscreen QPA. That test fails
-## (not skips) under CI if the tooling is absent, so these must stay installed.
 coverity:
   ## scan.coverity.com project name (org-ai-assisted-owned; the "/" is
   ## rejected in manual registration so the name is slash-free).
@@ -18,4 +13,4 @@ coverity:
   canonical-repos: "org-ai-assisted/msgcollector"
 
 dist-ai-tests:
-  apt-packages: "python3 python3-pytest python3-hypothesis python3-pyqt5 qtwayland5 labwc wtype"
+  apt-packages: "python3 python3-pytest python3-hypothesis python3-pyqt5"
