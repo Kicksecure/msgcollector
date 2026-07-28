@@ -1,3 +1,111 @@
+commit 100fcc62a5a7e19508056128455bcce0cd166f34
+Merge: 192fc84 2899550
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Jul 23 08:17:45 2026 -0400
+
+    Merge remote-tracking branch 'refs/remotes/org-ai-assisted/master'
+
+commit 2899550eb85222a9110d8949d5f44f587a0859aa
+Author: claude (dev100 03987f25-26a2-4e00-807f-e46c67d5d062) <noreply@anthropic.com>
+Date:   Tue Jul 21 20:02:57 2026 -0400
+
+    Revert "GUI dialogs: Wayland Qt-platform guard (select_qt_platform) + real-dialog CI test deps (#35)"
+
+    This reverts commit 18263ba09c98a3526cf38536f469ca3a4d7d0896.
+
+commit 18263ba09c98a3526cf38536f469ca3a4d7d0896
+Author: assisted-by-ai (Bot Account) (Machine Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Tue Jul 21 19:57:58 2026 -0400
+
+    GUI dialogs: Wayland Qt-platform guard (select_qt_platform) + real-dialog CI test deps (#35)
+
+    ## What
+
+    Qt5 defaults to the `xcb` platform even inside a Wayland session. With
+    no X server / XWayland reachable (a Wayland-only Kicksecure/Whonix
+    `.desktop` launch), xcb aborts the dialog with no window, and a caller
+    under `set -o errexit` (update-torbrowser) then dies silently.
+
+    Add `select_qt_platform()` to every libexec dialog that builds a
+    `QApplication` - `generic_gui_message.py`,
+    `msgdispatcher_dispatch_x.py`, `one-time-popup.py`, `tb_updater_gui.py`.
+    When `QT_QPA_PLATFORM` is unpinned and the session is Wayland
+    (`WAYLAND_DISPLAY` set, or `XDG_SESSION_TYPE=wayland`), it returns
+    `wayland;xcb` (Wayland first, xcb fallback), set before the
+    `QApplication` is constructed; otherwise it leaves Qt's default
+    untouched, and an explicit pin (e.g. `sandbox-update-torbrowser`'s) is
+    always respected.
+
+    ## Why this, now
+
+    This **re-applies the guard from the closed #30** to the current `.py`
+    libexec names. The original #30 landed the same fix on the
+    pre-`.py`-rename files and was orphaned when the scripts were renamed;
+    the guard never reached master, so the dist-ai `msgcollector-tests`
+    `test_gui_platform` suite (which enumerates every `QApplication` dialog
+    and asserts each defines + calls the guard before `QApplication`) has
+    been **red on master**. This turns it green.
+
+    ## CI deps
+
+    `dm-consumer.yml`: add `qtwayland5` + `labwc` + `wtype` to the
+    `dist-ai-tests` apt-packages, so the new dist-ai real-dialog Wayland
+    test (`test_gui_dialog_wayland.py`) actually runs - it launches each
+    dialog under the real `wayland` plugin on a headless labwc (wlroots)
+    compositor and confirms it with wtype (no stubbing, no offscreen QPA).
+
+    ## Tested
+
+    Full dist-ai `msgcollector-tests` suite green against this branch: 19
+    passed (incl. `test_gui_platform` 8/8 and the 2 new real-dialog Wayland
+    tests).
+
+    Co-Authored-By: Claude Opus 4.8
+
+    Co-authored-by: claude (dev100 03987f25-26a2-4e00-807f-e46c67d5d062) <noreply@anthropic.com>
+
+commit eacca1e556b2d55ce2768c6c0735fbc625d99288
+Author: assisted-by-ai (Bot Account) (Machine Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Tue Jul 21 07:55:19 2026 -0400
+
+    msgcollector: clear pre-existing shellcheck style debt (SC2236, SC2004) (#34)
+
+    Behavior-preserving: '[ ! -z x ]' -> '[ -n x ]' (8 sites) and drop redundant $ in arithmetic. (The red dist-ai-tests check is the pre-existing test_safe_textbrowser/msgdispatcher_dispatch_x stale test, unrelated.)
+
+    AI-Assisted
+
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+
+commit 2a23b37a22dcc6b33305f7bb6a07df8fa125621f
+Author: assisted-by-ai (Bot Account) (Machine Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Tue Jul 21 07:46:21 2026 -0400
+
+    msgcollector: remove alert.py (superseded by generic_gui_message.py) (#33)
+
+    alert.py (YAML+section+localization QMessageBox) had one in-tree caller (qubes-whonix), ported to generic_gui_message.py. Remove the script and its source-grep unit test. (The one red dist-ai-tests check is a pre-existing stale test_safe_textbrowser referencing the renamed msgdispatcher_dispatch_x, unrelated to this change.)
+
+    AI-Assisted
+
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+
+commit 6f2d796a4de5e6e569d08a9d6616fc959a479026
+Author: assisted-by-ai (Bot Account) (Machine Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Tue Jul 21 07:23:41 2026 -0400
+
+    cli_links_to_footnotes: do not footnote an anchor whose text is the URL (#32)
+
+    An anchor whose text equals its href rendered the URL twice (inline as url[N] and again under Links:). Emit such an anchor as the bare URL inline instead. Fixes the donate message and systemcheck's pvclock/timezone link lists.
+
+    AI-Assisted
+
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+
+commit 192fc8406a74ded47bad5ebb56ee930b4134bcba
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Jul 21 10:38:13 2026 +0000
+
+    bumped changelog version
+
 commit 6483db0bf378fc9d516f62a54b1079adb4103a4c
 Merge: 734e7a6 bdc3e70
 Author: Patrick Schleizer <adrelanos@whonix.org>
