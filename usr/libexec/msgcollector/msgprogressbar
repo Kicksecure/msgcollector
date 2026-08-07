@@ -259,7 +259,12 @@ start_progress_bar() {
       --window-icon "${icon}" \
       --title="${progressbartitlex}" \
       --progress \
-      "${percentage_maybe_add}" \
+      ## DELIBERATELY UNQUOTED: percentage_maybe_add is either EMPTY or the
+      ## two words '--percentage <n>'. Quoted, the dialog receives one argument
+      ## '--percentage 42' that it does not recognise -- or, when empty, a
+      ## spurious empty argument.
+      # shellcheck disable=SC2086
+      ${percentage_maybe_add} \
       --text "${message}" \
       < "${fifo}" & yad_progress_pid="$!"
 
