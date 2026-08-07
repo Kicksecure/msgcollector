@@ -3,6 +3,8 @@
 ## Copyright (C) 2012 - 2025 ENCRYPTED SUPPORT LLC <adrelanos@whonix.org>
 ## See the file COPYING for copying conditions.
 
+## Keep the command trace: it is this script's diagnostic output.
+set -x
 set -o errexit
 set -o nounset
 set -o pipefail
