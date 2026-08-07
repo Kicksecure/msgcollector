@@ -33,6 +33,11 @@ percentage_maybe_add=""
 icon=""
 progress_txt_file_progress=""
 verbose=""
+## Assigned only where yad is actually launched, but cleanup_self reads it and
+## runs EARLIER on two paths -- including the 'already 100%, not even opening
+## the progress bar' race the code handles deliberately. Under nounset that
+## clean exit aborted instead.
+yad_progress_pid=""
 
 source /usr/libexec/helper-scripts/light_sleep.bsh
 
@@ -352,6 +357,13 @@ folder_init
 
 ## provides: check, is_whole_number
 source /usr/libexec/msgcollector/check
+
+## msgfallbacks (sourced below) calls 'has', which is a FUNCTION from this
+## file, not an executable. msgdispatcher already sourced it; this one did not,
+## so the same shared code worked in one caller and not the other.
+# shellcheck source=../../../../helper-scripts/usr/libexec/helper-scripts/has.sh
+# shellcheck disable=SC1091
+source /usr/libexec/helper-scripts/has.sh
 
 source /usr/libexec/msgcollector/msgfallbacks
 fallbacks ## provided by /usr/libexec/msgcollector/msgfallbacks
