@@ -67,16 +67,40 @@ parse_cmd_options() {
                shift
                ;;
            --identifier)
-               identifier="$2"
-               shift 2
+               identifier="${2:-}"
+               ## Guarded: with the flag given LAST there is only one
+               ## argument to shift, and shift_verbose turns that into a
+               ## reported failure. Skipping the impossible shift lets the
+               ## check() below report which option is missing.
+               if [ "$#" -ge 2 ]; then
+                  shift 2
+               else
+                  shift 1
+               fi
                ;;
            --progress)
-               progress="$2"
-               shift 2
+               progress="${2:-}"
+               ## Guarded: with the flag given LAST there is only one
+               ## argument to shift, and shift_verbose turns that into a
+               ## reported failure. Skipping the impossible shift lets the
+               ## check() below report which option is missing.
+               if [ "$#" -ge 2 ]; then
+                  shift 2
+               else
+                  shift 1
+               fi
                ;;
            --progressbaridx)
-               progressbaridx="$2"
-               shift 2
+               progressbaridx="${2:-}"
+               ## Guarded: with the flag given LAST there is only one
+               ## argument to shift, and shift_verbose turns that into a
+               ## reported failure. Skipping the impossible shift lets the
+               ## check() below report which option is missing.
+               if [ "$#" -ge 2 ]; then
+                  shift 2
+               else
+                  shift 1
+               fi
                ;;
            --)
                shift

@@ -11,6 +11,11 @@ set -o errtrace
 shopt -s inherit_errexit
 shopt -s shift_verbose
 
+## Option targets, assigned only when their flag is given and read
+## unconditionally later -- 'verbose' by dispatch_x_active in particular.
+## Empty is what they expanded to before strict mode.
+verbose=""
+
 ## sets: has
 ## Sourced here rather than with the other helper-scripts near the bottom of
 ## this file: preparation() and the passive-popup dispatch below both run
@@ -25,7 +30,10 @@ source /usr/libexec/helper-scripts/has.sh
 error_handler() {
    local last_exit_code="$?"
    trap - ERR
-   if [ ! "$1" = "" ]; then
+   ## '${1:-}': 'trap "error_handler" ERR' passes NO arguments, so under
+   ## nounset the handler aborted on its own first line -- losing the error it
+   ## exists to report.
+   if [ ! "${1:-}" = "" ]; then
       error_text="$1"
    else
       error_text="${BASH_COMMAND}"
@@ -153,7 +161,7 @@ preparation() {
 passive_popup_tool() {
    local time title text
    time="$1"
-   title="$2"
+   title="${2:-}"
    text="$3"
 
    ## Fallback.
