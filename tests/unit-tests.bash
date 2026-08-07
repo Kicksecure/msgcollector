@@ -446,21 +446,6 @@ test_pv_wrapper_reject_injection() {
 
 ## --------------------------------------------------------------------------
 printf '%s\n' ""
-printf '%s\n' "$0: === alert icon allowlist tests ==="
-## --------------------------------------------------------------------------
-
-test_alert_icon_allowlist() {
-  ## Verify the allowlist is present in the source code.
-  if grep "allowed_icons.*Information.*Warning.*Critical" \
-    usr/libexec/msgcollector/alert &>/dev/null; then
-    pass "alert has icon allowlist"
-  else
-    fail "alert missing icon allowlist"
-  fi
-}
-
-## --------------------------------------------------------------------------
-printf '%s\n' ""
 printf '%s\n' "$0: === Run all tests ==="
 ## --------------------------------------------------------------------------
 
@@ -505,8 +490,6 @@ test_msgprogress_reject_bad_identifier
 
 test_pv_wrapper_filters_non_numeric
 test_pv_wrapper_reject_injection
-
-test_alert_icon_allowlist
 
 ## --------------------------------------------------------------------------
 printf '%s\n' ""

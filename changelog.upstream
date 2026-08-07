@@ -1,3 +1,477 @@
+commit a50fcad4befbb9d2dbe6f46379d029684a4d5491
+Merge: 66a60a8 1bfc0f3
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Jul 31 13:11:04 2026 -0400
+
+    Merge remote-tracking branch 'refs/remotes/org-ai-assisted/master'
+
+commit 1bfc0f3c303e15fdcd99aa9cb5703144a21c13f6
+Merge: 66a60a8 c7d4732
+Author: assisted-by-ai (Bot Account) (Machine Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Fri Jul 31 10:22:31 2026 -0400
+
+    Merge pull request from org-ai-assisted/ai
+
+    ci: gate the local workflows on CI_ENABLED_ORG_AI_ASSISTED
+
+commit c7d473287905de01f08465542cecce8fdf8cea89
+Author: claude (dev138 9b889944-0a22-45e7-8fd6-c189113e33b9) <noreply@anthropic.com>
+Date:   Fri Jul 31 09:37:56 2026 -0400
+
+    ci: gate the local workflows on CI_ENABLED_ORG_AI_ASSISTED
+
+    Our workflows ran wherever the branch landed. Merged upstream they burn
+    Kicksecure/Whonix runner quota and post our CI into repos that never
+    asked for it; on a contributor fork they run the whole suite unbidden.
+    Only 5 of 136 workflow files across the fleet carried any owner gate.
+
+    Gate: a job-level `vars.CI_ENABLED_ORG_AI_ASSISTED == 'true'`, set once
+    as an organization variable on org-ai-assisted. Zero runner cost -- a job
+    whose `if:` is false never allocates one -- and the run still reports
+    green, so upstream and forks are not handed a red X for a lane they did
+    not opt into. A fork that WANTS the lane sets the same variable in its
+    own repo; no patch to these files, no fork of our workflows.
+
+    ANDed in front of any existing fork-PR guard rather than replacing it.
+
+    Verified: the workflow-yaml validator reports 0 findings for this repo.
+
+    Generated with assistance from Claude Code.
+
+commit 66a60a83a3637da7d9a58c1a9c10c90ba46a5213
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Jul 28 13:19:02 2026 +0000
+
+    bumped changelog version
+
+commit 100fcc62a5a7e19508056128455bcce0cd166f34
+Merge: 192fc84 2899550
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Jul 23 08:17:45 2026 -0400
+
+    Merge remote-tracking branch 'refs/remotes/org-ai-assisted/master'
+
+commit 2899550eb85222a9110d8949d5f44f587a0859aa
+Author: claude (dev100 03987f25-26a2-4e00-807f-e46c67d5d062) <noreply@anthropic.com>
+Date:   Tue Jul 21 20:02:57 2026 -0400
+
+    Revert "GUI dialogs: Wayland Qt-platform guard (select_qt_platform) + real-dialog CI test deps (#35)"
+
+    This reverts commit 18263ba09c98a3526cf38536f469ca3a4d7d0896.
+
+commit 18263ba09c98a3526cf38536f469ca3a4d7d0896
+Author: assisted-by-ai (Bot Account) (Machine Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Tue Jul 21 19:57:58 2026 -0400
+
+    GUI dialogs: Wayland Qt-platform guard (select_qt_platform) + real-dialog CI test deps (#35)
+
+    ## What
+
+    Qt5 defaults to the `xcb` platform even inside a Wayland session. With
+    no X server / XWayland reachable (a Wayland-only Kicksecure/Whonix
+    `.desktop` launch), xcb aborts the dialog with no window, and a caller
+    under `set -o errexit` (update-torbrowser) then dies silently.
+
+    Add `select_qt_platform()` to every libexec dialog that builds a
+    `QApplication` - `generic_gui_message.py`,
+    `msgdispatcher_dispatch_x.py`, `one-time-popup.py`, `tb_updater_gui.py`.
+    When `QT_QPA_PLATFORM` is unpinned and the session is Wayland
+    (`WAYLAND_DISPLAY` set, or `XDG_SESSION_TYPE=wayland`), it returns
+    `wayland;xcb` (Wayland first, xcb fallback), set before the
+    `QApplication` is constructed; otherwise it leaves Qt's default
+    untouched, and an explicit pin (e.g. `sandbox-update-torbrowser`'s) is
+    always respected.
+
+    ## Why this, now
+
+    This **re-applies the guard from the closed #30** to the current `.py`
+    libexec names. The original #30 landed the same fix on the
+    pre-`.py`-rename files and was orphaned when the scripts were renamed;
+    the guard never reached master, so the dist-ai `msgcollector-tests`
+    `test_gui_platform` suite (which enumerates every `QApplication` dialog
+    and asserts each defines + calls the guard before `QApplication`) has
+    been **red on master**. This turns it green.
+
+    ## CI deps
+
+    `dm-consumer.yml`: add `qtwayland5` + `labwc` + `wtype` to the
+    `dist-ai-tests` apt-packages, so the new dist-ai real-dialog Wayland
+    test (`test_gui_dialog_wayland.py`) actually runs - it launches each
+    dialog under the real `wayland` plugin on a headless labwc (wlroots)
+    compositor and confirms it with wtype (no stubbing, no offscreen QPA).
+
+    ## Tested
+
+    Full dist-ai `msgcollector-tests` suite green against this branch: 19
+    passed (incl. `test_gui_platform` 8/8 and the 2 new real-dialog Wayland
+    tests).
+
+    Co-Authored-By: Claude Opus 4.8
+
+    Co-authored-by: claude (dev100 03987f25-26a2-4e00-807f-e46c67d5d062) <noreply@anthropic.com>
+
+commit eacca1e556b2d55ce2768c6c0735fbc625d99288
+Author: assisted-by-ai (Bot Account) (Machine Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Tue Jul 21 07:55:19 2026 -0400
+
+    msgcollector: clear pre-existing shellcheck style debt (SC2236, SC2004) (#34)
+
+    Behavior-preserving: '[ ! -z x ]' -> '[ -n x ]' (8 sites) and drop redundant $ in arithmetic. (The red dist-ai-tests check is the pre-existing test_safe_textbrowser/msgdispatcher_dispatch_x stale test, unrelated.)
+
+    AI-Assisted
+
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+
+commit 2a23b37a22dcc6b33305f7bb6a07df8fa125621f
+Author: assisted-by-ai (Bot Account) (Machine Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Tue Jul 21 07:46:21 2026 -0400
+
+    msgcollector: remove alert.py (superseded by generic_gui_message.py) (#33)
+
+    alert.py (YAML+section+localization QMessageBox) had one in-tree caller (qubes-whonix), ported to generic_gui_message.py. Remove the script and its source-grep unit test. (The one red dist-ai-tests check is a pre-existing stale test_safe_textbrowser referencing the renamed msgdispatcher_dispatch_x, unrelated to this change.)
+
+    AI-Assisted
+
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+
+commit 6f2d796a4de5e6e569d08a9d6616fc959a479026
+Author: assisted-by-ai (Bot Account) (Machine Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Tue Jul 21 07:23:41 2026 -0400
+
+    cli_links_to_footnotes: do not footnote an anchor whose text is the URL (#32)
+
+    An anchor whose text equals its href rendered the URL twice (inline as url[N] and again under Links:). Emit such an anchor as the bare URL inline instead. Fixes the donate message and systemcheck's pvclock/timezone link lists.
+
+    AI-Assisted
+
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+
+commit 192fc8406a74ded47bad5ebb56ee930b4134bcba
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Jul 21 10:38:13 2026 +0000
+
+    bumped changelog version
+
+commit 6483db0bf378fc9d516f62a54b1079adb4103a4c
+Merge: 734e7a6 bdc3e70
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Jul 21 06:21:22 2026 -0400
+
+    Merge remote-tracking branch 'refs/remotes/org-ai-assisted/master'
+
+commit bdc3e706d90b707fbbe966a80b19dbc43f6ea8c5
+Author: assisted-by-ai (Bot Account) (Machine Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Sun Jul 19 04:18:51 2026 -0400
+
+    msgcollector: drop compat symlinks, use .py libexec script names (#31)
+
+    Removes the compatibility symlinks left at the old extensionless names
+    and points every /usr/libexec/msgcollector/<name> caller, test, CI lint
+    list and in-script usage at the real <name>.py source. The .py files are
+    the sources Coverity's buildless capture recognizes; the symlinks are
+    gone so only the .py names ship.
+
+    AI-Assisted
+
+    <!-- This is an auto-generated comment: release notes by coderabbit.ai
+    -->
+
+    ## Summary by CodeRabbit
+
+    - **Bug Fixes**
+    - Improved automated validation by ensuring code quality checks and
+    integration tests target the correct Python implementations.
+    - Preserved existing argument-validation behavior, including expected
+    handling of invalid inputs.
+
+    - **Documentation**
+    - Updated command-line usage examples and help text to reflect the
+    current script names and invocation format.
+
+    - **Chores**
+    - Removed outdated script references to keep validation and runtime
+    dispatch paths consistent.
+
+    <!-- end of auto-generated comment: release notes by coderabbit.ai -->
+
+    ---------
+
+    Co-authored-by: claude (dev95 d7769525-599d-4781-9f2c-f21aa34d292d) <noreply@anthropic.com>
+
+commit 2ab1595b6782fcd1c1ec7aee073459211a09457c
+Author: assisted-by-ai (Bot Account) (Machine Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Sat Jul 18 21:58:17 2026 -0400
+
+    msgcollector: give python libexec scripts a .py extension so Coverity captures them
+
+    Rename each extensionless #!/usr/bin/python3 script under usr/libexec to
+    <name>.py (the real source Coverity's buildless capture recognizes) and
+    leave a relative symlink at the old name, so the installed command name and
+    every /usr/libexec/... caller keep working unchanged.
+
+    AI-Assisted
+
+commit ebf9b05ec6d8cd2bfabdd89a55a50374c8ed771e
+Author: assisted-by-ai (Bot Account) (Machine Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Sat Jul 18 20:00:41 2026 -0400
+
+    Coverity: point CI at the org-ai-assisted-msgcollector project
+
+commit db1b3cbe9d4fe146cbab1987d4b5c49d67198603
+Author: assisted-by-ai (Bot Account) (Machine Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Sat Jul 18 20:00:39 2026 -0400
+
+    Add consumer-coverity.yml (opt into Coverity Scan)
+
+commit d5c507c368d54ba9250c066697f39ad8d21304d8
+Merge: 939083e e53a3aa
+Author: assisted-by-ai (Bot Account) (Machine Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Tue Jul 14 14:37:53 2026 -0400
+
+    Merge pull request #29 from org-ai-assisted/ai/ci-scanners
+
+    CI: opt in to CodeQL (Python + Actions) scanners
+
+commit 939083ece10fe2f5228964c8a6e54ad357ef8da4
+Merge: 4a711ab 570f617
+Author: assisted-by-ai (Bot Account) (Machine Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Tue Jul 14 14:37:39 2026 -0400
+
+    Merge pull request #28 from org-ai-assisted/ai/cli-get-colors
+
+    Use helper-scripts get_colors instead of a local tput color block
+
+commit e53a3aa5b9df48b6811be8f5779a13e8e09c6a80
+Author: claude (dev78 241d086f-2b6c-4ada-883a-370b92c49a9a) <noreply@anthropic.com>
+Date:   Tue Jul 14 13:28:25 2026 -0400
+
+    CI: request python3-pyqt5 for the dist-ai SafeTextBrowser validator
+
+    The dist-ai msgcollector-tests core suite now includes an offscreen-Qt validator
+    for SafeTextBrowser (msgdispatcher_dispatch_x). Add dm-consumer.yml so the
+    reusable installs python3-pyqt5 (plus python3-hypothesis for the property tests).
+
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+
+commit ec91ffef505d049f51aee2c7a5ee90fde1dd778b
+Author: claude (dev78 241d086f-2b6c-4ada-883a-370b92c49a9a) <noreply@anthropic.com>
+Date:   Tue Jul 14 12:57:46 2026 -0400
+
+    CI: opt in to the dist-ai --core suite (hypothesis property tests)
+
+    Add consumer-dist-ai-tests.yml so msgcollector's new --core dist-ai suite
+    (msgcollector-tests, hypothesis property tests for the CLI link rewriter) gates
+    each PR. The --fuzz sweep already runs via dist-ai-fuzz.yml.
+
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+
+commit 125ae74f77df642112bb39df17b18eec11ca16f4
+Author: claude (dev78 241d086f-2b6c-4ada-883a-370b92c49a9a) <noreply@anthropic.com>
+Date:   Tue Jul 14 12:48:56 2026 -0400
+
+    CI: opt in to CodeQL (Python + Actions) scanners
+
+    Add the byte-identical consumer-codeql-python.yml (scans the PyQt5
+    msgdispatcher_dispatch_x and the other python tools) and consumer-codeql-actions.yml
+    (scans the GitHub Actions workflows). Bandit is already enabled.
+
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+
+commit 570f61755b078f8617b94117af7f45f9b93a8102
+Author: claude (dev78 241d086f-2b6c-4ada-883a-370b92c49a9a) <noreply@anthropic.com>
+Date:   Tue Jul 14 12:43:10 2026 -0400
+
+    Use helper-scripts get_colors instead of a local tput color block
+
+    msgcollector defined its own terminal color/attribute variables via tput. That
+    duplicated helper-scripts' get_colors and, worse, used `tput sgr0` for the reset
+    -- which emits ESC[m PLUS a Shift-In (0x0f) charset reset that trailed every
+    colored token in redirected CLI output. The previous commit worked around it
+    with a separate ESC[0m color_reset.
+
+    Replace the whole block with `source get_colors.sh; get_colors` (msgcollector
+    already Depends on helper-scripts). get_colors emits plain ESC[...m sequences
+    with a clean ESC[0m reset, so the color_reset workaround is dropped and the
+    p_type prefix and <font> conversion use $reset directly. ASSUME_TERM_PRESENT
+    keeps the previous behaviour of defining colors whenever TERM is set (colors are
+    stored in the message files for later display, independent of a tty). get_colors
+    stubs the unused `draw` var; msgcollector never referenced it.
+
+    Verified live: colors intact, SI (0x0f) count 0, footnotes intact, get_colors
+    runs cleanly under msgcollector's errexit.
+
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+
+commit 4a711ab75cd8b4419cdd9028b058ff43dfe68056
+Merge: 6af720b 59b4b8d
+Author: assisted-by-ai (Bot Account) (Machine Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Tue Jul 14 12:22:13 2026 -0400
+
+    Merge pull request #27 from org-ai-assisted/ai/cli-link-footnotes
+
+    CLI: footnote-style links + SI-free color reset
+
+commit 59b4b8dc3f1605cb9dfc02908d4a6591925801f8
+Author: claude (dev78 241d086f-2b6c-4ada-883a-370b92c49a9a) <noreply@anthropic.com>
+Date:   Tue Jul 14 12:05:04 2026 -0400
+
+    Opt in to the dist-ai fuzz suite in CI
+
+    Add .github/workflows/dist-ai-fuzz.yml, which runs msgcollector's dist-ai fuzz
+    suite (msgcollector-tests-fuzz) on each PR and push to master via the shared
+    reusable-dist-ai-tests.yml with categories: --fuzz. msgcollector has only a
+    fuzz suite (no --core suite), so this gates --fuzz rather than using the managed
+    consumer-dist-ai-tests.yml template.
+
+    Add the AGENTS.md Tests pointer (the suites live in org-ai-assisted/dist-ai) and
+    the CLAUDE.md stub.
+
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+
+commit 52d3f2c8fba34c513cb1d63ba0082ed0ee962eb6
+Author: claude (dev78 241d086f-2b6c-4ada-883a-370b92c49a9a) <noreply@anthropic.com>
+Date:   Tue Jul 14 11:57:29 2026 -0400
+
+    cli_links_to_footnotes: fix infinite loop on crafted nested anchors
+
+    A dist-ai fuzzer found that cli_links_to_footnotes could hang. It rewrote the
+    first LITERAL occurrence of the regex match (${msg/"$whole"/...}); on crafted
+    input where the matched anchor text reappears -- e.g. an href that itself
+    contains "<a href=", or nested <a><a>..</a></a> -- the replaced occurrence was
+    not the one the regex matched, so the loop failed to advance and spun forever.
+
+    Rewrite it to split the remainder on the match (before/after) and reinsert the
+    "text[N]" in place, re-scanning. Every pass replaces one anchor -- one "</a>" --
+    with anchor-free text, so the "</a>" count strictly decreases and the loop is
+    guaranteed to terminate; re-scanning also collapses a reunited outer anchor from
+    invalid nested input. Verified: the hang cases now terminate, nested anchors are
+    fully rewritten, and an 8000-iteration fuzz sweep is clean.
+
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+
+commit 2e32aa42a4d73b8cc90e9f0394e808215aaf7373
+Author: claude (dev78 241d086f-2b6c-4ada-883a-370b92c49a9a) <noreply@anthropic.com>
+Date:   Tue Jul 14 11:43:04 2026 -0400
+
+    CLI: footnote-style links + SI-free color reset
+
+    Two CLI-rendering hygiene fixes for the --messagecli path:
+
+    1. Links as footnotes instead of inline "(url)". A message with several
+       hyperlinks used to read like
+         "Login (https://.../Login) Security Check (Colors (https://.../Colors))"
+       -- URLs cluttering the flow text. Now each <a href="url">text</a> renders as
+       "text[N]" inline and the URLs are listed under a trailing "Links:" section:
+         "Login[1] Security Check (Colors[2])"
+         ...
+         Links:
+         [1] https://.../Login
+         [2] https://.../Colors
+       Implemented in pure bash (cli_links_to_footnotes); no inline URL in the flow.
+
+    2. Drop the stray Shift-In (0x0f) that trailed every colored token. The color
+       reset was 'tput sgr0', which emits ESC[m PLUS an SI (0x0f) to also reset the
+       charset. Text coloring never shifts the charset, so the SI was pure noise
+       that polluted redirected output / logs / 'cat -v' / parsing. Add a plain
+       ESC[0m color_reset for the [TYPE] prefix and the <font> conversion, kept
+       separate from $reset (still used, with its SI, by the alt-charset progress
+       bar drawing).
+
+    Verified against a live systemcheck --cli run: SI count 13 -> 0, links now
+    render as footnotes.
+
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+
+commit 6af720b1ff67c20440153e47745f07795d690777
+Merge: 58ed460 a586fed
+Author: assisted-by-ai (Bot Account) (Machine Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Tue Jul 14 05:13:35 2026 -0400
+
+    Merge pull request #26 from org-ai-assisted/ai/cli-br-to-newline
+
+    CLI: render <br> as a newline so multi-line messages keep their breaks
+
+commit a586fedf24e5b843bba70ca1745919ffb6fbdeea
+Author: claude (dev78 241d086f-2b6c-4ada-883a-370b92c49a9a) <noreply@anthropic.com>
+Date:   Tue Jul 14 04:49:41 2026 -0400
+
+    CLI: render <br> as a newline so multi-line messages keep their breaks
+
+    Completes the CLI HTML-rendering set (after <font color> -> ANSI and
+    <a href> -> "text (url)"): translate <br>/<br/>/<br /> to a real newline before
+    strip-markup, which would otherwise drop <br> and run the lines together. A
+    consumer can now build one HTML message -- color, links, and line breaks -- that
+    renders correctly in both the GUI and the CLI, instead of maintaining a separate
+    plain-text CLI message.
+
+    ## AI-Assisted
+
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+
+commit 58ed46040cd95218ba50e16503057e7ef7311abc
+Merge: c013789 5a91ae3
+Author: assisted-by-ai (Bot Account) (Machine Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Tue Jul 14 04:36:19 2026 -0400
+
+    Merge pull request #25 from org-ai-assisted/ai/cli-anchor-to-text-url
+
+    CLI: render GUI hyperlinks as "text (url)" so the URL survives
+
+commit 5a91ae3b3a95beb7ac8662274ec5eb42a26d5139
+Author: claude (dev78 241d086f-2b6c-4ada-883a-370b92c49a9a) <noreply@anthropic.com>
+Date:   Tue Jul 14 03:57:58 2026 -0400
+
+    CLI: render GUI hyperlinks as "text (url)" so the URL survives
+
+    The --messagecli path runs strip-markup, which strips <a> tags and drops the
+    URL, forcing consumers to build a separate plain-URL CLI message alongside the
+    GUI anchor. Convert <a href="url">text</a> to "text (url)" before strip-markup
+    (analogous to the merged font-color-to-ANSI translation), so a single HTML
+    message works for both channels and the CLI keeps the link target. Handles
+    quoted or unquoted href.
+
+    ## AI-Assisted
+
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+
+commit c013789e285cc538373a389ad82aacd281b57ed0
+Merge: 734e7a6 db409a3
+Author: assisted-by-ai (Bot Account) (Machine Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Tue Jul 14 03:28:58 2026 -0400
+
+    Merge pull request #24 from org-ai-assisted/ai/cli-font-color-and-safe-textbrowser
+
+    Add font-color-to-ANSI CLI rendering + SafeTextBrowser defense-in-depth
+
+commit db409a3367d7661b752517af2a857cb09f99d536
+Author: claude (dev78 241d086f-2b6c-4ada-883a-370b92c49a9a) <noreply@anthropic.com>
+Date:   Tue Jul 14 03:01:26 2026 -0400
+
+    Add font-color-to-ANSI CLI rendering + SafeTextBrowser defense-in-depth
+
+    CLI: translate <font color="..."> to terminal ANSI in the --messagecli path
+    (before strip-markup, which strips all tags) so a single HTML message renders
+    colored in BOTH the GUI and the CLI. Lets consumers (e.g. systemcheck's green
+    $status_ok) color a result once instead of building two separate messages.
+
+    GUI defense-in-depth: msgdispatcher_dispatch_x and generic_gui_message now use a
+    SafeTextBrowser subclass whose loadResource() refuses every resource load, so a
+    message rendered via setHtml() can never trigger a network or filesystem fetch
+    (e.g. <img src="http://...">), even if an unsanitized value reaches the widget.
+
+    Adds the sanctioned no-strict waiver to the msgcollector script (it uses set -e
+    + pipefail but intentionally not nounset, given its many optional CLI fields).
+
+    ## AI-Assisted
+
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+
+commit 734e7a6afbe9497ab747cc4d77482c3c56369525
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed May 27 23:00:05 2026 +0000
+
+    bumped changelog version
+
 commit 53470c367563e3ac180b30d2537f609a0fc7fe6e
 Merge: 57b47bb f61618f
 Author: Patrick Schleizer <adrelanos@whonix.org>

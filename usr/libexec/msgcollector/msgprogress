@@ -3,8 +3,23 @@
 ## Copyright (C) 2012 - 2025 ENCRYPTED SUPPORT LLC <adrelanos@whonix.org>
 ## See the file COPYING for copying conditions.
 
-set -e
+set -o errexit
+set -o nounset
 set -o pipefail
+set -o errtrace
+shopt -s inherit_errexit
+shopt -s shift_verbose
+
+## Every command-line option target. Each is assigned only when its option is
+## given, and the required ones are handed straight to check(), whose job is to
+## report a missing value. Under nounset an unset read aborts BEFORE check()
+## can say which option is missing, replacing a precise message with a bash
+## error. Empty is what these expanded to before strict mode.
+did_echo=""
+identifier=""
+progress=""
+progressbaridx=""
+verbose=""
 
 scriptname="$(basename -- "${BASH_SOURCE[0]}")"
 
@@ -13,21 +28,21 @@ error_handler() {
 
    local msg="\
 ###############################################################################
-## $scriptname script bug.
+## ${scriptname} script bug.
 ## No panic. Nothing is broken. Just some rare condition has been hit.
 ## Try again later. There is likely a solution for this problem.
 ## Please see Whonix News, Whonix Blog and Whonix User Help Forum.
 ## Please report this bug!
 ##
-## BASH_COMMAND: $BASH_COMMAND
-## exit_code: $exit_code
+## BASH_COMMAND: ${BASH_COMMAND}
+## exit_code: ${exit_code}
 ###############################################################################\
 "
-   echo "$msg" >&2
+   printf '%s\n' "${msg}" >&2
    if [ ! -d ~/".msgcollector" ]; then
       mkdir --parents ~/".msgcollector"
    fi
-   echo "$scriptname: BASH_COMMAND: $BASH_COMMAND | exit_code: $exit_code" | tee -a ~/".msgcollector/msgdispatcher-error.log" >/dev/null
+   printf '%s\n' "${scriptname}: BASH_COMMAND: ${BASH_COMMAND} | exit_code: ${exit_code}" | tee -a ~/".msgcollector/msgdispatcher-error.log" >/dev/null
    exit 1
 }
 
@@ -40,30 +55,59 @@ parse_cmd_options() {
    ## http://mywiki.wooledge.org/BashFAQ/035
 
    while true; do
-       case $1 in
+       ## The loop runs until the arguments are exhausted, so its last iteration
+       ## reads an unset $1 by design -- the '*' arm below is what breaks out.
+       case "${1:-}" in
            --verbose)
                set -x
+               ## Parsed for compatibility with the shared option set; this
+               ## script has no verbose output of its own.
+               # shellcheck disable=SC2034
                verbose="1"
                shift
                ;;
            --identifier)
-               identifier="$2"
-               shift 2
+               identifier="${2:-}"
+               ## Guarded: with the flag given LAST there is only one
+               ## argument to shift, and shift_verbose turns that into a
+               ## reported failure. Skipping the impossible shift lets the
+               ## check() below report which option is missing.
+               if [ "$#" -ge 2 ]; then
+                  shift 2
+               else
+                  shift 1
+               fi
                ;;
            --progress)
-               progress="$2"
-               shift 2
+               progress="${2:-}"
+               ## Guarded: with the flag given LAST there is only one
+               ## argument to shift, and shift_verbose turns that into a
+               ## reported failure. Skipping the impossible shift lets the
+               ## check() below report which option is missing.
+               if [ "$#" -ge 2 ]; then
+                  shift 2
+               else
+                  shift 1
+               fi
                ;;
            --progressbaridx)
-               progressbaridx="$2"
-               shift 2
+               progressbaridx="${2:-}"
+               ## Guarded: with the flag given LAST there is only one
+               ## argument to shift, and shift_verbose turns that into a
+               ## reported failure. Skipping the impossible shift lets the
+               ## check() below report which option is missing.
+               if [ "$#" -ge 2 ]; then
+                  shift 2
+               else
+                  shift 1
+               fi
                ;;
            --)
                shift
                break
                ;;
            -*)
-               echo "$scriptname unknown option: $1" >&2
+               printf '%s\n' "${scriptname} unknown option: $1" >&2
                exit 1
                ;;
            *)
@@ -79,6 +123,10 @@ parse_cmd_options() {
 safe_file_write() {
   ## For extra security against freezing while trying to write to a non-existing pipe, let's use timeout.
   ## Use printf with positional arg to avoid shell injection.
+  ## Single quotes are deliberate: '$1' must reach the inner bash as a
+  ## literal so the value is passed as an ARGUMENT rather than interpolated
+  ## into the code it runs.
+  # shellcheck disable=SC2016
   timeout 1 /bin/bash -c 'printf "%s\n" "$1"' -- "$1" > "$2"
 }
 
@@ -91,35 +139,35 @@ progress_bar() {
    local fifo="${msgcollector_run_dir}/${identifier}_${progressbaridx}_fifo"
    local progress_txt_file="${msgcollector_run_dir}/${identifier}_${progressbaridx}_progresstxt"
 
-   if [ "$did_echo" = "1" ]; then
+   if [ "${did_echo}" = "1" ]; then
       true "did already echo to progress_txt_file"
    else
       did_echo="1"
-      safe_file_write "$progress" "$progress_txt_file"
+      safe_file_write "${progress}" "${progress_txt_file}"
    fi
 
    if [ -p "${msgcollector_run_dir}/${identifier}_${progressbaridx}_fifo" ]; then
       if [ -f "${msgcollector_run_dir}/${identifier}_${progressbaridx}_yadprogresspid" ]; then
          yad_progress_pid="$(cat "${msgcollector_run_dir}/${identifier}_${progressbaridx}_yadprogresspid")"
          ## Validate PID is numeric before using in ps.
-         if ! is_whole_number "$yad_progress_pid"; then
-            true "yad_progress_pid is not numeric: $yad_progress_pid"
+         if ! is_whole_number "${yad_progress_pid}"; then
+            true "yad_progress_pid is not numeric: ${yad_progress_pid}"
             return 0
          fi
          ## Check if 'yad' is running.
          local ps_p_exit_code
          ps_p_exit_code="0"
-         ps -p "$yad_progress_pid" >/dev/null 2>/dev/null || { ps_p_exit_code="$?"; true; };
-         if [ "$ps_p_exit_code" = "0" ]; then
+         ps -p "${yad_progress_pid}" >/dev/null 2>/dev/null || { ps_p_exit_code="$?"; true; };
+         if [ "${ps_p_exit_code}" = "0" ]; then
             true "yad is running."
             ## || true to catch an error if the pipe no longer exists.
-            safe_file_write "$progress" "$fifo"
+            safe_file_write "${progress}" "${fifo}"
             ## Debugging.
             #caller="$(ps -p $PPID)" || true
             #echo "progress: $progress | caller: $PPID | $caller" >> /home/user/progresslog
             return 0
          else
-            true "ps_p_exit_code was not 0, was $ps_p_exit_code"
+            true "ps_p_exit_code was not 0, was ${ps_p_exit_code}"
          fi
       else
          true "yadprogresspid does not exist: ${msgcollector_run_dir}/${identifier}_${progressbaridx}_yadprogresspid"
@@ -141,17 +189,30 @@ source /usr/libexec/msgcollector/check
 
 parse_cmd_options "$@"
 
-check "$identifier"
-check "$progressbaridx"
+## The ERR trap is lifted for these two calls only.
+##
+## R-010 adds errtrace, which makes the ERR trap fire for a failure INSIDE a
+## function -- so a missing command-line option started printing the "script
+## bug ... Please report this bug!" banner on top of check()'s own precise
+## message. A missing option is a USER error, not a bug to report.
+##
+## '|| exit 1' would NOT do: putting check() in a condition context disables
+## errexit inside it, so it runs on past the first failed validation and prints
+## a second, contradictory complaint. Lifting the trap keeps errexit intact --
+## same exit code, same single message as before strict mode.
+trap - ERR
+check "${identifier}"
+check "${progressbaridx}"
+trap "error_handler" ERR
 
-if [ "$progress" = "" ]; then
+if [ "${progress}" = "" ]; then
    error "Variable 'progress' does not exist"
    exit 1
 fi
 
 ## Validate that progress is numeric to prevent injection.
-if ! is_whole_number "$progress"; then
-   error "Variable 'progress' is not numeric: '$progress'"
+if ! is_whole_number "${progress}"; then
+   error "Variable 'progress' is not numeric: '${progress}'"
    exit 1
 fi
 

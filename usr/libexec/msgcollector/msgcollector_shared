@@ -3,6 +3,14 @@
 ## Copyright (C) 2012 - 2025 ENCRYPTED SUPPORT LLC <adrelanos@whonix.org>
 ## See the file COPYING for copying conditions.
 
+## style-ok: no-strict
+##
+## No strict-mode preamble: this file is SOURCED, never executed, so a 'set -o'
+## block here would rewrite the CALLER's shell rather than govern this code.
+## Its callers (msgprogress, msgdispatcher, msgdispatcher_run_check) carry the
+## R-010 preamble themselves, which is what these functions actually run under
+## -- see the ':-' in loop_protection below.
+
 source /usr/libexec/helper-scripts/light_sleep.bsh
 source /usr/libexec/helper-scripts/strings.bsh
 
@@ -27,13 +35,19 @@ folder_init() {
 }
 
 loop_protection() {
-   if ! is_whole_number "$loop_counter_protection"; then
+   ## ':-' because the FIRST call has no counter yet, and the line below is the
+   ## one that creates it. The unset-safe default belongs here, in the shared
+   ## helper, not in the callers: msgprogress and msgdispatcher_run_check both
+   ## call this under nounset, so fixing it in one would leave the other
+   ## aborting. Without it, every '--progressx' update exited before writing
+   ## the progress value.
+   if ! is_whole_number "${loop_counter_protection:-}"; then
       loop_counter_protection="0"
       ## Do not wait on first run of this function.
       return 0
    fi
-   loop_counter_protection="$(( $loop_counter_protection + 1 ))"
-   if [ "$loop_counter_protection" -gt "60" ]; then
+   loop_counter_protection="$(( loop_counter_protection + 1 ))"
+   if [ "${loop_counter_protection}" -gt "60" ]; then
       ## Timeout reached.
       exit 2
    fi

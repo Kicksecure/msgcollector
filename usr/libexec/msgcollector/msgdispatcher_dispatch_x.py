@@ -8,7 +8,7 @@ This script creates a GUI message dialog using PyQt5. It allows the user to spec
 the type of message, title, and content, as well as customize the icon and position of the dialog.
 
 Usage:
-/usr/libexec/msgcollector/msgdispatcher_dispatch_x <message_type> <title> <message> <position> [icon]
+/usr/libexec/msgcollector/msgdispatcher_dispatch_x.py <message_type> <title> <message> <position> [icon]
 
 Arguments:
 1. message_type: 'info', 'warning', or 'error'
@@ -18,7 +18,7 @@ Arguments:
 5. icon (optional): Path to a custom icon (defaults to a specific icon if not provided)
 
 Example:
-/usr/libexec/msgcollector/msgdispatcher_dispatch_x warning "Warning Title" "This is a warning message." "1" "/path/to/custom/icon.svg"
+/usr/libexec/msgcollector/msgdispatcher_dispatch_x.py warning "Warning Title" "This is a warning message." "1" "/path/to/custom/icon.svg"
 """
 
 import os
@@ -27,6 +27,21 @@ import signal
 import argparse
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5 import QtCore, QtGui, QtWidgets
+
+
+class SafeTextBrowser(QtWidgets.QTextBrowser):
+    """
+    Defense-in-depth QTextBrowser that refuses to load ANY resource.
+
+    Messages are rendered via setHtml() from caller-constructed HTML. Refusing
+    every resource load guarantees a message can never trigger a network or
+    filesystem fetch (e.g. '<img src="http://...">'), even if an unsanitized
+    value reaches the widget. Legitimate messages contain only text and links,
+    never embedded resources.
+    """
+
+    def loadResource(self, resource_type, url):
+        return None
 
 
 def signal_handler(sig, frame):
@@ -60,7 +75,7 @@ class Ui_Dialog(object):
         self.Info_Icon.setAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
         self.gridLayout.addWidget(self.Info_Icon, 0, 0, 1, 1)
 
-        self.Message = QtWidgets.QTextBrowser(Dialog)
+        self.Message = SafeTextBrowser(Dialog)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHeightForWidth(self.Message.sizePolicy().hasHeightForWidth())
         self.Message.setSizePolicy(sizePolicy)

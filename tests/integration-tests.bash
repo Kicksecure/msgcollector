@@ -750,9 +750,9 @@ printf '%s\n' "$0: === br_add (Python line-break conversion) ==="
 ## --------------------------------------------------------------------------
 
 test_br_add() {
-  if [ -x /usr/libexec/msgcollector/br_add ]; then
+  if [ -x /usr/libexec/msgcollector/br_add.py ]; then
     local output
-    output="$(/usr/libexec/msgcollector/br_add $'line1\nline2\nline3')"
+    output="$(/usr/libexec/msgcollector/br_add.py $'line1\nline2\nline3')"
     if printf '%s\n' "${output}" | grep '<br />' &>/dev/null; then
       pass "br_add: inserts <br /> tags"
     else
@@ -772,7 +772,7 @@ test_msgdispatcher_dispatch_x_argparse() {
   ## Test that the argument parser rejects invalid message types.
   local result
   result=0
-  /usr/libexec/msgcollector/msgdispatcher_dispatch_x "invalid_type" "title" "msg" "0" 2>/dev/null || result=$?
+  /usr/libexec/msgcollector/msgdispatcher_dispatch_x.py "invalid_type" "title" "msg" "0" 2>/dev/null || result=$?
   if [ "${result}" != "0" ]; then
     pass "msgdispatcher_dispatch_x: rejects invalid message_type"
   else
@@ -783,7 +783,7 @@ test_msgdispatcher_dispatch_x_argparse() {
 test_generic_gui_message_argparse() {
   local result
   result=0
-  /usr/libexec/msgcollector/generic_gui_message "invalid_type" "title" "msg" "" "ok" 2>/dev/null || result=$?
+  /usr/libexec/msgcollector/generic_gui_message.py "invalid_type" "title" "msg" "" "ok" 2>/dev/null || result=$?
   if [ "${result}" != "0" ]; then
     pass "generic_gui_message: rejects invalid message_type"
   else
@@ -794,7 +794,7 @@ test_generic_gui_message_argparse() {
 test_generic_gui_message_argparse_button() {
   local result
   result=0
-  /usr/libexec/msgcollector/generic_gui_message "info" "title" "msg" "" "invalid_button" 2>/dev/null || result=$?
+  /usr/libexec/msgcollector/generic_gui_message.py "info" "title" "msg" "" "invalid_button" 2>/dev/null || result=$?
   if [ "${result}" != "0" ]; then
     pass "generic_gui_message: rejects invalid button_type"
   else
@@ -805,7 +805,7 @@ test_generic_gui_message_argparse_button() {
 test_one_time_popup_argparse_missing() {
   local result
   result=0
-  /usr/libexec/msgcollector/one-time-popup 2>/dev/null || result=$?
+  /usr/libexec/msgcollector/one-time-popup.py 2>/dev/null || result=$?
   if [ "${result}" != "0" ]; then
     pass "one-time-popup: exits non-zero with missing args"
   else
