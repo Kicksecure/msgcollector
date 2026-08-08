@@ -47,8 +47,8 @@ error_handler() {
 <br></br>Please see News, Blog and User Help Forum.
 <br></br>Please report this bug!
 <br></br>
-<br></br>msgdispatcher_identifier: '<code>${msgdispatcher_identifier}</code>'
-<br></br>msgdispatcher_appendix: '<code>${msgdispatcher_appendix}</code>'
+<br></br>msgdispatcher_identifier: '<code>${msgdispatcher_identifier:-}</code>'
+<br></br>msgdispatcher_appendix: '<code>${msgdispatcher_appendix:-}</code>'
 <br></br>
 <br></br>error_text: '<code>${error_text}</code>'
 <br></br>last_exit_code: '<code>${last_exit_code}</code>'
@@ -117,6 +117,14 @@ preparation() {
    true "XDG_SESSION_TYPE: ${XDG_SESSION_TYPE}"
    true "DISPLAY: ${DISPLAY}"
    true "WAYLAND_DISPLAY: ${WAYLAND_DISPLAY}"
+   ## Both declared BEFORE the chain rather than only adding the missing 'gui=0'
+   ## to the tty arm. Every other arm sets both; the tty arm set only cli, so
+   ## msgdispatcher_handler's unconditional '${gui}' read aborted on the first
+   ## CLI message. Declaring both here means a future arm cannot reintroduce the
+   ## same half-set state.
+   gui=0
+   cli=0
+
    if [ "${XDG_SESSION_TYPE}" = "x11" ]; then
       gui=1
       cli=0
