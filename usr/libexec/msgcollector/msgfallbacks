@@ -6,10 +6,18 @@
 ## This file gets sourced by msgdispatcher and msgprogressbar.
 ## Therefore the error_handler function has been already load.
 
+## style-ok: no-strict
+##
+## No strict-mode preamble: this file is SOURCED, never executed.
+
+## The dummy yad / kdialog / notify-send below SHADOW the real commands, so
+## every later call to those names reaches these bodies.
+# shellcheck disable=SC2317
+
 fallbacks() {
    trap "error_handler" ERR
 
-   if [ "$DISPLAY" = "" ] && [ "$WAYLAND_DISPLAY" = "" ]; then
+   if [ "${DISPLAY:-}" = "" ] && [ "${WAYLAND_DISPLAY:-}" = "" ]; then
       no_gui="1"
    else
       no_gui="0"
@@ -18,7 +26,7 @@ fallbacks() {
    ## Check if 'yad' is installed.
    ## - This is not the case for cli users,
    ##   who removed yad or custom builds which never had 'yad' installed.
-   if [ "$(command -v "yad")" = "" ] || [ "$no_gui" = "1" ]; then
+   if ! has yad || [ "${no_gui}" = "1" ]; then
       ## 'yad' is not installed or no Wayland / X server running.
       yad() {
          ## dummy
@@ -26,7 +34,7 @@ fallbacks() {
       }
    fi
 
-   if [ "$(command -v "kdialog")" = "" ] || [ "$no_gui" = "1" ]; then
+   if ! has kdialog || [ "${no_gui}" = "1" ]; then
       ## kdialog is not installed or no Wayland / X server running.
       kdialog() {
          ## dummy
@@ -34,7 +42,7 @@ fallbacks() {
       }
    fi
 
-   if [ "$(command -v "notify-send")" = "" ] || [ "$no_gui" = "1" ]; then
+   if ! has notify-send || [ "${no_gui}" = "1" ]; then
       ## notify-send is not installed or no Wayland / X server running.
       notify-send() {
          ## dummy

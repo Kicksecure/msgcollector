@@ -3,6 +3,10 @@
 ## Copyright (C) 2012 - 2025 ENCRYPTED SUPPORT LLC <adrelanos@whonix.org>
 ## See the file COPYING for copying conditions.
 
+## style-ok: no-strict
+##
+## No strict-mode preamble: this file is SOURCED, never executed.
+
 source /usr/libexec/helper-scripts/light_sleep.bsh
 source /usr/libexec/helper-scripts/strings.bsh
 
@@ -27,13 +31,13 @@ folder_init() {
 }
 
 loop_protection() {
-   if ! is_whole_number "$loop_counter_protection"; then
+   if ! is_whole_number "${loop_counter_protection:-}"; then
       loop_counter_protection="0"
       ## Do not wait on first run of this function.
       return 0
    fi
-   loop_counter_protection="$(( $loop_counter_protection + 1 ))"
-   if [ "$loop_counter_protection" -gt "60" ]; then
+   loop_counter_protection="$(( loop_counter_protection + 1 ))"
+   if [ "${loop_counter_protection}" -gt "60" ]; then
       ## Timeout reached.
       exit 2
    fi

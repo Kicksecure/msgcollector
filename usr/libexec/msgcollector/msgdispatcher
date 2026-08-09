@@ -4,18 +4,40 @@
 ## See the file COPYING for copying conditions.
 
 #set -x
-set -e
+set -o errexit
+set -o nounset
 set -o pipefail
 set -o errtrace
+shopt -s inherit_errexit
+shopt -s shift_verbose
+
+## Option targets, assigned only when their flag is given and read
+## unconditionally later -- 'verbose' by dispatch_x_active in particular.
+## Empty is what they expanded to before strict mode.
+verbose=""
+
+## sets: has
+## Sourced here rather than with the other helper-scripts near the bottom of
+## this file: preparation() and the passive-popup dispatch below both run
+## before that point.
+# shellcheck source=../../../../helper-scripts/usr/libexec/helper-scripts/has.sh
+## Sibling repo: absent in an isolated CI checkout, so shellcheck cannot follow
+## it there. The source= path above still documents where it lives.
+##
+## TODO: We can probably just not shellcheck this unless we're working with a
+## full derivative-maker tree, and then get rid of this exception.
+# shellcheck disable=SC1091
+source /usr/libexec/helper-scripts/has.sh
 #trap 'sleep 1' DEBUG
 
 error_handler() {
    local last_exit_code="$?"
    trap - ERR
-   if [ ! "$1" = "" ]; then
+   ## '${1:-}': 'trap "error_handler" ERR' passes NO arguments.
+   if [ ! "${1:-}" = "" ]; then
       error_text="$1"
    else
-      error_text="$BASH_COMMAND"
+      error_text="${BASH_COMMAND}"
    fi
 
    local msg="<p>
@@ -26,26 +48,26 @@ error_handler() {
 <br></br>Please see News, Blog and User Help Forum.
 <br></br>Please report this bug!
 <br></br>
-<br></br>msgdispatcher_identifier: '<code>$msgdispatcher_identifier</code>'
-<br></br>msgdispatcher_appendix: '<code>$msgdispatcher_appendix</code>'
+<br></br>msgdispatcher_identifier: '<code>${msgdispatcher_identifier}</code>'
+<br></br>msgdispatcher_appendix: '<code>${msgdispatcher_appendix}</code>'
 <br></br>
-<br></br>error_text: '<code>$error_text</code>'
-<br></br>last_exit_code: '<code>$last_exit_code</code>'
+<br></br>error_text: '<code>${error_text}</code>'
+<br></br>last_exit_code: '<code>${last_exit_code}</code>'
 </p>"
 
    local stripped_msg
-   stripped_msg="$(sanitize-string -- nolimit "$msg")"
-   printf '%s\n' "$stripped_msg"
+   stripped_msg="$(sanitize-string -- nolimit "${msg}")"
+   printf '%s\n' "${stripped_msg}"
 
    if [ ! -d ~/".msgcollector" ]; then
       mkdir --parents -- ~/".msgcollector"
    fi
-   echo "$0: BASH_COMMAND: $BASH_COMMAND | exit_code: $last_exit_code" | sponge -a -- ~/".msgcollector/msgdispatcher-error.log" >/dev/null
+   printf '%s\n' "$0: BASH_COMMAND: ${BASH_COMMAND} | exit_code: ${last_exit_code}" | sponge -a -- ~/".msgcollector/msgdispatcher-error.log" >/dev/null
 
    ## Popup window with the message above.
    ## /usr/share/icons/icon-pack-dist/whonix.ico might not exist, but
    ## fortunately msgdispatcher_dispatch_x works anyway.
-   /usr/libexec/msgcollector/msgdispatcher_dispatch_x.py "warning" "$0" "$msg" "0" "/usr/share/icons/icon-pack-dist/whonix.ico" &
+   /usr/libexec/msgcollector/msgdispatcher_dispatch_x.py "warning" "$0" "${msg}" "0" "/usr/share/icons/icon-pack-dist/whonix.ico" &
 
    true
 }
@@ -57,7 +79,7 @@ parse_cmd_options() {
    ## http://mywiki.wooledge.org/BashFAQ/035
 
    while true; do
-       case $1 in
+       case "${1:-}" in
            --verbose)
                set -x
                verbose="1"
@@ -68,7 +90,7 @@ parse_cmd_options() {
                break
                ;;
            -*)
-               echo "$0: unknown option: $1" >&2
+               printf '%s\n' "$0: unknown option: $1" >&2
                exit 1
                ;;
            *)
@@ -80,69 +102,76 @@ parse_cmd_options() {
 
 preparation() {
    ## Sanity test.
-   command -v flock >/dev/null 2>/dev/null
+   has flock
 
-   true "XDG_SESSION_TYPE: $XDG_SESSION_TYPE"
-   true "DISPLAY: $DISPLAY"
-   true "WAYLAND_DISPLAY: $WAYLAND_DISPLAY"
-   if [ "$XDG_SESSION_TYPE" = "x11" ]; then
+   XDG_SESSION_TYPE="${XDG_SESSION_TYPE:-}"
+   XDG_CURRENT_DESKTOP="${XDG_CURRENT_DESKTOP:-}"
+   DISPLAY="${DISPLAY:-}"
+   WAYLAND_DISPLAY="${WAYLAND_DISPLAY:-}"
+
+   true "XDG_SESSION_TYPE: ${XDG_SESSION_TYPE}"
+   true "DISPLAY: ${DISPLAY}"
+   true "WAYLAND_DISPLAY: ${WAYLAND_DISPLAY}"
+   if [ "${XDG_SESSION_TYPE}" = "x11" ]; then
       gui=1
       cli=0
-   elif [ "$XDG_SESSION_TYPE" = "wayland" ]; then
+   elif [ "${XDG_SESSION_TYPE}" = "wayland" ]; then
       gui=1
       cli=0
-   elif [ "$XDG_CURRENT_DESKTOP" = "X-QUBES" ]; then
+   elif [ "${XDG_CURRENT_DESKTOP}" = "X-QUBES" ]; then
       gui=1
       cli=0
-   elif [ ! "$DISPLAY" = "" ]; then
+   elif [ ! "${DISPLAY}" = "" ]; then
       gui=1
       cli=0
-   elif [ ! "$WAYLAND_DISPLAY" = "" ]; then
+   elif [ ! "${WAYLAND_DISPLAY}" = "" ]; then
       gui=1
       cli=0
-   elif [ "$XDG_SESSION_TYPE" = "tty" ]; then
+   elif [ "${XDG_SESSION_TYPE}" = "tty" ]; then
       cli=1
       ## Do this only in /dev/tty1.
       if [ ! "$(tty)" = "/dev/tty1" ]; then
-         echo "$0: INFO: Skip, because not running in /dev/tty1."
+         printf '%s\n' "$0: INFO: Skip, because not running in /dev/tty1."
          exit 0
       fi
    else
-      echo "$0: INFO: XDG_SESSION_TYPE is neither x11 nor wayland nor tty, DISPLAY and WAYLAND_DISPLAY are not set either, exiting."
+      printf '%s\n' "$0: INFO: XDG_SESSION_TYPE is neither x11 nor wayland nor tty, DISPLAY and WAYLAND_DISPLAY are not set either, exiting."
       exit 0
    fi
 
-   if [ "$cli" = "1" ]; then
+   if [ "${cli}" = "1" ]; then
       inotifywait_subshell_fifo="${msgcollector_run_dir}/msgdispatcher_cli_subshell_fifo"
-   elif [ "$gui" = "1" ]; then
+   elif [ "${gui}" = "1" ]; then
       inotifywait_subshell_fifo="${msgcollector_run_dir}/msgdispatcher_x_subshell_fifo"
    else
-      echo "$$" | sponge -- "${msgcollector_run_dir}/msgdispatcher_piderror" >/dev/null
+      printf '%s\n' "$$" | sponge -- "${msgcollector_run_dir}/msgdispatcher_piderror" >/dev/null
       exit 3
    fi
 
    inotifywait_folder="${msgcollector_run_dir}"
-   test -d "$inotifywait_folder"
+   test -d "${inotifywait_folder}"
 }
 
 ## {{ Small wrapper to use either 'kdialog', 'notify-send' or nothing.
 passive_popup_tool() {
    local time title text
    time="$1"
-   title="$2"
+   ## FIXME: Why on *earth* are we guarding against $2 being unset but not $3?
+   ## If $2 is unset, certainly $3 will be.
+   title="${2:-}"
    text="$3"
 
    ## Fallback.
    ## 'notify-send' does not work if $title is unset.
-   if [ "$title" = "" ]; then
-      title="$msgdispatcher_identifier"
+   if [ "${title}" = "" ]; then
+      title="${msgdispatcher_identifier}"
    fi
 
    ## 'notify-send' timeout in milliseconds.
 
-   if command -v "qubesdb-read" >/dev/null 2>&1 ; then
-      if command -v "notify-send" >/dev/null 2>&1 ; then
-         notify-send --expire-time "${time}000" -- "$title" "$text"
+   if has "qubesdb-read" ; then
+      if has "notify-send" ; then
+         notify-send --expire-time "${time}000" -- "${title}" "${text}"
          return 0
       fi
    fi
@@ -150,11 +179,11 @@ passive_popup_tool() {
    ## check if 'kdialog', 'notify-send' or no passive popup tool is installed
    ## - that is not the case for CLI Custom-Workstation users
    ## - that may not be the case for Gnome users
-   if command -v "kdialog" >/dev/null 2>&1 ; then
+   if has "kdialog" ; then
       ## 'kdialog' does not support end-of-options.
-      kdialog --title "$title" --passivepopup "$text" "$time"
-   elif command -v "notify-send" >/dev/null 2>&1 ; then
-      notify-send --expire-time "${time}000" -- "$title" "$text"
+      kdialog --title "${title}" --passivepopup "${text}" "${time}"
+   elif has "notify-send" ; then
+      notify-send --expire-time "${time}000" -- "${title}" "${text}"
    fi
 }
 ## }}
@@ -166,7 +195,7 @@ dispatch_cli() {
    if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_parenttty" ]; then
       local parenttty
       parenttty="$(cat "${msgcollector_run_dir}/${msgdispatcher_identifier}_parenttty")" || true
-      if [ "$parenttty" = "/dev/tty1" ]; then
+      if [ "${parenttty}" = "/dev/tty1" ]; then
          ## When for example 'systemcheck' was run in 'tty1', then messages were
          ## already echoed by 'msgcollector'. No need to dispatch them again.
          true "Skipping, because parenttty is /dev/tty1."
@@ -174,7 +203,7 @@ dispatch_cli() {
       fi
    fi
 
-   echo "$msg"
+   printf '%s\n' "${msg}"
 }
 
 dispatch_x_active() {
@@ -191,7 +220,7 @@ dispatch_x_active() {
    fi
 
    ## Fallback.
-   if [ "$type" = "" ]; then
+   if [ "${type}" = "" ]; then
       type="info"
    fi
 
@@ -204,38 +233,38 @@ dispatch_x_active() {
       msg="${msg} [truncated - try command line interface (CLI) version for complete output]"
    fi
 
-   if [ "$verbose" = "1" ]; then
-      /usr/libexec/msgcollector/msgdispatcher_dispatch_x.py "$type" "$title" "$msg" "0" "$icon"
+   if [ "${verbose}" = "1" ]; then
+      /usr/libexec/msgcollector/msgdispatcher_dispatch_x.py "${type}" "${title}" "${msg}" "0" "${icon}"
    else
       ## Launching into background, so it doesn't block msgdispatcher until
       ## msgdispatcher_dispatch_x exits.
-      /usr/libexec/msgcollector/msgdispatcher_dispatch_x.py "$type" "$title" "$msg" "0" "$icon" &
+      /usr/libexec/msgcollector/msgdispatcher_dispatch_x.py "${type}" "${title}" "${msg}" "0" "${icon}" &
    fi
 }
 
 dispatch_x_passive() {
-   passive_popup_tool "20" "$title" "$msg"
+   passive_popup_tool "20" "${title}" "${msg}"
 }
 
 inotifywait_setup() {
-   safe-rm --force -- "$inotifywait_subshell_fifo"
-   mkfifo -- "$inotifywait_subshell_fifo"
+   safe-rm --force -- "${inotifywait_subshell_fifo}"
+   mkfifo -- "${inotifywait_subshell_fifo}"
    ## Start inotifywait in a sub process to continuously monitor the directory.
-   inotifywait --quiet --monitor --event close_write --format "%w%f" -- "$inotifywait_folder" > "$inotifywait_subshell_fifo" &
+   inotifywait --quiet --monitor --event close_write --format "%w%f" -- "${inotifywait_folder}" > "${inotifywait_subshell_fifo}" &
    inotifywait_main_pid="$!"
 }
 
 parse_existing_files() {
-   for file_name in "$inotifywait_folder/"*; do
-      true "parse_existing_files: file_name: $file_name"
+   for file_name in "${inotifywait_folder}/"*; do
+      true "parse_existing_files: file_name: ${file_name}"
       msgdispatcher_handler || true
    done
 }
 
 msgdispatcher_handler() {
-   true "msgdispatcher_handler: file_name: $file_name"
+   true "msgdispatcher_handler: file_name: ${file_name}"
    file_extension="${file_name##*_}"
-   if [ ! "$file_extension" = "done" ]; then
+   if [ ! "${file_extension}" = "done" ]; then
       true "msgdispatcher_handler: Not a done file. Stop processing, ok."
       true "----------"
       return 0
@@ -255,14 +284,14 @@ msgdispatcher_handler() {
       return 0
    fi
 
-   if [ "$gui" = "1" ]; then
-      if [ "$file_name" = "${msgcollector_run_dir}/${msgdispatcher_identifier}_messagex_done" ]; then
+   if [ "${gui}" = "1" ]; then
+      if [ "${file_name}" = "${msgcollector_run_dir}/${msgdispatcher_identifier}_messagex_done" ]; then
          if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_messagex" ]; then
             true "INFO: messagex file exists."
             msg="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_messagex")" || true
             title="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_titlex")" || true
             type="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_typex")" || true
-            dispatch_x_active "$type" "$msg"
+            dispatch_x_active "${type}" "${msg}"
             msgdispatcher_delete_wrapper "messagex_done"
             msgdispatcher_delete_wrapper "titlex"
             msgdispatcher_delete_wrapper "messagex"
@@ -276,7 +305,7 @@ msgdispatcher_handler() {
          true "----------"
          return 0
       fi
-      if [ "$file_name" = "${msgcollector_run_dir}/${msgdispatcher_identifier}_passivepopupqueuex_done" ]; then
+      if [ "${file_name}" = "${msgcollector_run_dir}/${msgdispatcher_identifier}_passivepopupqueuex_done" ]; then
          if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_passivepopupqueuex" ]; then
             msg="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_passivepopupqueuex")" || true
             title="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_passivepopupqueuextitle")" || true
@@ -286,9 +315,9 @@ msgdispatcher_handler() {
             if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_forceactive" ]; then
                ## TODO: --forceactive not yet implemented.
                #dispatch_x_active "$type" "$msg"
-               dispatch_x_passive "$type" "$title" "$msg" || true
+               dispatch_x_passive "${type}" "${title}" "${msg}" || true
             else
-               dispatch_x_passive "$type" "$title" "$msg" || true
+               dispatch_x_passive "${type}" "${title}" "${msg}" || true
             fi
             msgdispatcher_delete_wrapper "forceactive"
             msgdispatcher_delete_wrapper "passivepopupqueuex_done"
@@ -300,48 +329,13 @@ msgdispatcher_handler() {
          true "----------"
          return 0
       fi
-
-#       last_two="${file_name#*_*_}"
-#       if [ "$last_two" = "progressbarx_done" ]; then
-#          first_two="${file_name%_*_*}"
-#          ## first_two example:
-#          ## /run/msgcollector/systemcheck/systemcheck_2b3916d6-3b3f-4490-bc85-b97da494a55d
-#          progressbaridx=${first_two#*_}
-#          ## progressbaridx example:
-#          ## 2b3916d6-3b3f-4490-bc85-b97da494a55d
-#          if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_${progressbaridx}_progressbarx" ]; then
-#             if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_${progressbaridx}_progressbarx_animate" ]; then
-#                msgdispatcher_delete_wrapper "${progressbaridx}_progressbarx_animate"
-#                animate="--animate"
-#             else
-#                unset animate
-#             fi
-#             if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_${progressbaridx}_progressbartitlex" ]; then
-#                local progressbartitlex
-#                progressbartitlex="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_${progressbaridx}_progressbartitlex")" || true
-#             fi
-#             if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_${progressbaridx}_progressbarx" ]; then
-#                progressbarx="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_${progressbaridx}_progressbarx")" || true
-#             fi
-#
-#             unset animate
-#             msgdispatcher_delete_wrapper "${progressbaridx}_progressbarx_done"
-#             msgdispatcher_delete_wrapper "${progressbaridx}_progressbartitlex"
-#             msgdispatcher_delete_wrapper "${progressbaridx}_progressbarx"
-#          else
-#             msgdispatcher_delete_wrapper "${progressbaridx}_progressbarx_done"
-#          fi
-#          true "----------"
-#          return 0
-#       fi
-
-   elif [ "$cli" = "1" ]; then
-      if [ "$file_name" = "${msgcollector_run_dir}/${msgdispatcher_identifier}_waitmessagecli_done" ]; then
+   elif [ "${cli}" = "1" ]; then
+      if [ "${file_name}" = "${msgcollector_run_dir}/${msgdispatcher_identifier}_waitmessagecli_done" ]; then
          if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_waitmessagecli" ]; then
             true "INFO: waitmessagecli file exists."
             msg="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_waitmessagecli")" || true
             type="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_typecli")" || true
-            dispatch_cli "$msg"
+            dispatch_cli "${msg}"
             msgdispatcher_delete_wrapper "waitmessagecli_done"
             msgdispatcher_delete_wrapper "waitmessagecli"
             msgdispatcher_delete_wrapper "typecli"
@@ -352,11 +346,11 @@ msgdispatcher_handler() {
          true "----------"
          return 0
       fi
-      if [ "$file_name" = "${msgcollector_run_dir}/${msgdispatcher_identifier}_messagecli_done" ]; then
+      if [ "${file_name}" = "${msgcollector_run_dir}/${msgdispatcher_identifier}_messagecli_done" ]; then
          if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_messagecli" ]; then
             msg="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_messagecli")" || true
             type="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_typecli")" || true
-            dispatch_cli "$msg"
+            dispatch_cli "${msg}"
             msgdispatcher_delete_wrapper "messagecli_done"
             msgdispatcher_delete_wrapper "messagecli"
             msgdispatcher_delete_wrapper "typecli"
@@ -386,10 +380,10 @@ msgdispatcher_delete_wrapper() {
    full_path="${msgcollector_run_dir}/${msgdispatcher_identifier}_${msgdispatcher_appendix}"
    check_is_not_empty_and_only_one_line "full_path"
 
-   if test -f "$full_path" ; then
-      safe-rm -f -- "$full_path"
+   if test -f "${full_path}" ; then
+      safe-rm -f -- "${full_path}"
    else
-      true "INFO: file_name $full_path does not exist."
+      true "INFO: file_name ${full_path} does not exist."
    fi
 
    ## In case above errors, do not additionally error out from this function.
@@ -401,9 +395,9 @@ inotifywait_loop() {
 
    ## Launching inotifywait_loop into the background.
    while read -r -- file_name; do
-      true "file_name: $file_name"
+      true "file_name: ${file_name}"
       msgdispatcher_handler || true
-   done < "$inotifywait_subshell_fifo" &
+   done < "${inotifywait_subshell_fifo}" &
    inotifywait_subshell_pid="$!"
 }
 
@@ -430,8 +424,8 @@ msgdispatcher_loop() {
       "${systemd_notify[@]}" --pid="$$" WATCHDOG=1 &>/dev/null || true
       light_sleep 10
       ## Check that pids are still running.
-      kill -0 -- "$inotifywait_main_pid"
-      kill -0 -- "$inotifywait_subshell_pid"
+      kill -0 -- "${inotifywait_main_pid}"
+      kill -0 -- "${inotifywait_subshell_pid}"
    done
 }
 
