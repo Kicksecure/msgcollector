@@ -8,6 +8,9 @@
 ## omitted: msgcollector reads many optional CLI fields (icon, titlecli,
 ## typecli, progressbaridx, ...) that are legitimately unset, and enabling
 ## nounset would abort on them. The gate's R-010 strict-triple does not fit.
+##
+## TODO: Can we make it fit? Yes, there are many optional CLI fields, but why
+## can't we default them all to blank or use "${var:-}" syntax for them?
 
 #set -x
 set -e
@@ -223,10 +226,6 @@ parse_cmd_options() {
                progressbarxprogresstxtexisting="1"
                shift
                ;;
-           --animate)
-               animate="1"
-               shift
-               ;;
            --nonewlinex)
                nonewlinex="1"
                shift
@@ -324,13 +323,6 @@ cli_links_to_footnotes() {
    ## unquoted href.
    local rest="$1" footer="" n=0 whole url text before after
    local re='<a href="?([^">]*)"?>([^<]*)</a>'
-   ## Rewrite each <a href>...</a> to "text[N]", re-scanning so a reunited outer
-   ## anchor (from invalid nested input) is caught too. Every pass replaces one
-   ## anchor -- and thus one "</a>" -- with anchor-free text, so the "</a>" count
-   ## strictly decreases and the loop always terminates. (An earlier version
-   ## replaced the first LITERAL match rather than splitting on it, which could
-   ## fail to advance and loop forever on crafted input like
-   ## '<a href="<a href=">x</a>'.)
    while [[ "$rest" =~ $re ]]; do
       whole="${BASH_REMATCH[0]}"
       url="${BASH_REMATCH[1]}"
@@ -338,12 +330,7 @@ cli_links_to_footnotes() {
       before="${rest%%"$whole"*}"   # text before the first occurrence
       after="${rest#*"$whole"}"     # text after it
       if [ "$text" = "$url" ]; then
-         ## Link text is the URL itself, so a footnote would print the same
-         ## URL twice -- inline as "url[N]" and again under "Links:". Emit the
-         ## bare URL inline instead: no number, no footer entry. (text comes
-         ## from the [^<]* group, so it holds no '<'; when text == url the url
-         ## is therefore anchor-free too, keeping the loop's termination and
-         ## idempotency invariants intact.)
+         ## Link text is the URL itself, so just include verbatim
          rest="${before}${url}${after}"
          continue
       fi
@@ -354,6 +341,9 @@ cli_links_to_footnotes() {
    if [ "$n" -gt 0 ]; then
       printf '%s\n\nLinks:\n%s' "$rest" "$footer"
    else
+      ## FIXME: $message will most likely not include a trailing newline, so we
+      ## probably need '%s\n' here. We don't need it above because when $n > 0,
+      ## $footer has a newline explicitly appended to it.
       printf '%s' "$rest"
    fi
 }
@@ -561,22 +551,24 @@ collector() {
          ## such as for login security check table.
          ## The application using 'msgcollector' needs to provide sanitized strings.
          #message="$(sanitize-string -- nolimit "$message")"
+         ## TODO: Let's make it safe to pass unsanitized strings here. Run the
+         ## string through stdisplay here to sanitize any Unicode or SGR codes
+         ## that might confuse strip-markup.
+         ##
          ## Translate GUI color tags (<font color="...">) to terminal ANSI
          ## colors so a single HTML message renders colored in BOTH the GUI and
          ## the CLI. Must run BEFORE strip-markup (which strips all tags); the
          ## inserted ANSI escapes contain no HTML metacharacters and survive it.
+         ##
+         ## TODO: Break this color tag translation code and the accompanying
+         ## comment into a new function for consistency.
          message="$(printf '%s' "$message" | sed \
             -e "s/<font color=\"green\">/${green:-}/g" \
             -e "s/<font color=\"orange\">/${yellow:-}/g" \
             -e "s/<font color=\"yellow\">/${yellow:-}/g" \
             -e "s/<font color=\"red\">/${red:-}/g" \
             -e "s#</font>#${reset:-}#g")"
-         ## Translate GUI hyperlinks (<a href="url">text</a>) to footnote form:
-         ## the link text stays inline as "text[N]" and the URLs are listed under
-         ## a "Links:" section below the message, so a URL never clutters the
-         ## flow text (a message with several links used to read like
-         ## "Login (url) Security Check (Colors (url))"). Keeps the URL that
-         ## strip-markup would otherwise drop. Run BEFORE strip-markup.
+         ## Translate GUI hyperlinks (<a href="url">text</a>) to footnote form.
          message="$(cli_links_to_footnotes "$message")"
          ## Translate GUI line breaks (<br>, <br/>, <br />) to real newlines, so a
          ## single HTML message keeps its line breaks on the CLI too. strip-markup
@@ -585,6 +577,13 @@ collector() {
          message="$(printf '%s' "$message" | sed -E -e 's#<br ?/?>#\n#g')"
          ## Instead, "only" use 'strip-markup' (strips HTML tags for CLI display).
          message="$(strip-markup "$message")"
+         ## TODO: Run the string through stdisplay one more time here, to
+         ## remove any SGR escapes that strip-markup created from entities it
+         ## expanded. In combination with the initial stdisplay, the HTML tag
+         ## translation, and the strip-markup call, this routine will be
+         ## equivalent in strength to a `sanitize-string` call and we will be
+         ## able to safely pass unsanitized input to this.
+         #
          pretty_type_cli "$typecli"
          message="[$p_type] [$identifier] $message"
          printf '%s\n' "$message"
@@ -618,12 +617,6 @@ collector() {
       fi
       write_to_file="${msgcollector_run_dir}/${identifier}_passivepopupqueuex"
       append_to_file
-   fi
-   ## }}
-
-   ## {{ --animate
-   if [ "$animate" = "1" ]; then
-      touch -- "${msgcollector_run_dir}/${identifier}_${progressbaridx}_progressbarx_animate"
    fi
    ## }}
 
@@ -671,12 +664,7 @@ collector() {
       append_to_file
 
       ## Cannot run from msgdispatcher due to user mismatch permission issues.
-      local animate_val
-      animate_val=''
-      if [ "$animate" = '1' ]; then
-         animate_val='--animate'
-      fi
-      /usr/libexec/msgcollector/msgprogressbar --identifier "${identifier}" --progressbaridx "${progressbaridx}" --progressbartitlex "$progressbartitlex" --message "$message" $animate_val & disown
+      /usr/libexec/msgcollector/msgprogressbar --identifier "${identifier}" --progressbaridx "${progressbaridx}" --progressbartitlex "$progressbartitlex" --message "$message" & disown
    fi
    ## }}
 }

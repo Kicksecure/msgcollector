@@ -13,6 +13,11 @@
 ## provides: read_integer_file
 source /usr/libexec/helper-scripts/strings.bsh
 
+## FIXME: Rewrite check() to not require errexit to be active to work
+## correctly. Adjust all callers of check() to also not need errexit for it to
+## abort the script. We should keep errexit in place, but should NOT rely on
+## it working due to how easy it is to temporarily disable on accident.
+
 check() {
   ## NOTE: 'local variable_to_check="$1"' is intentionally avoided.
   ## 'local' always returns 0, which would clobber '$?' if we ever
