@@ -905,7 +905,12 @@ msgprogressbar_capture_yad() {
     printf '%s\n' 'exit 0'
   } > "${stub_dir}/yad"
   chmod u+rwx -- "${stub_dir}/yad"
-  YAD_CAPTURE="${capture}" PATH="${stub_dir}:${PATH}" \
+  ## The empty-title popup only exists in GUI mode. In a headless environment
+  ## (no DISPLAY, e.g. CI) msgfallbacks shadows yad with a no-op function, so
+  ## force GUI mode with a dummy DISPLAY: then 'has yad' finds the stub on PATH,
+  ## no dummy is defined, and the stub records the argv. The stub never connects
+  ## to X, so no real server is needed.
+  DISPLAY=:99 YAD_CAPTURE="${capture}" PATH="${stub_dir}:${PATH}" \
     timeout 20 /usr/libexec/msgcollector/msgprogressbar \
       --identifier "${identifier}" \
       --progressbaridx "pbidx" \
