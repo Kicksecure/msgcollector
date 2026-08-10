@@ -571,6 +571,27 @@ test_src_translate_color_enabled() {
   fi
 }
 
+test_src_error_handler_unset_parentpid() {
+  ## Regression: error_handler must not itself abort under nounset when
+  ## parentpid is empty. ps_p_parentpid is only assigned when parentpid is a
+  ## real PID; with the empty default it stays '', so the diagnostic block that
+  ## prints ${ps_p_parentpid} must find it defined. On the buggy code the msg
+  ## assembly aborts with 'ps_p_parentpid: unbound variable' before the
+  ## 'No panic' banner is ever printed.
+  local out
+  out="$(MSGC="${MSGCOLLECTOR_SCRIPT}" bash -c '
+    source "${MSGC}" </dev/null >/dev/null 2>&1 || true
+    parentpid=""
+    error_handler
+  ' 2>&1 || true)"
+  if printf '%s' "${out}" | grep -Fq 'No panic' \
+     && ! printf '%s' "${out}" | grep -Fq 'unbound variable'; then
+    pass "error_handler: empty parentpid does not trip nounset"
+  else
+    fail "error_handler: nounset abort on empty parentpid (got '${out}')"
+  fi
+}
+
 ## --------------------------------------------------------------------------
 printf '%s\n' ""
 printf '%s\n' "$0: === Run all tests ==="
@@ -626,6 +647,7 @@ test_src_translate_color_enabled
 test_src_translate_br_newline
 test_src_pretty_type_cli
 test_src_pretty_type_x
+test_src_error_handler_unset_parentpid
 
 ## --------------------------------------------------------------------------
 printf '%s\n' ""

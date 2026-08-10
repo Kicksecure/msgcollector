@@ -63,7 +63,7 @@ error_handler() {
 
    local my_pstree
    my_pstree="$(pstree -p $$)" || true
-   local ps_p_parentpid
+   local ps_p_parentpid=""
 
    if [ ! "${parentpid}" = "" ]; then
       if [ ! "${parentpid}" = "0000000000" ]; then
