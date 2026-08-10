@@ -112,7 +112,7 @@ parse_cmd_options() {
                shift
                ;;
            --debug)
-               debug="1"
+               ## Accepted for compatibility; no debug behaviour is wired up.
                shift
                ;;
            --identifier)
