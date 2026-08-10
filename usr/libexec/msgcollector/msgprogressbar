@@ -334,8 +334,8 @@ source /usr/libexec/msgcollector/msgfallbacks
 fallbacks ## provided by /usr/libexec/msgcollector/msgfallbacks
 parse_cmd_options "$@"
 
-check "${identifier}"
-check "${progressbaridx}"
+check "${identifier}" || exit 1
+check "${progressbaridx}" || exit 1
 
 preparation
 start_progress_bar

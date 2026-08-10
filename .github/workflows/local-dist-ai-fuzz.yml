@@ -3,10 +3,6 @@
 
 ## AI-Assisted
 
-## FIXME: Breaks our existing conventions with reusables vs local workflows.
-## Either rename with a "local-" prefix or create a proper reusable in
-## developer-meta-files.
-
 ## Runs msgcollector's dist-ai FUZZ suite (msgcollector-tests-fuzz, which lives
 ## in org-ai-assisted/dist-ai, not in-tree) on each PR and on push to master.
 ## This is NOT the managed consumer-dist-ai-tests.yml template: msgcollector has
