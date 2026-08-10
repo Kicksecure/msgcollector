@@ -4,11 +4,20 @@
 ## See the file COPYING for copying conditions.
 
 ## Unit tests for msgcollector input validation and security.
+##
+## The tests below feed deliberately literal injection payloads ('$(whoami)',
+## backtick and '; echo HACKED') to the validators to prove they are rejected,
+## so the single-quoted non-expansions are intentional (SC2016) and a literal
+## 'echo' inside a payload string is not a command (R-034).
+# shellcheck disable=SC2016
+## style-ok: allow-echo
 
 set -o errexit
 set -o nounset
 set -o errtrace
 set -o pipefail
+shopt -s inherit_errexit
+shopt -s shift_verbose
 
 if ! [ "${CI:-}" = "true" ]; then
   printf '%s\n' "$0: These tests are only supposed to run on CI." >&2
@@ -35,14 +44,14 @@ source /usr/libexec/helper-scripts/strings.bsh
 source /usr/libexec/msgcollector/check
 
 ## --------------------------------------------------------------------------
-printf '%s\n' "$0: === check() function tests ==="
+printf '%s\n' "$0: === msgcollector_check() function tests ==="
 ## --------------------------------------------------------------------------
 
 ## check() should accept valid alphanumeric identifiers.
 test_check_valid_simple() {
   local result
   result=0
-  check "systemcheck" || result=$?
+  msgcollector_check "systemcheck" || result=$?
   if [ "${result}" = "0" ]; then
     pass "check accepts 'systemcheck'"
   else
@@ -53,7 +62,7 @@ test_check_valid_simple() {
 test_check_valid_with_dashes() {
   local result
   result=0
-  check "2b3916d6-3b3f-4490-bc85-b97da494a55d" || result=$?
+  msgcollector_check "2b3916d6-3b3f-4490-bc85-b97da494a55d" || result=$?
   if [ "${result}" = "0" ]; then
     pass "check accepts UUID with dashes"
   else
@@ -64,7 +73,7 @@ test_check_valid_with_dashes() {
 test_check_valid_with_underscores() {
   local result
   result=0
-  check "my_identifier_123" || result=$?
+  msgcollector_check "my_identifier_123" || result=$?
   if [ "${result}" = "0" ]; then
     pass "check accepts underscores"
   else
@@ -77,7 +86,7 @@ test_check_reject_path_traversal() {
   local result
   result=0
   ## check() calls exit 1 on failure, run in subshell.
-  (check "../../etc/passwd" 2>/dev/null) || result=$?
+  (msgcollector_check "../../etc/passwd" 2>/dev/null) || result=$?
   if [ "${result}" != "0" ]; then
     pass "check rejects path traversal '../../etc/passwd'"
   else
@@ -88,7 +97,7 @@ test_check_reject_path_traversal() {
 test_check_reject_slash() {
   local result
   result=0
-  (check "foo/bar" 2>/dev/null) || result=$?
+  (msgcollector_check "foo/bar" 2>/dev/null) || result=$?
   if [ "${result}" != "0" ]; then
     pass "check rejects slash 'foo/bar'"
   else
@@ -99,7 +108,7 @@ test_check_reject_slash() {
 test_check_reject_empty() {
   local result
   result=0
-  (check "" 2>/dev/null) || result=$?
+  (msgcollector_check "" 2>/dev/null) || result=$?
   if [ "${result}" != "0" ]; then
     pass "check rejects empty string"
   else
@@ -110,7 +119,7 @@ test_check_reject_empty() {
 test_check_reject_spaces() {
   local result
   result=0
-  (check "has spaces" 2>/dev/null) || result=$?
+  (msgcollector_check "has spaces" 2>/dev/null) || result=$?
   if [ "${result}" != "0" ]; then
     pass "check rejects spaces"
   else
@@ -121,7 +130,7 @@ test_check_reject_spaces() {
 test_check_reject_dots() {
   local result
   result=0
-  (check "two..dots" 2>/dev/null) || result=$?
+  (msgcollector_check "two..dots" 2>/dev/null) || result=$?
   if [ "${result}" != "0" ]; then
     pass "check rejects dots"
   else
@@ -132,7 +141,7 @@ test_check_reject_dots() {
 test_check_reject_semicolon() {
   local result
   result=0
-  (check "foo;bar" 2>/dev/null) || result=$?
+  (msgcollector_check "foo;bar" 2>/dev/null) || result=$?
   if [ "${result}" != "0" ]; then
     pass "check rejects semicolon injection"
   else
@@ -143,7 +152,7 @@ test_check_reject_semicolon() {
 test_check_reject_dollar() {
   local result
   result=0
-  (check '$(whoami)' 2>/dev/null) || result=$?
+  (msgcollector_check '$(whoami)' 2>/dev/null) || result=$?
   if [ "${result}" != "0" ]; then
     pass "check rejects command substitution"
   else
@@ -154,7 +163,7 @@ test_check_reject_dollar() {
 test_check_reject_backtick() {
   local result
   result=0
-  (check '`whoami`' 2>/dev/null) || result=$?
+  (msgcollector_check '`whoami`' 2>/dev/null) || result=$?
   if [ "${result}" != "0" ]; then
     pass "check rejects backtick injection"
   else
@@ -165,7 +174,7 @@ test_check_reject_backtick() {
 test_check_reject_newline() {
   local result
   result=0
-  (check $'line1\nline2' 2>/dev/null) || result=$?
+  (msgcollector_check $'line1\nline2' 2>/dev/null) || result=$?
   if [ "${result}" != "0" ]; then
     pass "check rejects newline"
   else

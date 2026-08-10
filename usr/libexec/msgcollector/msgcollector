@@ -20,7 +20,9 @@ scriptname="$(basename -- "${BASH_SOURCE[0]}")"
 
 ## Every optional CLI field, defaulted so a read before its flag is parsed is
 ## safe under nounset. Also the two error_handler reads (my_command_line_
-## parameters, write_to_file) and the color names colors() fills in later.
+## parameters, write_to_file). Color variables are NOT defaulted here: colors()
+## calls get_colors (which always defines every one, '' when disabled) and runs
+## before parse_cmd_options in main().
 cli=""
 done=""
 forceactive=""
@@ -55,15 +57,6 @@ verbose=""
 waitmessagecli=""
 my_command_line_parameters=""
 write_to_file=""
-
-## Color escape codes -- colors() fills these from helper-scripts' get_colors;
-## defaulted so a read before that (e.g. the parse_cmd_options trace) is safe.
-cyan=""
-reset=""
-green=""
-yellow=""
-red=""
-bold=""
 
 error_handler() {
    local exit_code="$?"
@@ -337,18 +330,9 @@ preparation() {
 colors() {
    trap "error_handler" ERR
 
-   if [ "${TERM:-}" = "" ]; then
-      return 0
+   if [ ! "${TERM:-}" = "" ]; then
+      ASSUME_TERM_PRESENT=true
    fi
-
-   ## Terminal color/attribute variables (green, red, yellow, reset, bold, eel,
-   ## ebl, ...) come from helper-scripts' get_colors, which emits plain ESC[...m
-   ## sequences -- no tput, and crucially no Shift-In (0x0f) that 'tput sgr0'
-   ## appends to also reset the charset and that would then trail every colored
-   ## token in redirected CLI output. ASSUME_TERM_PRESENT keeps the previous
-   ## behaviour of defining colors whenever TERM is set (they are stored in the
-   ## message files for later display), independent of whether stderr is a tty.
-   ASSUME_TERM_PRESENT=true
    source /usr/libexec/helper-scripts/get_colors.sh
    get_colors
 }
@@ -524,7 +508,7 @@ collector() {
          old_typecli="$(cat -- "${msgcollector_run_dir}/${identifier}_typecli")"
       fi
 
-      if [ "${old_typecli}" = "info" ]; then
+      if [ "${old_typecli:-}" = "info" ]; then
          if [ "${typecli}" = "error" ]; then
             ## Upgrade from info to error.
             write_typecli_to_file "error" "${msgcollector_run_dir}/${identifier}_typecli"
@@ -532,12 +516,12 @@ collector() {
             ## Upgrade from info to warning.
             write_typecli_to_file "warning" "${msgcollector_run_dir}/${identifier}_typecli"
          fi
-      elif [ "${old_typecli}" = "warning" ]; then
+      elif [ "${old_typecli:-}" = "warning" ]; then
          if [ "${typecli}" = "error" ]; then
             ## Upgrade from warning to error.
             write_typecli_to_file "error" "${msgcollector_run_dir}/${identifier}_typecli"
          fi
-      elif [ "${old_typecli}" = "error" ]; then
+      elif [ "${old_typecli:-}" = "error" ]; then
          true
       else
          if [ ! "${typecli}" = "" ]; then
@@ -553,7 +537,7 @@ collector() {
          old_typex="$(cat -- "${msgcollector_run_dir}/${identifier}_typex")"
       fi
 
-      if [ "${old_typex}" = "info" ]; then
+      if [ "${old_typex:-}" = "info" ]; then
          if [ "${typex}" = "error" ]; then
             ## Upgrade from info to error.
             printf '%s\n' "error" > "${msgcollector_run_dir}/${identifier}_typex"
@@ -561,12 +545,12 @@ collector() {
             ## Upgrade from info to warning.
             printf '%s\n' "warning" > "${msgcollector_run_dir}/${identifier}_typex"
          fi
-      elif [ "${old_typex}" = "warning" ]; then
+      elif [ "${old_typex:-}" = "warning" ]; then
          if [ "${typex}" = "error" ]; then
             ## Upgrade from warning to error.
             printf '%s\n' "error" > "${msgcollector_run_dir}/${identifier}_typex"
          fi
-      elif [ "${old_typex}" = "error" ]; then
+      elif [ "${old_typex:-}" = "error" ]; then
          true
       else
          printf '%s\n' "${typex}" > "${msgcollector_run_dir}/${identifier}_typex"
@@ -940,6 +924,9 @@ main() {
    trap "error_handler" ERR
    my_command_line_parameters="$*"
 
+   ## Before parse: parse_cmd_options' trace reads ${cyan}/${reset}.
+   colors
+
    parse_cmd_options "$@"
 
    source /usr/libexec/msgcollector/msgcollector_shared
@@ -960,7 +947,6 @@ main() {
    fi
 
    preparation
-   colors
 
    if [ "${status}" = "1" ]; then
       return_status
