@@ -1014,12 +1014,14 @@ test_messagecli_color_conversion_preserved() {
   else
     pass "messagecli color: <font> tag converted"
   fi
-  ## The word survives and an ANSI escape (ESC byte) is present around it.
-  if LC_ALL=C grep -q 'GREENWORD' "${out}" \
-     && LC_ALL=C grep -Fq -- "$(printf '\033')" "${out}"; then
-    pass "messagecli color: ANSI color preserved through the final stdisplay pass"
+  ## The markup color must apply specifically to GREENWORD: an SGR sequence
+  ## (ESC '[' ... 'm') immediately precedes the word. Asserting merely that
+  ## SOME ESC exists would pass on the [INFO] prefix's own color even if the
+  ## markup conversion were removed, so match the escape right before the word.
+  if LC_ALL=C grep -Pq '\x1b\[[0-9;]*mGREENWORD' "${out}"; then
+    pass "messagecli color: markup ANSI color applied to GREENWORD and preserved"
   else
-    fail "messagecli color: color lost or word missing"
+    fail "messagecli color: markup color not applied to GREENWORD"
   fi
 }
 

@@ -463,6 +463,55 @@ write_typecli_to_file() {
    printf '%s\n' "$1" > "$2"
 }
 
+escalate_type_file() {
+   ## Write $2 (info|warning|error) to the type file $1 without DOWNGRADING an
+   ## existing higher severity (info < warning < error). A passive popup queue
+   ## aggregates several messages under one identifier, so -- like the messagex
+   ## _typex escalation -- the worst severity must win, not the last write.
+   # $1 - type file, $2 - new type
+   local type_file new old
+   type_file="$1"
+   new="$2"
+   old=""
+   if [ -f "${type_file}" ]; then
+      old="$(cat -- "${type_file}" 2>/dev/null)" || true
+   fi
+   case "${old}" in
+      error)
+         ## already the worst; never downgrade
+         return 0
+         ;;
+      warning)
+         if [ "${new}" != "error" ]; then
+            return 0
+         fi
+         ;;
+      info)
+         if [ "${new}" != "error" ] && [ "${new}" != "warning" ]; then
+            return 0
+         fi
+         ;;
+   esac
+   printf '%s\n' "${new}" > "${type_file}"
+}
+
+stdisplay_message() {
+   ## Sanitize a CLI message from stdin with stdisplay (stcat): drop non-ASCII
+   ## and every dangerous (non-SGR) escape, keep only a safe SGR subset. Honor
+   ## msgcollector's OWN color decision: get_colors (via colors()'s
+   ## ASSUME_TERM_PRESENT) can enable color where stdisplay's own NO_COLOR /
+   ## TERM=dumb defaults would disable SGR. If they disagreed, stdisplay would
+   ## replace only the ESC of a color we just inserted and leave visible '[..m'
+   ## debris. So when color is on (${green} set) force stdisplay to allow SGR
+   ## too. Non-SGR escapes (cursor moves, clears, OSC) are neutralized either
+   ## way -- that is the security guarantee, independent of the color policy.
+   if [ -n "${green:-}" ]; then
+      env --unset=NO_COLOR COLORTERM=truecolor stcat
+   else
+      stcat
+   fi
+}
+
 collector() {
    trap "error_handler" ERR
 
@@ -618,7 +667,7 @@ collector() {
          ## crafted string cannot confuse the markup translation or strip-markup
          ## below. Terminal colors a caller legitimately embedded (e.g. the login
          ## security check table) fall in that safe subset and survive.
-         message="$(printf '%s' "${message}" | stcat)"
+         message="$(printf '%s' "${message}" | stdisplay_message)"
          ## Translate GUI markup (color tags, hyperlinks, line breaks) to CLI.
          message="$(cli_translate_gui_markup "${message}")"
          ## Strip the remaining HTML tags for CLI display.
@@ -628,7 +677,7 @@ collector() {
          ## preserving the SGR the markup translation inserted. Combined with the
          ## first pass, the color translation and strip-markup, this is as strong
          ## as a 'sanitize-string' call, so unsanitized input is safe here.
-         message="$(printf '%s' "${message}" | stcat)"
+         message="$(printf '%s' "${message}" | stdisplay_message)"
          pretty_type_cli "${typecli}"
          message="[${p_type}] [${identifier}] ${message}"
          printf '%s\n' "${message}"
@@ -665,7 +714,9 @@ collector() {
          ## _typex so msgdispatcher's passive path reads the caller's type
          ## without colliding with a concurrent messagex for the same identifier.
          ## msgdispatcher only maps this to a per-type icon, never runs it.
-         printf '%s\n' "${typex}" > "${msgcollector_run_dir}/${identifier}_passivepopupqueuextype"
+         ## Escalate (never downgrade): a queued error keeps its error icon even
+         ## if a later info message is appended to the same popup.
+         escalate_type_file "${msgcollector_run_dir}/${identifier}_passivepopupqueuextype" "${typex}"
       fi
       write_to_file="${msgcollector_run_dir}/${identifier}_passivepopupqueuex"
       append_to_file

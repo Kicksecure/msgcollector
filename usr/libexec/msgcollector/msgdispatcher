@@ -342,11 +342,15 @@ msgdispatcher_handler() {
       if [ "${file_name}" = "${msgcollector_run_dir}/${msgdispatcher_identifier}_passivepopupqueuex_done" ]; then
          if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_passivepopupqueuex" ]; then
             msg="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_passivepopupqueuex")" || true
-            title="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_passivepopupqueuextitle")" || true
+            ## 2>/dev/null: the title and type files are optional (written only
+            ## when the caller gives --passivepopupqueuextitle / --typex), so a
+            ## missing one must not spam this daemon's journal with 'cat: ... No
+            ## such file'. The || true keeps the read non-fatal.
+            title="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_passivepopupqueuextitle" 2>/dev/null)" || true
             ## Read the caller's type from the dedicated passive-popup type file,
             ## NOT _typex, so a concurrent messagex for the same identifier cannot
             ## clobber it. dispatch_x_passive maps it to a per-type icon only.
-            type="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_passivepopupqueuextype")" || true
+            type="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_passivepopupqueuextype" 2>/dev/null)" || true
             if [ "${type}" = "" ]; then
                type="info"
             fi
