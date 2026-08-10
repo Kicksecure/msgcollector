@@ -214,7 +214,7 @@ start_progress_bar() {
    fi
 
    if [ "${icon}" = "" ]; then
-      ## TODO: write error log
+      true "${scriptname}: no icon set for this progress bar; using the default info icon."
       local icon="/usr/share/icons/gnome/24x24/status/info.png"
    fi
 
@@ -322,16 +322,7 @@ folder_init
 ## provides: check, is_whole_number
 source /usr/libexec/msgcollector/check
 
-## msgfallbacks (sourced below) calls 'has', which is a FUNCTION from this
-## file, not an executable. msgdispatcher already sourced it; this one did not,
-## so the same shared code worked in one caller and not the other.
-##
-## TODO: Maybe we should just source 'has' in msgfallbacks itself? We're going
-## to have a source_once mechanism eventually, which will make this more
-## efficient later.
-# shellcheck source=../../../../helper-scripts/usr/libexec/helper-scripts/has.sh
-source /usr/libexec/helper-scripts/has.sh
-
+## 'has' is sourced by msgfallbacks itself now.
 source /usr/libexec/msgcollector/msgfallbacks
 fallbacks ## provided by /usr/libexec/msgcollector/msgfallbacks
 parse_cmd_options "$@"

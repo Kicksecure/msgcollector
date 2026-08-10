@@ -164,8 +164,6 @@ progress_bar() {
    else
       true "fifo does not exist: ${msgcollector_run_dir}/${identifier}_${progressbaridx}_fifo"
    fi
-   ## XXX
-   #progress_bar
    return 0
 }
 
