@@ -70,7 +70,7 @@ error_handler() {
    ## EACCES. Kicksecure's default umask (027) does not mask it, so this is
    ## defensive -- for a dir pre-created without owner-x. Every error path that
    ## writes this log does the same (msgprogress, msgprogressbar, msgdispatcher).
-   chmod +x ~/".msgcollector" || true
+   chmod u+rwx -- ~/".msgcollector" || true
 
    if ! touch -- ~/".msgcollector/msgdispatcher-error.log" ; then
       printf '%s\n' "${scriptname}: skipping log to ${home_var}/.msgcollector/msgdispatcher-error.log since failed to 'touch' file." >&2
