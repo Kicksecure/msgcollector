@@ -1078,6 +1078,61 @@ test_passivepopupqueuex_type_icon_mapping() {
 
 ## --------------------------------------------------------------------------
 printf '%s\n' ""
+printf '%s\n' "$0: === argument validation + append variants (coverage) ==="
+## --------------------------------------------------------------------------
+
+test_trailing_positional_arg_rejected() {
+  ## A leftover positional argument after '--' is rejected with exit 3.
+  local rc
+  rc=0
+  ${MSGCOLLECTOR} --identifier trailtest -- unexpected_positional 2>/dev/null || rc=$?
+  if [ "${rc}" = "3" ]; then
+    pass "trailing positional argument rejected with exit 3"
+  else
+    fail "trailing positional arg: expected exit 3, got ${rc}"
+  fi
+}
+
+test_reject_empty_typex() {
+  local rc
+  rc=0
+  ${MSGCOLLECTOR} --identifier emptytypextest --typex "" \
+    --messagex --message "x" 2>/dev/null || rc=$?
+  if [ "${rc}" != "0" ]; then
+    pass "empty --typex value rejected (exit ${rc})"
+  else
+    fail "empty --typex value accepted (exit 0)"
+  fi
+}
+
+test_reject_empty_progressx() {
+  local rc
+  rc=0
+  ${MSGCOLLECTOR} --identifier emptyprogxtest --progressbaridx pbx \
+    --progressx "" 2>/dev/null || rc=$?
+  if [ "${rc}" != "0" ]; then
+    pass "empty --progressx value rejected (exit ${rc})"
+  else
+    fail "empty --progressx value accepted (exit 0)"
+  fi
+}
+
+test_newlinecli_append() {
+  ## The --newlinecli append variant writes the message with a leading newline.
+  ${MSGCOLLECTOR} --identifier nlclitest --messagecli --newlinecli \
+    --typecli info --message "NLLINE" 2>/dev/null || true
+  local file content
+  file="${msgcollector_run_dir}/nlclitest_messagecli"
+  content="$(cat -- "${file}" 2>/dev/null || true)"
+  if [ -f "${file}" ] && printf '%s' "${content}" | grep -Fq 'NLLINE'; then
+    pass "--newlinecli writes the message (newline-prefixed variant)"
+  else
+    fail "--newlinecli did not write the message (got '${content}')"
+  fi
+}
+
+## --------------------------------------------------------------------------
+printf '%s\n' ""
 printf '%s\n' "$0: === unknown-option output is sanitized against injection (#29) ==="
 ## --------------------------------------------------------------------------
 
@@ -1255,6 +1310,11 @@ test_messagecli_color_conversion_preserved
 test_passivepopupqueuex_type_dedicated_file
 test_passivepopupqueuex_type_icon_mapping
 
+test_trailing_positional_arg_rejected
+test_reject_empty_typex
+test_reject_empty_progressx
+test_newlinecli_append
+
 test_unknown_option_output_sanitized
 
 test_pv_wrapper_passthrough
@@ -1267,7 +1327,8 @@ test_no_file_outside_run_dir
 ## Clean up test identifiers.
 for id in unittest escalation statustest waitcli echotest appendtest \
           pidtest ttytest forcetest typexesc clipstattest popupdone \
-          forgetall prettytest progtest sanitizetest colorprestest; do
+          forgetall prettytest progtest sanitizetest colorprestest \
+          nlclitest; do
   ${MSGCOLLECTOR} --identifier "${id}" --forget 2>/dev/null || true
 done
 

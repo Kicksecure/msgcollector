@@ -541,6 +541,36 @@ test_src_pretty_type_cli() {
   fi
 }
 
+test_src_pretty_type_x() {
+  ## pretty_type_x rewrites a <p>-prefixed message with a typed span; a message
+  ## not starting with <p>, and an unknown type, are left unchanged.
+  local info_out warn_out plain_out
+  info_out="$(run_sourced 'message="<p>hello"; pretty_type_x info; printf "%s" "${message}"')"
+  warn_out="$(run_sourced 'message="<p>hello"; pretty_type_x warning; printf "%s" "${message}"')"
+  plain_out="$(run_sourced 'message="plain no p"; pretty_type_x error; printf "%s" "${message}"')"
+  if printf '%s' "${info_out}" | grep -Fq 'INFO' \
+     && printf '%s' "${warn_out}" | grep -Fq 'WARNING' \
+     && [ "${plain_out}" = 'plain no p' ]; then
+    pass "pretty_type_x: <p> messages get typed spans; non-<p> unchanged"
+  else
+    fail "pretty_type_x: wrong (info='${info_out}' warn='${warn_out}' plain='${plain_out}')"
+  fi
+}
+
+test_src_translate_color_enabled() {
+  ## With color enabled, <font color="..."> becomes the terminal color code.
+  ## A plain sentinel stands in for the ANSI code: the str_replace path is the
+  ## same, and it keeps the assertion free of escape bytes.
+  local out
+  out="$(run_sourced 'green="[[G]]"; reset="[[R]]"; cli_translate_gui_markup "${ARG}"' \
+    '<font color="green">X</font>')"
+  if [ "${out}" = '[[G]]X[[R]]' ]; then
+    pass "cli_translate_gui_markup: color tags become the color codes when enabled"
+  else
+    fail "cli_translate_gui_markup: color-enabled output wrong (got '${out}')"
+  fi
+}
+
 ## --------------------------------------------------------------------------
 printf '%s\n' ""
 printf '%s\n' "$0: === Run all tests ==="
@@ -592,8 +622,10 @@ test_src_links_footnote
 test_src_links_bare_url
 test_src_links_plain_unchanged
 test_src_translate_color_disabled
+test_src_translate_color_enabled
 test_src_translate_br_newline
 test_src_pretty_type_cli
+test_src_pretty_type_x
 
 ## --------------------------------------------------------------------------
 printf '%s\n' ""
