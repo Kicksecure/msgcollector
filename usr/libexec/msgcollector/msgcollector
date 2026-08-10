@@ -657,6 +657,13 @@ collector() {
       if [ "${message}" = "" ]; then
          message="message was empty after sanitize-string."
       fi
+      if [ -n "${typex}" ]; then
+         ## Dedicated passive-popup type file, kept separate from messagex's
+         ## _typex so msgdispatcher's passive path reads the caller's type
+         ## without colliding with a concurrent messagex for the same identifier.
+         ## msgdispatcher only maps this to a per-type icon, never runs it.
+         printf '%s\n' "${typex}" > "${msgcollector_run_dir}/${identifier}_passivepopupqueuextype"
+      fi
       write_to_file="${msgcollector_run_dir}/${identifier}_passivepopupqueuex"
       append_to_file
    fi
@@ -878,6 +885,7 @@ forget() {
       "${msgcollector_run_dir}/${identifier}_titlecli"
       "${msgcollector_run_dir}/${identifier}_titlex"
       "${msgcollector_run_dir}/${identifier}_passivepopupqueuextitle"
+      "${msgcollector_run_dir}/${identifier}_passivepopupqueuextype"
       "${msgcollector_run_dir}/${identifier}_${progressbaridx}_progressbartitlex"
       "${msgcollector_run_dir}/${identifier}_typecli"
       "${msgcollector_run_dir}/${identifier}_typex"

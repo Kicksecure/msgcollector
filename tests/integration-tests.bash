@@ -1025,6 +1025,59 @@ test_messagecli_color_conversion_preserved() {
 
 ## --------------------------------------------------------------------------
 printf '%s\n' ""
+printf '%s\n' "$0: === passive popup: typed via dedicated file, per-type icon (#31) ==="
+## --------------------------------------------------------------------------
+
+test_passivepopupqueuex_type_dedicated_file() {
+  ## A passive popup with --typex records the type in its OWN file, separate
+  ## from messagex's _typex, so msgdispatcher reads the caller's type without a
+  ## cross-feature collision.
+  ${MSGCOLLECTOR} --identifier pptypetest --passivepopupqueuex \
+    --passivepopupqueuextitle "T" --typex warning --message "M" 2>/dev/null || true
+  local tf content
+  tf="${msgcollector_run_dir}/pptypetest_passivepopupqueuextype"
+  content="$(cat -- "${tf}" 2>/dev/null || true)"
+  if [ -f "${tf}" ] && [ "${content}" = "warning" ]; then
+    pass "passivepopupqueuex: type written to dedicated _passivepopupqueuextype file"
+  else
+    fail "passivepopupqueuex: dedicated type file missing or wrong (got '${content}')"
+  fi
+  ## --forget must clean it up like the other passive-popup files.
+  ${MSGCOLLECTOR} --identifier pptypetest --forget 2>/dev/null || true
+  if [ -f "${tf}" ]; then
+    fail "passivepopupqueuex: --forget did not clean up the type file"
+  else
+    pass "passivepopupqueuex: --forget cleans up the dedicated type file"
+  fi
+}
+
+test_passivepopupqueuex_type_icon_mapping() {
+  ## The msgdispatcher helper maps a passive-popup type to a freedesktop icon.
+  ## Extract just that function from the real source and exercise it.
+  local src fn
+  src="/usr/libexec/msgcollector/msgdispatcher"
+  fn="$(sed -n '/^msgdispatcher_passive_type_icon() {/,/^}/p' "${src}")"
+  if [ -z "${fn}" ]; then
+    fail "passive type icon: function not found in msgdispatcher"
+    return
+  fi
+  local got_err got_warn got_info got_unknown
+  got_err="$(eval "${fn}"; msgdispatcher_passive_type_icon error)"
+  got_warn="$(eval "${fn}"; msgdispatcher_passive_type_icon warning)"
+  got_info="$(eval "${fn}"; msgdispatcher_passive_type_icon info)"
+  got_unknown="$(eval "${fn}"; msgdispatcher_passive_type_icon bogus)"
+  if [ "${got_err}" = "dialog-error" ] \
+     && [ "${got_warn}" = "dialog-warning" ] \
+     && [ "${got_info}" = "dialog-information" ] \
+     && [ "${got_unknown}" = "dialog-information" ]; then
+    pass "passive type icon: error/warning/info/unknown map correctly"
+  else
+    fail "passive type icon: wrong (err=${got_err} warn=${got_warn} info=${got_info} unk=${got_unknown})"
+  fi
+}
+
+## --------------------------------------------------------------------------
+printf '%s\n' ""
 printf '%s\n' "$0: === pv_wrapper normal operation ==="
 ## --------------------------------------------------------------------------
 
@@ -1172,6 +1225,9 @@ test_progressbar_empty_message_not_alarming
 
 test_messagecli_sanitizes_dangerous_input
 test_messagecli_color_conversion_preserved
+
+test_passivepopupqueuex_type_dedicated_file
+test_passivepopupqueuex_type_icon_mapping
 
 test_pv_wrapper_passthrough
 test_pv_wrapper_single_value

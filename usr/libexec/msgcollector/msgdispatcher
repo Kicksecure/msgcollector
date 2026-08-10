@@ -158,12 +158,29 @@ preparation() {
 }
 
 ## {{ Small wrapper to use either 'kdialog', 'notify-send' or nothing.
+msgdispatcher_passive_type_icon() {
+   ## Map a passive-popup type to a freedesktop icon name, so the popup shows
+   ## its severity like the active dialog does. Unknown types fall back to info.
+   case "$1" in
+      error)
+         printf '%s' 'dialog-error'
+         ;;
+      warning)
+         printf '%s' 'dialog-warning'
+         ;;
+      *)
+         printf '%s' 'dialog-information'
+         ;;
+   esac
+}
+
 passive_popup_tool() {
-   local time title text
+   local time title text icon icon_opts
    time="$1"
    ## Both guarded: under nounset an unset $3 aborts the same as an unset $2.
    title="${2:-}"
    text="${3:-}"
+   icon="${4:-}"
 
    ## Fallback.
    ## 'notify-send' does not work if $title is unset.
@@ -171,11 +188,17 @@ passive_popup_tool() {
       title="${msgdispatcher_identifier}"
    fi
 
+   ## Pass --icon only when set, so an empty icon does not reach the tool.
+   icon_opts=()
+   if [ -n "${icon}" ]; then
+      icon_opts=("--icon" "${icon}")
+   fi
+
    ## 'notify-send' timeout in milliseconds.
 
    if has "qubesdb-read" ; then
       if has "notify-send" ; then
-         notify-send --expire-time "${time}000" -- "${title}" "${text}"
+         notify-send "${icon_opts[@]}" --expire-time "${time}000" -- "${title}" "${text}"
          return 0
       fi
    fi
@@ -185,9 +208,9 @@ passive_popup_tool() {
    ## - that may not be the case for Gnome users
    if has "kdialog" ; then
       ## 'kdialog' does not support end-of-options.
-      kdialog --title "${title}" --passivepopup "${text}" "${time}"
+      kdialog "${icon_opts[@]}" --title "${title}" --passivepopup "${text}" "${time}"
    elif has "notify-send" ; then
-      notify-send --expire-time "${time}000" -- "${title}" "${text}"
+      notify-send "${icon_opts[@]}" --expire-time "${time}000" -- "${title}" "${text}"
    fi
 }
 ## }}
@@ -247,7 +270,12 @@ dispatch_x_active() {
 }
 
 dispatch_x_passive() {
-   passive_popup_tool "20" "${title}" "${msg}"
+   local icon
+   ## Give the passive popup a per-type icon, so its severity is visible like
+   ## the active dialog's. ${type} is the caller's type read from the dedicated
+   ## passive-popup type file (info when unset).
+   icon="$(msgdispatcher_passive_type_icon "${type:-}")"
+   passive_popup_tool "20" "${title}" "${msg}" "${icon}"
 }
 
 inotifywait_setup() {
@@ -313,9 +341,13 @@ msgdispatcher_handler() {
          if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_passivepopupqueuex" ]; then
             msg="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_passivepopupqueuex")" || true
             title="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_passivepopupqueuextitle")" || true
-            ## TODO: do not use "_typex" to avoid conflicts with "messagex_done".
-            #type="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_typex")" || true
-            type="info"
+            ## Read the caller's type from the dedicated passive-popup type file,
+            ## NOT _typex, so a concurrent messagex for the same identifier cannot
+            ## clobber it. dispatch_x_passive maps it to a per-type icon only.
+            type="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_passivepopupqueuextype")" || true
+            if [ "${type}" = "" ]; then
+               type="info"
+            fi
             if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_forceactive" ]; then
                #dispatch_x_active "${type}" "${msg}"
                dispatch_x_passive "${type}" "${title}" "${msg}" || true
@@ -326,6 +358,7 @@ msgdispatcher_handler() {
             msgdispatcher_delete_wrapper "passivepopupqueuex_done"
             msgdispatcher_delete_wrapper "passivepopupqueuex"
             msgdispatcher_delete_wrapper "passivepopupqueuextitle"
+            msgdispatcher_delete_wrapper "passivepopupqueuextype"
          else
             msgdispatcher_delete_wrapper "passivepopupqueuex_done"
          fi
