@@ -964,6 +964,67 @@ test_progressbar_empty_message_not_alarming() {
 
 ## --------------------------------------------------------------------------
 printf '%s\n' ""
+printf '%s\n' "$0: === messagecli: stdisplay hardening + color conversion (#30) ==="
+## --------------------------------------------------------------------------
+
+test_messagecli_sanitizes_dangerous_input() {
+  ## The two stdisplay (stcat) passes must neutralize a non-SGR control
+  ## sequence and non-ASCII bytes in an otherwise unsanitized CLI message.
+  local out msg
+  msg="$(printf 'X\033[2JY \303\251 Z')"
+  ${MSGCOLLECTOR} --identifier sanitizetest --messagecli --typecli info \
+    --message "${msg}" >/dev/null 2>&1 || true
+  out="${msgcollector_run_dir}/sanitizetest_messagecli"
+  if [ ! -f "${out}" ]; then
+    fail "messagecli sanitize: output file not created"
+    return
+  fi
+  ## The raw clear-screen escape (ESC + '[2J') must be gone: stdisplay replaces
+  ## the ESC, so the raw sequence no longer appears.
+  if LC_ALL=C grep -Fq -- "$(printf '\033')[2J" "${out}"; then
+    fail "messagecli sanitize: raw clear-screen escape survived"
+  else
+    pass "messagecli sanitize: dangerous escape neutralized"
+  fi
+  ## The non-ASCII bytes must be gone (replaced by stdisplay).
+  if LC_ALL=C grep -Fq -- "$(printf '\303\251')" "${out}"; then
+    fail "messagecli sanitize: non-ASCII byte survived"
+  else
+    pass "messagecli sanitize: non-ASCII neutralized"
+  fi
+}
+
+test_messagecli_color_conversion_preserved() {
+  ## <font color="..."> must still become a terminal ANSI color, and that color
+  ## must survive the final stdisplay pass. Force a color environment so
+  ## get_colors emits real codes (ASSUME_TERM_PRESENT bypasses the tty check)
+  ## and stdisplay allows the SGR (TERM advertises colors).
+  local out
+  ASSUME_TERM_PRESENT=true TERM=xterm-256color NO_COLOR='' \
+    ${MSGCOLLECTOR} --identifier colorprestest --messagecli --typecli info \
+      --message '<font color="green">GREENWORD</font>' >/dev/null 2>&1 || true
+  out="${msgcollector_run_dir}/colorprestest_messagecli"
+  if [ ! -f "${out}" ]; then
+    fail "messagecli color: output file not created"
+    return
+  fi
+  ## The literal tag must be gone (converted, not passed through).
+  if LC_ALL=C grep -Fq -- '<font' "${out}"; then
+    fail "messagecli color: <font> tag was not converted"
+  else
+    pass "messagecli color: <font> tag converted"
+  fi
+  ## The word survives and an ANSI escape (ESC byte) is present around it.
+  if LC_ALL=C grep -q 'GREENWORD' "${out}" \
+     && LC_ALL=C grep -Fq -- "$(printf '\033')" "${out}"; then
+    pass "messagecli color: ANSI color preserved through the final stdisplay pass"
+  else
+    fail "messagecli color: color lost or word missing"
+  fi
+}
+
+## --------------------------------------------------------------------------
+printf '%s\n' ""
 printf '%s\n' "$0: === pv_wrapper normal operation ==="
 ## --------------------------------------------------------------------------
 
@@ -1109,6 +1170,9 @@ test_msgprogress_progress_100
 test_progressbar_empty_title_not_alarming
 test_progressbar_empty_message_not_alarming
 
+test_messagecli_sanitizes_dangerous_input
+test_messagecli_color_conversion_preserved
+
 test_pv_wrapper_passthrough
 test_pv_wrapper_single_value
 
@@ -1119,7 +1183,7 @@ test_no_file_outside_run_dir
 ## Clean up test identifiers.
 for id in unittest escalation statustest waitcli echotest appendtest \
           pidtest ttytest forcetest typexesc clipstattest popupdone \
-          forgetall prettytest progtest; do
+          forgetall prettytest progtest sanitizetest colorprestest; do
   ${MSGCOLLECTOR} --identifier "${id}" --forget 2>/dev/null || true
 done
 

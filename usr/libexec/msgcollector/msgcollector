@@ -378,6 +378,40 @@ cli_links_to_footnotes() {
    fi
 }
 
+cli_translate_gui_markup() {
+   ## Translate a GUI (HTML) message into its CLI equivalent, in the order that
+   ## must run BEFORE strip-markup: color tags, hyperlinks, line breaks. Echoes
+   ## the transformed message. The color codes come from get_colors and are ''
+   ## when color is disabled, so nothing is inserted in that case.
+   trap "error_handler" ERR
+
+   local text
+   text="$1"
+
+   ## Translate GUI color tags (<font color="...">) to terminal ANSI colors so a
+   ## single HTML message renders colored in BOTH the GUI and the CLI. The
+   ## inserted ANSI escapes contain no HTML metacharacters and survive
+   ## strip-markup. str_replace is a literal fixed-string replace: unlike sed it
+   ## treats neither the search nor the ANSI replacement as a regex, so there are
+   ## no metacharacter, '&'/backslash, or locale pitfalls. The color codes come
+   ## from get_colors and are '' when color is disabled, removing the tag.
+   text="$(printf '%s' "${text}" | str_replace '<font color="green">' "${green:-}")"
+   text="$(printf '%s' "${text}" | str_replace '<font color="orange">' "${yellow:-}")"
+   text="$(printf '%s' "${text}" | str_replace '<font color="yellow">' "${yellow:-}")"
+   text="$(printf '%s' "${text}" | str_replace '<font color="red">' "${red:-}")"
+   text="$(printf '%s' "${text}" | str_replace '</font>' "${reset:-}")"
+   ## Translate GUI hyperlinks (<a href="url">text</a>) to footnote form.
+   text="$(cli_links_to_footnotes "${text}")"
+   ## Translate GUI line breaks (<br>, <br/>, <br />) to real newlines, so a
+   ## single HTML message keeps its line breaks on the CLI too. strip-markup
+   ## would otherwise drop <br> and run the lines together. The <br></br>
+   ## closing half is left for strip-markup to remove. This is a regex (all <br>
+   ## spellings in one pass), so sed -E stays here.
+   text="$(printf '%s' "${text}" | sed -E -e 's#<br ?/?>#\n#g')"
+
+   printf '%s' "${text}"
+}
+
 pretty_type_cli() {
    trap "error_handler" ERR
 
@@ -576,43 +610,22 @@ collector() {
       write_to_file="${msgcollector_run_dir}/${identifier}_messagecli"
       if [ -n "${message}" ]; then
          ## variable $message exists
-         ## NOTE: Cannot use 'sanitize-string' as it would remove terminal colors,
-         ## such as for login security check table.
-         ## The application using 'msgcollector' needs to provide sanitized strings.
-         #message="$(sanitize-string -- nolimit "$message")"
-         ## TODO: Let's make it safe to pass unsanitized strings here. Run the
-         ## string through stdisplay here to sanitize any Unicode or SGR codes
-         ## that might confuse strip-markup.
-         ##
-         ## Translate GUI color tags (<font color="...">) to terminal ANSI
-         ## colors so a single HTML message renders colored in BOTH the GUI and
-         ## the CLI. Must run BEFORE strip-markup (which strips all tags); the
-         ## inserted ANSI escapes contain no HTML metacharacters and survive it.
-         ##
-         ## TODO: Break this color tag translation code and the accompanying
-         ## comment into a new function for consistency.
-         message="$(printf '%s' "${message}" | sed \
-            -e "s/<font color=\"green\">/${green:-}/g" \
-            -e "s/<font color=\"orange\">/${yellow:-}/g" \
-            -e "s/<font color=\"yellow\">/${yellow:-}/g" \
-            -e "s/<font color=\"red\">/${red:-}/g" \
-            -e "s#</font>#${reset:-}#g")"
-         ## Translate GUI hyperlinks (<a href="url">text</a>) to footnote form.
-         message="$(cli_links_to_footnotes "${message}")"
-         ## Translate GUI line breaks (<br>, <br/>, <br />) to real newlines, so a
-         ## single HTML message keeps its line breaks on the CLI too. strip-markup
-         ## would otherwise drop <br> and run the lines together. The <br></br>
-         ## closing half is left for strip-markup to remove. Run BEFORE strip-markup.
-         message="$(printf '%s' "${message}" | sed -E -e 's#<br ?/?>#\n#g')"
-         ## Instead, "only" use 'strip-markup' (strips HTML tags for CLI display).
+         ## Sanitize untrusted input up front: stdisplay (stcat) drops non-ASCII
+         ## and dangerous escape sequences, keeping only a safe SGR subset, so a
+         ## crafted string cannot confuse the markup translation or strip-markup
+         ## below. Terminal colors a caller legitimately embedded (e.g. the login
+         ## security check table) fall in that safe subset and survive.
+         message="$(printf '%s' "${message}" | stcat)"
+         ## Translate GUI markup (color tags, hyperlinks, line breaks) to CLI.
+         message="$(cli_translate_gui_markup "${message}")"
+         ## Strip the remaining HTML tags for CLI display.
          message="$(strip-markup "${message}")"
-         ## TODO: Run the string through stdisplay one more time here, to
-         ## remove any SGR escapes that strip-markup created from entities it
-         ## expanded. In combination with the initial stdisplay, the HTML tag
-         ## translation, and the strip-markup call, this routine will be
-         ## equivalent in strength to a `sanitize-string` call and we will be
-         ## able to safely pass unsanitized input to this.
-         #
+         ## Sanitize once more: strip-markup expands HTML entities, which can
+         ## reintroduce escape sequences. This second pass neutralizes them while
+         ## preserving the SGR the markup translation inserted. Combined with the
+         ## first pass, the color translation and strip-markup, this is as strong
+         ## as a 'sanitize-string' call, so unsanitized input is safe here.
+         message="$(printf '%s' "${message}" | stcat)"
          pretty_type_cli "${typecli}"
          message="[${p_type}] [${identifier}] ${message}"
          printf '%s\n' "${message}"
