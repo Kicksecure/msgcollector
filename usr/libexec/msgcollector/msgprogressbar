@@ -322,7 +322,12 @@ folder_init
 ## provides: check, is_whole_number
 source /usr/libexec/msgcollector/check
 
-## 'has' is sourced by msgfallbacks itself now.
+## Convention: source every helper-script we (transitively) use, even if a
+## sourced lib sources it too -- the libs are double-source-safe. msgfallbacks
+## calls 'has'.
+# shellcheck source=../../../../helper-scripts/usr/libexec/helper-scripts/has.sh
+source /usr/libexec/helper-scripts/has.sh
+
 source /usr/libexec/msgcollector/msgfallbacks
 fallbacks ## provided by /usr/libexec/msgcollector/msgfallbacks
 parse_cmd_options "$@"

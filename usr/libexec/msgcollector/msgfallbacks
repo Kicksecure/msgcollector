@@ -14,8 +14,9 @@
 ## every later call to those names reaches these bodies.
 # shellcheck disable=SC2317
 
-## 'fallbacks' probes with 'has'; source it here so every caller (msgdispatcher,
-## msgprogressbar) gets it without sourcing 'has' itself.
+## 'fallbacks' probes with 'has'. Convention: source every helper-script we use
+## unconditionally -- the libs are double-source-safe, so a caller sourcing it
+## too is harmless.
 # shellcheck source=../../../../helper-scripts/usr/libexec/helper-scripts/has.sh
 source /usr/libexec/helper-scripts/has.sh
 
