@@ -7,7 +7,7 @@
 ## errexit ('set -e') and pipefail ARE set below. nounset is intentionally
 ## omitted: msgcollector reads many optional CLI fields (icon, titlecli,
 ## typecli, progressbaridx, ...) that are legitimately unset, and enabling
-## nounset would abort on them. The gate's R-010 strict-triple does not fit.
+## nounset would abort on them.
 ##
 ## TODO: Can we make it fit? Yes, there are many optional CLI fields, but why
 ## can't we default them all to blank or use "${var:-}" syntax for them?
@@ -15,8 +15,6 @@
 #set -x
 set -e
 set -o pipefail
-
-true "$0: START"
 
 scriptname="$(basename -- "${BASH_SOURCE[0]}")"
 
@@ -97,10 +95,6 @@ exit_code: ${exit_code}
 
    exit 1
 }
-
-trap "error_handler" ERR
-
-my_command_line_parameters="$*"
 
 parse_cmd_options() {
    trap "error_handler" ERR
@@ -894,32 +888,42 @@ forgetwaitcli() {
 #printf '%s\n' "${BASH_SOURCE[0]} $@
 #" >> "/home/user/msgcollector"
 
-parse_cmd_options "$@"
+main() {
+   true "$0: START"
+   trap "error_handler" ERR
+   my_command_line_parameters="$*"
 
-source /usr/libexec/msgcollector/msgcollector_shared
-## sets: ${msgcollector_run_dir}
-folder_init
+   parse_cmd_options "$@"
 
-## provides: check, is_whole_number
-source /usr/libexec/msgcollector/check
+   source /usr/libexec/msgcollector/msgcollector_shared
+   ## sets: ${msgcollector_run_dir}
+   folder_init
 
-if [ "${forget}" = "1" ]; then
-   forget
-   exit 0
+   ## provides: check, is_whole_number
+   source /usr/libexec/msgcollector/check
+
+   if [ "${forget}" = "1" ]; then
+      forget
+      exit 0
+   fi
+
+   if [ "${forgetwaitcli}" = "1" ]; then
+      forgetwaitcli
+      exit 0
+   fi
+
+   preparation
+   colors
+
+   if [ "${status}" = "1" ]; then
+      return_status
+   else
+      collector
+   fi
+
+   true "$0: END"
+}
+
+if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
+   main "$@"
 fi
-
-if [ "${forgetwaitcli}" = "1" ]; then
-   forgetwaitcli
-   exit 0
-fi
-
-preparation
-colors
-
-if [ "${status}" = "1" ]; then
-   return_status
-else
-   collector
-fi
-
-true "$0: END"
