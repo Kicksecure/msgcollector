@@ -1078,6 +1078,32 @@ test_passivepopupqueuex_type_icon_mapping() {
 
 ## --------------------------------------------------------------------------
 printf '%s\n' ""
+printf '%s\n' "$0: === unknown-option output is sanitized against injection (#29) ==="
+## --------------------------------------------------------------------------
+
+test_unknown_option_output_sanitized() {
+  ## An unknown option is an untrusted caller argument. Its echo on stderr must
+  ## be sanitized, so a crafted option cannot inject terminal escapes.
+  local err evil esc
+  ## ANSI-C quoting yields the raw ESC byte with no printf format string.
+  esc=$'\033'
+  evil=$'--evil\033[2Jinjection'
+  err="$(${MSGCOLLECTOR} "${evil}" 2>&1 >/dev/null || true)"
+  if printf '%s' "${err}" | LC_ALL=C grep -Fq -- "${esc}[2J"; then
+    fail "unknown option: raw terminal escape survived on stderr (injection)"
+  else
+    pass "unknown option: terminal escape sanitized on stderr"
+  fi
+  ## The diagnostic is still emitted.
+  if printf '%s' "${err}" | grep -q 'unknown option'; then
+    pass "unknown option: diagnostic still reported"
+  else
+    fail "unknown option: no 'unknown option' diagnostic emitted"
+  fi
+}
+
+## --------------------------------------------------------------------------
+printf '%s\n' ""
 printf '%s\n' "$0: === pv_wrapper normal operation ==="
 ## --------------------------------------------------------------------------
 
@@ -1228,6 +1254,8 @@ test_messagecli_color_conversion_preserved
 
 test_passivepopupqueuex_type_dedicated_file
 test_passivepopupqueuex_type_icon_mapping
+
+test_unknown_option_output_sanitized
 
 test_pv_wrapper_passthrough
 test_pv_wrapper_single_value
