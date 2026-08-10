@@ -455,6 +455,94 @@ test_pv_wrapper_reject_injection() {
 
 ## --------------------------------------------------------------------------
 printf '%s\n' ""
+printf '%s\n' "$0: === source-based: msgcollector pure functions (#33) ==="
+## --------------------------------------------------------------------------
+
+## msgcollector is source-able (main() + BASH_SOURCE guard), so its pure
+## functions can be driven directly instead of shelling out through the CLI.
+MSGCOLLECTOR_SCRIPT="/usr/libexec/msgcollector/msgcollector"
+
+run_sourced() {
+  ## Run $1 (shell code) in a clean child shell with msgcollector sourced:
+  ## functions defined, main() NOT run. Color globals are forced empty so the
+  ## color-disabled path is deterministic (and pretty_type_*'s bare ${green}
+  ## references are defined). $2, if given, is exposed to the snippet as ${ARG}.
+  MSGC="${MSGCOLLECTOR_SCRIPT}" ARG="${2:-}" bash -c '
+    source "${MSGC}" </dev/null >/dev/null 2>&1 || true
+    green="" yellow="" red="" reset="" bold=""
+    '"$1"'
+  ' 2>/dev/null
+}
+
+test_src_links_footnote() {
+  local out
+  out="$(run_sourced 'cli_links_to_footnotes "${ARG}"' \
+    'See <a href="https://example.com">here</a>.')"
+  if printf '%s' "${out}" | grep -Fq 'here[1]' \
+     && printf '%s' "${out}" | grep -Fq 'Links:' \
+     && printf '%s' "${out}" | grep -Fq '[1] https://example.com'; then
+    pass "cli_links_to_footnotes: distinct link text becomes a footnote"
+  else
+    fail "cli_links_to_footnotes: footnote form wrong (got '${out}')"
+  fi
+}
+
+test_src_links_bare_url() {
+  local out
+  out="$(run_sourced 'cli_links_to_footnotes "${ARG}"' \
+    'Go <a href="https://example.com">https://example.com</a> now')"
+  if printf '%s' "${out}" | grep -Fq 'https://example.com' \
+     && ! printf '%s' "${out}" | grep -Fq '[1]'; then
+    pass "cli_links_to_footnotes: link text equal to URL stays a bare URL"
+  else
+    fail "cli_links_to_footnotes: bare-URL case wrong (got '${out}')"
+  fi
+}
+
+test_src_links_plain_unchanged() {
+  local out
+  out="$(run_sourced 'cli_links_to_footnotes "${ARG}"' 'no links here')"
+  if [ "${out}" = 'no links here' ]; then
+    pass "cli_links_to_footnotes: a message with no link is unchanged"
+  else
+    fail "cli_links_to_footnotes: plain message altered (got '${out}')"
+  fi
+}
+
+test_src_translate_color_disabled() {
+  local out
+  out="$(run_sourced 'cli_translate_gui_markup "${ARG}"' \
+    '<font color="green">X</font>')"
+  if [ "${out}" = 'X' ]; then
+    pass "cli_translate_gui_markup: color tags removed when color disabled"
+  else
+    fail "cli_translate_gui_markup: color-disabled output wrong (got '${out}')"
+  fi
+}
+
+test_src_translate_br_newline() {
+  local out
+  out="$(run_sourced 'cli_translate_gui_markup "${ARG}"' 'A<br>B')"
+  if [ "${out}" = $'A\nB' ]; then
+    pass "cli_translate_gui_markup: <br> becomes a real newline"
+  else
+    fail "cli_translate_gui_markup: <br> not translated (got '${out}')"
+  fi
+}
+
+test_src_pretty_type_cli() {
+  local info_out error_out
+  info_out="$(run_sourced 'pretty_type_cli info; printf "%s" "${p_type}"')"
+  error_out="$(run_sourced 'pretty_type_cli error; printf "%s" "${p_type}"')"
+  if [ "${info_out}" = 'INFO' ] && printf '%s' "${error_out}" | grep -Fq 'ERROR'; then
+    pass "pretty_type_cli: info/error produce INFO/ERROR labels"
+  else
+    fail "pretty_type_cli: labels wrong (info='${info_out}' error='${error_out}')"
+  fi
+}
+
+## --------------------------------------------------------------------------
+printf '%s\n' ""
 printf '%s\n' "$0: === Run all tests ==="
 ## --------------------------------------------------------------------------
 
@@ -499,6 +587,13 @@ test_msgprogress_reject_bad_identifier
 
 test_pv_wrapper_filters_non_numeric
 test_pv_wrapper_reject_injection
+
+test_src_links_footnote
+test_src_links_bare_url
+test_src_links_plain_unchanged
+test_src_translate_color_disabled
+test_src_translate_br_newline
+test_src_pretty_type_cli
 
 ## --------------------------------------------------------------------------
 printf '%s\n' ""
