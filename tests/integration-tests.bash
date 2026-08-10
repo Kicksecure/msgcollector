@@ -9,11 +9,15 @@ set -o errexit
 set -o nounset
 set -o errtrace
 set -o pipefail
+shopt -s inherit_errexit
+shopt -s shift_verbose
 
 if ! [ "${CI:-}" = "true" ]; then
   printf '%s\n' "$0: These tests are only supposed to run on CI." >&2
   exit 1
 fi
+
+[ -v TMP ] || TMP=/tmp
 
 PASS=0
 FAIL=0
@@ -39,7 +43,8 @@ fail() {
 ## bootstrap. On a logind-enabled host XDG_RUNTIME_DIR is already
 ## set to /run/user/$(id -u); CI runners do not run logind for
 ## the runner user, hence the explicit setup below.
-export XDG_RUNTIME_DIR="$(mktemp --directory)"
+XDG_RUNTIME_DIR="$(mktemp --directory)"
+export XDG_RUNTIME_DIR
 
 ## Determine the run directory the same way msgcollector does.
 source /usr/libexec/msgcollector/msgcollector_shared
@@ -876,12 +881,93 @@ test_msgprogress_progress_100() {
 
 ## --------------------------------------------------------------------------
 printf '%s\n' ""
+printf '%s\n' "$0: === msgprogressbar: empty title/message must not alarm the user (#35) ==="
+## --------------------------------------------------------------------------
+
+## Drive the REAL msgprogressbar with a 'yad' stub on PATH that records the argv
+## it is launched with. This lets us assert exactly what the user's popup would
+## show, with no display and no real yad. Regression for the alarming
+##   title:   "Variable progressbartitlex is empty. Please report this bug!"
+##   message: "Progress bar message is empty, please report this msgcollector bug!"
+## Prints the captured yad argv (one arg per line); empty if yad never launched.
+## SC2016: the stub body written below is LITERAL code; its $-expansions must
+## NOT expand here -- they run when msgprogressbar launches the stub.
+# shellcheck disable=SC2016
+msgprogressbar_capture_yad() {
+  local identifier stub_dir capture
+  identifier="$1"
+  shift
+  stub_dir="$(mktemp --directory)"
+  capture="${stub_dir}/yad_argv"
+  {
+    printf '%s\n' '#!/bin/bash'
+    printf '%s\n' 'for arg in "$@"; do printf "%s\n" "${arg}"; done > "${YAD_CAPTURE}"'
+    printf '%s\n' 'exit 0'
+  } > "${stub_dir}/yad"
+  chmod u+rwx -- "${stub_dir}/yad"
+  YAD_CAPTURE="${capture}" PATH="${stub_dir}:${PATH}" \
+    timeout 20 /usr/libexec/msgcollector/msgprogressbar \
+      --identifier "${identifier}" \
+      --progressbaridx "pbidx" \
+      "$@" >/dev/null 2>&1 || true
+  if [ -f "${capture}" ]; then
+    cat -- "${capture}"
+  fi
+  safe-rm --recursive --force -- "${stub_dir}"
+}
+
+test_progressbar_empty_title_not_alarming() {
+  local argv
+  argv="$(msgprogressbar_capture_yad "pbtitletest" --message "download in progress")"
+  if [ -z "${argv}" ]; then
+    fail "msgprogressbar: yad never launched for the empty-title case"
+    return
+  fi
+  if printf '%s\n' "${argv}" | grep --quiet --fixed-strings -- "Please report this bug"; then
+    fail "msgprogressbar: empty title still shows the alarming 'report this bug' popup"
+  else
+    pass "msgprogressbar: empty title does not show the alarming 'report this bug' popup"
+  fi
+  ## Falls back to the identifier, matching msgdispatcher's convention.
+  if printf '%s\n' "${argv}" | grep --quiet --fixed-strings -- "--title=pbtitletest"; then
+    pass "msgprogressbar: empty title falls back to the identifier"
+  else
+    fail "msgprogressbar: empty title did not fall back to the identifier (--title=pbtitletest)"
+  fi
+}
+
+test_progressbar_empty_message_not_alarming() {
+  local argv
+  argv="$(msgprogressbar_capture_yad "pbmsgtest" --progressbartitlex "Real Title")"
+  if [ -z "${argv}" ]; then
+    fail "msgprogressbar: yad never launched for the empty-message case"
+    return
+  fi
+  if printf '%s\n' "${argv}" | grep --quiet --fixed-strings -- "report this msgcollector bug"; then
+    fail "msgprogressbar: empty message still shows the alarming 'report this msgcollector bug' text"
+  else
+    pass "msgprogressbar: empty message does not show the alarming text"
+  fi
+  ## A real title must still pass through verbatim; the identifier fallback must
+  ## not clobber a title the caller actually provided.
+  if printf '%s\n' "${argv}" | grep --quiet --fixed-strings -- "--title=Real Title"; then
+    pass "msgprogressbar: a real title is passed through to yad verbatim"
+  else
+    fail "msgprogressbar: a real title was not passed through (--title=Real Title)"
+  fi
+}
+
+## --------------------------------------------------------------------------
+printf '%s\n' ""
 printf '%s\n' "$0: === pv_wrapper normal operation ==="
 ## --------------------------------------------------------------------------
 
 test_pv_wrapper_passthrough() {
   ## Valid numeric values should be passed through to $percent and eval'd commands.
   local output
+  ## SC2016: $percent is expanded by pv_wrapper's own eval, not here, so the
+  ## single quotes are deliberate.
+  # shellcheck disable=SC2016
   output="$(printf '%s\n' "10" "20" "30" | \
     pv_echo_command='printf "progress=%s\n" "$percent"' \
     pv_wrapper_command='true' \
@@ -897,6 +983,8 @@ test_pv_wrapper_passthrough() {
 
 test_pv_wrapper_single_value() {
   local output
+  ## SC2016: $percent is expanded by pv_wrapper's own eval, not here.
+  # shellcheck disable=SC2016
   output="$(printf '%s\n' "100" | \
     pv_echo_command='printf "%s\n" "$percent"' \
     pv_wrapper_command='true' \
@@ -933,11 +1021,13 @@ printf '%s\n' "$0: === Security: path traversal blocked end-to-end ==="
 
 test_no_file_outside_run_dir() {
   local evil_path
-  evil_path="/tmp/msgcollector-test-evil-$$"
+  evil_path="${TMP}/msgcollector-test-evil-$$"
   safe-rm --force -- "${evil_path}" 2>/dev/null || true
-  ## Attempt path traversal. Should fail validation.
+  ## Attempt path traversal. Should fail validation. The traversal target is
+  ## derived from the same ${TMP} as evil_path (leading slash stripped) so the
+  ## check and the attack always point at the same location.
   ${MSGCOLLECTOR} \
-    --identifier "../../../../../../tmp/msgcollector-test-evil-$$" \
+    --identifier "../../../../../../${TMP#/}/msgcollector-test-evil-$$" \
     --messagecli --typecli info --message "evil" 2>/dev/null || true
   if [ -f "${evil_path}" ] || [ -f "${evil_path}_messagecli" ]; then
     safe-rm --force -- "${evil_path}" "${evil_path}_messagecli" 2>/dev/null || true
@@ -1010,6 +1100,9 @@ test_one_time_popup_argparse_missing
 test_msgprogress_valid_progress
 test_msgprogress_progress_zero
 test_msgprogress_progress_100
+
+test_progressbar_empty_title_not_alarming
+test_progressbar_empty_message_not_alarming
 
 test_pv_wrapper_passthrough
 test_pv_wrapper_single_value

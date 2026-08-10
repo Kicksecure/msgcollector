@@ -118,12 +118,15 @@ parse_cmd_options() {
                fi
                ;;
            --message)
+               ## Empty is tolerated: start_progress_bar renders it gracefully.
+               ## Guard the shift like the other options, so a trailing --message
+               ## with no value does not abort under shift_verbose.
                message="${2:-}"
-               if [ "${message}" = "" ]; then
-                  printf '%s\n' "$0: ERROR: variable message is empty."
-                  exit 1
+               if [ "$#" -ge 2 ]; then
+                  shift 2
+               else
+                  shift 1
                fi
-               shift 2
                ;;
            --)
                shift
@@ -200,12 +203,18 @@ output_sigterm() {
 }
 
 start_progress_bar() {
-   if [ "${message}" = "" ]; then
-      message="Progress bar message is empty, please report this msgcollector bug!"
+   ## An empty title or message is a caller omission, not a user-actionable bug.
+   ## Never surface an alarming "please report this bug" popup to the user for it.
+   ## Title: fall back to the identifier, matching msgdispatcher's convention.
+   ## ${identifier} is validated non-empty by msgcollector_check before we get here.
+   ## Message: leave the progress text empty; yad renders that cleanly.
+   if [ "${progressbartitlex}" = "" ]; then
+      true "INFO: ${scriptname}: progressbartitlex empty; falling back to identifier."
+      progressbartitlex="${identifier}"
    fi
 
-   if [ "${progressbartitlex}" = "" ]; then
-      progressbartitlex="Variable progressbartitlex is empty. Please report this bug!"
+   if [ "${message}" = "" ]; then
+      true "INFO: ${scriptname}: message empty; rendering an empty progress text."
    fi
 
    if [ -f "${msgcollector_run_dir}/${identifier}_icon" ]; then
