@@ -49,7 +49,7 @@ error_handler() {
    ## Owner-execute for traversal (see msgcollector's error_handler): defensive
    ## against a dir pre-created under a umask that masks the 0100 bit.
    "${timeout_command[@]}" chmod u+rwx -- ~/".msgcollector" || true
-   printf '%s\n' "${scriptname}: BASH_COMMAND: ${BASH_COMMAND} | exit_code: ${exit_code}" | tee -a ~/".msgcollector/msgdispatcher-error.log" >/dev/null
+   printf '%s\n' "${scriptname}: BASH_COMMAND: ${BASH_COMMAND} | exit_code: ${exit_code}" | tee -a -- ~/".msgcollector/msgdispatcher-error.log" >/dev/null
    exit 1
 }
 
