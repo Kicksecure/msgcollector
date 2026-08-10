@@ -8,26 +8,15 @@
 
 ## style-ok: no-strict
 ##
-## No strict-mode preamble: this file is SOURCED, never executed, so a 'set -o'
-## block here would rewrite the CALLER's shell instead of governing this code.
-## Both callers carry the R-010 preamble themselves, which is what 'fallbacks'
-## actually runs under -- see the ':-' defaults below.
+## No strict-mode preamble: this file is SOURCED, never executed.
 
 ## The dummy yad / kdialog / notify-send below SHADOW the real commands, so
-## every later call to those names reaches these bodies. shellcheck sees a
-## function that nothing in this file invokes and calls it unreachable; the
-## indirection is the whole point of the file.
+## every later call to those names reaches these bodies.
 # shellcheck disable=SC2317
 
 fallbacks() {
    trap "error_handler" ERR
 
-   ## ':-' because deciding whether there is a GUI is exactly the case where
-   ## these are unset: a headless or pure-Wayland session has no DISPLAY. This
-   ## file is SOURCED into msgdispatcher and msgprogressbar, both of which run
-   ## under nounset, so reading them bare aborted before the no-GUI fallback
-   ## could be installed -- in the one environment the fallback exists for.
-   ## The default lives here rather than in the callers, since both reach it.
    if [ "${DISPLAY:-}" = "" ] && [ "${WAYLAND_DISPLAY:-}" = "" ]; then
       no_gui="1"
    else

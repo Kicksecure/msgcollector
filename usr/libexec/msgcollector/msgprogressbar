@@ -19,7 +19,6 @@ shopt -s shift_verbose
 ## report a missing value. Under nounset an unset read aborts BEFORE check()
 ## can say which option is missing, replacing a precise message with a bash
 ## error. Empty is what these expanded to before strict mode.
-animate=""
 identifier=""
 message=""
 progressbaridx=""
@@ -82,8 +81,6 @@ parse_cmd_options() {
    ## http://mywiki.wooledge.org/BashFAQ/035
 
    while true; do
-       ## The loop runs until the arguments are exhausted, so its last iteration
-       ## reads an unset $1 by design -- the '*' arm below is what breaks out.
        case "${1:-}" in
            --verbose)
                set -x
@@ -95,10 +92,6 @@ parse_cmd_options() {
                ;;
            --identifier)
                identifier="${2:-}"
-               ## Guarded: with the flag given LAST there is only one
-               ## argument to shift, and shift_verbose turns that into a
-               ## reported failure. Skipping the impossible shift lets the
-               ## check() below report which option is missing.
                if [ "$#" -ge 2 ]; then
                   shift 2
                else
@@ -107,10 +100,6 @@ parse_cmd_options() {
                ;;
            --progressbaridx)
                progressbaridx="${2:-}"
-               ## Guarded: with the flag given LAST there is only one
-               ## argument to shift, and shift_verbose turns that into a
-               ## reported failure. Skipping the impossible shift lets the
-               ## check() below report which option is missing.
                if [ "$#" -ge 2 ]; then
                   shift 2
                else
@@ -119,37 +108,19 @@ parse_cmd_options() {
                ;;
            --progressbartitlex)
                progressbartitlex="${2:-}"
-               ## Guarded: with the flag given LAST there is only one
-               ## argument to shift, and shift_verbose turns that into a
-               ## reported failure. Skipping the impossible shift lets the
-               ## check() below report which option is missing.
                if [ "$#" -ge 2 ]; then
                   shift 2
                else
                   shift 1
                fi
-               ;;
-           --animate)
-               ## Same: accepted and ignored here.
-               # shellcheck disable=SC2034
-               animate="1"
-               shift
                ;;
            --message)
                message="${2:-}"
-               ## Guarded: with the flag given LAST there is only one
-               ## argument to shift, and shift_verbose turns that into a
-               ## reported failure. Skipping the impossible shift lets the
-               ## check() below report which option is missing.
-               if [ "$#" -ge 2 ]; then
-                  shift 2
-               else
-                  shift 1
-               fi
                if [ "${message}" = "" ]; then
                   printf '%s\n' "$0: ERROR: variable message is empty."
                   exit 1
                fi
+               shift 2
                ;;
            --)
                shift
@@ -203,13 +174,7 @@ output_ex() {
    if [ -f "${parent_pid_file}" ]; then
       "${timeout_command[@]}" "/usr/libexec/msgcollector/msgprogressbar_kill_helper" "${identifier}" "${progressbaridx}"
    else
-      ## parentpid belongs to msgprogressbar_kill_helper, which reads it from
-      ## the very file this branch has just established does NOT exist. It is
-      ## never set in this script, so the message has always rendered it blank
-      ## -- and under nounset the expansion aborts the signal handler even
-      ## though the command is a no-op 'true'.
-      true "${output_signal_caught} caught. Not killing parentpid ${parentpid:-}, \
-because ${parent_pid_file} does not exist."
+      true "${output_signal_caught} caught. Not killing parentpid, because ${parent_pid_file} does not exist."
    fi
 
    cleanup_self
@@ -295,14 +260,10 @@ start_progress_bar() {
    ##    yad --auto-kill will result in yad sending a sighup signal upon
    ##    pressing of cancel button.
    ##    Therefore using '--no-buttons'.
-      ## '${percentage_maybe_add}' below is DELIBERATELY UNQUOTED: it is
-      ## either EMPTY or the two words '--percentage <n>'. Quoted, the dialog
-      ## gets one argument '--percentage 42' it does not recognise -- or, when
-      ## empty, a spurious empty argument.
-      ##
-      ## The directive must live HERE, not beside the expansion: a comment
-      ## placed BETWEEN two line-continuation lines ENDS the command.
-      # shellcheck disable=SC2086
+   ## '${percentage_maybe_add}' below is DELIBERATELY UNQUOTED: it is
+   ## either EMPTY or the two words '--percentage <n>'. It must be
+   ## word-split either way.
+   # shellcheck disable=SC2086
    yad \
       --timeout "86400" \
       --no-markup \
@@ -361,6 +322,10 @@ source /usr/libexec/msgcollector/check
 ## msgfallbacks (sourced below) calls 'has', which is a FUNCTION from this
 ## file, not an executable. msgdispatcher already sourced it; this one did not,
 ## so the same shared code worked in one caller and not the other.
+##
+## TODO: Maybe we should just source 'has' in msgfallbacks itself? We're going
+## to have a source_once mechanism eventually, which will make this more
+## efficient later.
 # shellcheck source=../../../../helper-scripts/usr/libexec/helper-scripts/has.sh
 # shellcheck disable=SC1091
 source /usr/libexec/helper-scripts/has.sh

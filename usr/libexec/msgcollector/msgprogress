@@ -55,8 +55,6 @@ parse_cmd_options() {
    ## http://mywiki.wooledge.org/BashFAQ/035
 
    while true; do
-       ## The loop runs until the arguments are exhausted, so its last iteration
-       ## reads an unset $1 by design -- the '*' arm below is what breaks out.
        case "${1:-}" in
            --verbose)
                set -x
@@ -68,10 +66,6 @@ parse_cmd_options() {
                ;;
            --identifier)
                identifier="${2:-}"
-               ## Guarded: with the flag given LAST there is only one
-               ## argument to shift, and shift_verbose turns that into a
-               ## reported failure. Skipping the impossible shift lets the
-               ## check() below report which option is missing.
                if [ "$#" -ge 2 ]; then
                   shift 2
                else
@@ -80,10 +74,6 @@ parse_cmd_options() {
                ;;
            --progress)
                progress="${2:-}"
-               ## Guarded: with the flag given LAST there is only one
-               ## argument to shift, and shift_verbose turns that into a
-               ## reported failure. Skipping the impossible shift lets the
-               ## check() below report which option is missing.
                if [ "$#" -ge 2 ]; then
                   shift 2
                else
@@ -92,10 +82,6 @@ parse_cmd_options() {
                ;;
            --progressbaridx)
                progressbaridx="${2:-}"
-               ## Guarded: with the flag given LAST there is only one
-               ## argument to shift, and shift_verbose turns that into a
-               ## reported failure. Skipping the impossible shift lets the
-               ## check() below report which option is missing.
                if [ "$#" -ge 2 ]; then
                   shift 2
                else

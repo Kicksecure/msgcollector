@@ -6,12 +6,20 @@
 ## Shared input validation for msgcollector scripts.
 ## Source this file to get the check() function and strings.bsh utilities.
 
+## style-ok: no-strict
+## No strict-mode preamble: this file is SOURCED, never executed.
+
 ## provides: check_is_not_empty_and_only_one_line
 ## provides: check_is_alpha_numeric
 ## provides: validate_safe_filename
 ## provides: is_whole_number
 ## provides: read_integer_file
 source /usr/libexec/helper-scripts/strings.bsh
+
+## FIXME: Rewrite check() to not require errexit to be active to work
+## correctly. Adjust all callers of check() to also not need errexit for it to
+## abort the script. We should keep errexit in place, but should NOT rely on
+## it working due to how easy it is to temporarily disable on accident.
 
 check() {
   ## NOTE: 'local variable_to_check="$1"' is intentionally avoided.

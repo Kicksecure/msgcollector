@@ -23,6 +23,9 @@ verbose=""
 # shellcheck source=../../../../helper-scripts/usr/libexec/helper-scripts/has.sh
 ## Sibling repo: absent in an isolated CI checkout, so shellcheck cannot follow
 ## it there. The source= path above still documents where it lives.
+##
+## TODO: We can probably just not shellcheck this unless we're working with a
+## full derivative-maker tree, and then get rid of this exception.
 # shellcheck disable=SC1091
 source /usr/libexec/helper-scripts/has.sh
 #trap 'sleep 1' DEBUG
@@ -30,9 +33,7 @@ source /usr/libexec/helper-scripts/has.sh
 error_handler() {
    local last_exit_code="$?"
    trap - ERR
-   ## '${1:-}': 'trap "error_handler" ERR' passes NO arguments, so under
-   ## nounset the handler aborted on its own first line -- losing the error it
-   ## exists to report.
+   ## '${1:-}': 'trap "error_handler" ERR' passes NO arguments.
    if [ ! "${1:-}" = "" ]; then
       error_text="$1"
    else
@@ -78,8 +79,6 @@ parse_cmd_options() {
    ## http://mywiki.wooledge.org/BashFAQ/035
 
    while true; do
-       ## The loop runs until the arguments are exhausted, so its last iteration
-       ## reads an unset $1 by design -- the '*' arm below is what breaks out.
        case "${1:-}" in
            --verbose)
                set -x
@@ -105,10 +104,6 @@ preparation() {
    ## Sanity test.
    has flock
 
-   ## Session-type environment variables, all four optional. The fallback
-   ## chain below exists precisely for the case where NONE of them is set --
-   ## its own message says so -- and under nounset an unset read would abort
-   ## before that fallback could run.
    XDG_SESSION_TYPE="${XDG_SESSION_TYPE:-}"
    XDG_CURRENT_DESKTOP="${XDG_CURRENT_DESKTOP:-}"
    DISPLAY="${DISPLAY:-}"
@@ -117,11 +112,8 @@ preparation() {
    true "XDG_SESSION_TYPE: ${XDG_SESSION_TYPE}"
    true "DISPLAY: ${DISPLAY}"
    true "WAYLAND_DISPLAY: ${WAYLAND_DISPLAY}"
-   ## Both declared BEFORE the chain rather than only adding the missing 'gui=0'
-   ## to the tty arm. Every other arm sets both; the tty arm set only cli, so
-   ## msgdispatcher_handler's unconditional '${gui}' read aborted on the first
-   ## CLI message. Declaring both here means a future arm cannot reintroduce the
-   ## same half-set state.
+   ## Declared before the chain, not just in the tty arm: the tty arm set only
+   ## cli, so msgdispatcher_handler's unconditional '${gui}' read aborted.
    gui=0
    cli=0
 
@@ -169,6 +161,8 @@ preparation() {
 passive_popup_tool() {
    local time title text
    time="$1"
+   ## FIXME: Why on *earth* are we guarding against $2 being unset but not $3?
+   ## If $2 is unset, certainly $3 will be.
    title="${2:-}"
    text="$3"
 
@@ -340,41 +334,6 @@ msgdispatcher_handler() {
          true "----------"
          return 0
       fi
-
-#       last_two="${file_name#*_*_}"
-#       if [ "$last_two" = "progressbarx_done" ]; then
-#          first_two="${file_name%_*_*}"
-#          ## first_two example:
-#          ## /run/msgcollector/systemcheck/systemcheck_2b3916d6-3b3f-4490-bc85-b97da494a55d
-#          progressbaridx=${first_two#*_}
-#          ## progressbaridx example:
-#          ## 2b3916d6-3b3f-4490-bc85-b97da494a55d
-#          if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_${progressbaridx}_progressbarx" ]; then
-#             if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_${progressbaridx}_progressbarx_animate" ]; then
-#                msgdispatcher_delete_wrapper "${progressbaridx}_progressbarx_animate"
-#                animate="--animate"
-#             else
-#                unset animate
-#             fi
-#             if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_${progressbaridx}_progressbartitlex" ]; then
-#                local progressbartitlex
-#                progressbartitlex="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_${progressbaridx}_progressbartitlex")" || true
-#             fi
-#             if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_${progressbaridx}_progressbarx" ]; then
-#                progressbarx="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_${progressbaridx}_progressbarx")" || true
-#             fi
-#
-#             unset animate
-#             msgdispatcher_delete_wrapper "${progressbaridx}_progressbarx_done"
-#             msgdispatcher_delete_wrapper "${progressbaridx}_progressbartitlex"
-#             msgdispatcher_delete_wrapper "${progressbaridx}_progressbarx"
-#          else
-#             msgdispatcher_delete_wrapper "${progressbaridx}_progressbarx_done"
-#          fi
-#          true "----------"
-#          return 0
-#       fi
-
    elif [ "${cli}" = "1" ]; then
       if [ "${file_name}" = "${msgcollector_run_dir}/${msgdispatcher_identifier}_waitmessagecli_done" ]; then
          if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_waitmessagecli" ]; then
