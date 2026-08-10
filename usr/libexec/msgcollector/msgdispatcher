@@ -21,12 +21,9 @@ verbose=""
 ## this file: preparation() and the passive-popup dispatch below both run
 ## before that point.
 # shellcheck source=../../../../helper-scripts/usr/libexec/helper-scripts/has.sh
-## Sibling repo: absent in an isolated CI checkout, so shellcheck cannot follow
-## it there. The source= path above still documents where it lives.
-##
-## TODO: We can probably just not shellcheck this unless we're working with a
-## full derivative-maker tree, and then get rid of this exception.
-# shellcheck disable=SC1091
+## Sibling repo: absent in an isolated CI checkout. No inline SC1091 disable
+## needed -- the CI shellcheck excludes SC1091, and a full-tree run resolves the
+## source= path above.
 source /usr/libexec/helper-scripts/has.sh
 #trap 'sleep 1' DEBUG
 
@@ -320,8 +317,7 @@ msgdispatcher_handler() {
             #type="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_typex")" || true
             type="info"
             if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_forceactive" ]; then
-               ## TODO: --forceactive not yet implemented.
-               #dispatch_x_active "$type" "$msg"
+               #dispatch_x_active "${type}" "${msg}"
                dispatch_x_passive "${type}" "${title}" "${msg}" || true
             else
                dispatch_x_passive "${type}" "${title}" "${msg}" || true

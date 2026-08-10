@@ -330,7 +330,6 @@ source /usr/libexec/msgcollector/check
 ## to have a source_once mechanism eventually, which will make this more
 ## efficient later.
 # shellcheck source=../../../../helper-scripts/usr/libexec/helper-scripts/has.sh
-# shellcheck disable=SC1091
 source /usr/libexec/helper-scripts/has.sh
 
 source /usr/libexec/msgcollector/msgfallbacks

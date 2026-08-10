@@ -447,10 +447,9 @@ collector() {
 
    ## {{ --titlecli
    if [ -n "${titlecli}" ]; then
-      ## variable $titlecli exists
-      ## TODO
-      true "TODO: --titlecli not yet implemented in msgdispatcher"
-      #printf '%s\n' "$titlecli" > "${msgcollector_run_dir}/${identifier}_titlecli"
+      ## --titlecli is parsed but not yet consumed by msgdispatcher.
+      true
+      #printf '%s\n' "${titlecli}" > "${msgcollector_run_dir}/${identifier}_titlecli"
    fi
    ## }}
 
