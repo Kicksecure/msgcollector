@@ -319,7 +319,7 @@ source /usr/libexec/msgcollector/msgcollector_shared
 ## sets: ${msgcollector_run_dir}
 folder_init
 
-## provides: check, is_whole_number
+## provides: msgcollector_check, is_whole_number
 source /usr/libexec/msgcollector/check
 
 # shellcheck source=../../../../helper-scripts/usr/libexec/helper-scripts/has.sh
@@ -329,8 +329,8 @@ source /usr/libexec/msgcollector/msgfallbacks
 fallbacks ## provided by /usr/libexec/msgcollector/msgfallbacks
 parse_cmd_options "$@"
 
-check "${identifier}" || exit 1
-check "${progressbaridx}" || exit 1
+msgcollector_check "${identifier}" || exit 1
+msgcollector_check "${progressbaridx}" || exit 1
 
 preparation
 start_progress_bar

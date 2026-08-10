@@ -406,7 +406,7 @@ collector() {
    ## - messagex: NOT sanitized (intentional - contains caller-constructed HTML for setHtml())
 
    ## {{ --identifier
-   if ! check "${identifier}"; then
+   if ! msgcollector_check "${identifier}"; then
       printf '%s\n' "${BASH_SOURCE[0]} ERROR: variable 'identifier' is empty or invalid."
       exit 1
    fi
@@ -620,7 +620,7 @@ collector() {
 
    ## {{ --progressx
    if [ ! "${progressx}" = "" ]; then
-      if ! check "${progressbaridx}"; then
+      if ! msgcollector_check "${progressbaridx}"; then
          error "Variable 'progressbaridx' is empty or invalid."
          exit 4
       fi
@@ -652,7 +652,7 @@ collector() {
 
    ## {{ --progressbarx
    if [ "${progressbarx}" = "1" ]; then
-      if ! check "${progressbaridx}"; then
+      if ! msgcollector_check "${progressbaridx}"; then
          error "Variable 'progressbaridx' is empty or invalid."
          exit 4
       fi
@@ -703,7 +703,7 @@ return_status() {
    trap "error_handler" ERR
 
    ## {{ --identifier
-   if ! check "${identifier}"; then
+   if ! msgcollector_check "${identifier}"; then
       printf '%s\n' "${BASH_SOURCE[0]} ERROR: variable identifier is empty or invalid."
       exit 1
    fi
@@ -739,7 +739,7 @@ return_status() {
 
    ## {{ --progressbarx
    if [ "${progressbarx}" = "1" ]; then
-      if ! check "${progressbaridx}"; then
+      if ! msgcollector_check "${progressbaridx}"; then
          error "Variable progressbaridx is empty or invalid."
          exit 4
       fi
@@ -899,7 +899,7 @@ main() {
    ## sets: ${msgcollector_run_dir}
    folder_init
 
-   ## provides: check, is_whole_number
+   ## provides: msgcollector_check, is_whole_number
    source /usr/libexec/msgcollector/check
 
    if [ "${forget}" = "1" ]; then

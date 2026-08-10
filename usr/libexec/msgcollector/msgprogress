@@ -171,7 +171,7 @@ source /usr/libexec/msgcollector/msgcollector_shared
 ## sets: ${msgcollector_run_dir}
 folder_init
 
-## provides: check, is_whole_number
+## provides: msgcollector_check, is_whole_number
 source /usr/libexec/msgcollector/check
 
 parse_cmd_options "$@"
@@ -188,8 +188,8 @@ parse_cmd_options "$@"
 ## a second, contradictory complaint. Lifting the trap keeps errexit intact --
 ## same exit code, same single message as before strict mode.
 trap - ERR
-check "${identifier}" || exit 1
-check "${progressbaridx}" || exit 1
+msgcollector_check "${identifier}" || exit 1
+msgcollector_check "${progressbaridx}" || exit 1
 trap "error_handler" ERR
 
 if [ "${progress}" = "" ]; then

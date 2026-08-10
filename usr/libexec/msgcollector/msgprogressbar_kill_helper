@@ -14,7 +14,7 @@ source /usr/libexec/msgcollector/msgcollector_shared
 ## sets: ${msgcollector_run_dir}
 folder_init
 
-## provides: check, check_is_not_empty_and_only_one_line, read_integer_file
+## provides: msgcollector_check, check_is_not_empty_and_only_one_line, read_integer_file
 source /usr/libexec/msgcollector/check
 
 if ! [[ -v 1 ]]; then
@@ -29,8 +29,8 @@ fi
 identifier="$1"
 progressbaridx="$2"
 
-check "${identifier}" || exit 1
-check "${progressbaridx}" || exit 1
+msgcollector_check "${identifier}" || exit 1
+msgcollector_check "${progressbaridx}" || exit 1
 
 full_path="${msgcollector_run_dir}/${identifier}_${progressbaridx}_parentpid"
 check_is_not_empty_and_only_one_line full_path

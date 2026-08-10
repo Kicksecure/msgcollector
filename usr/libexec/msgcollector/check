@@ -16,7 +16,7 @@
 ## provides: read_integer_file
 source /usr/libexec/helper-scripts/strings.bsh
 
-check() {
+msgcollector_check() {
   ## NOTE: 'local variable_to_check="$1"' is intentionally avoided.
   ## 'local' always returns 0, which would clobber '$?' if we ever
   ## needed it, and separating declaration from assignment is the
