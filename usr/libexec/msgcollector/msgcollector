@@ -3,20 +3,67 @@
 ## Copyright (C) 2012 - 2025 ENCRYPTED SUPPORT LLC <adrelanos@whonix.org>
 ## See the file COPYING for copying conditions.
 
-## style-ok: no-strict
-## errexit ('set -e') and pipefail ARE set below. nounset is intentionally
-## omitted: msgcollector reads many optional CLI fields (icon, titlecli,
-## typecli, progressbaridx, ...) that are legitimately unset, and enabling
-## nounset would abort on them.
-##
-## TODO: Can we make it fit? Yes, there are many optional CLI fields, but why
-## can't we default them all to blank or use "${var:-}" syntax for them?
+## Strict mode. msgcollector reads many optional CLI fields (icon, titlecli,
+## typecli, progressbaridx, ...) that are legitimately unset; they are defaulted
+## to '' below so nounset does not abort on an unset read, and parse_cmd_options
+## overwrites them when the flag is actually given.
 
 #set -x
-set -e
+set -o errexit
+set -o nounset
 set -o pipefail
+set -o errtrace
+shopt -s inherit_errexit
+shopt -s shift_verbose
 
 scriptname="$(basename -- "${BASH_SOURCE[0]}")"
+
+## Every optional CLI field, defaulted so a read before its flag is parsed is
+## safe under nounset. Also the two error_handler reads (my_command_line_
+## parameters, write_to_file) and the color names colors() fills in later.
+cli=""
+done=""
+forceactive=""
+forget=""
+forgetwaitcli=""
+icon=""
+identifier=""
+message=""
+messagecli=""
+messagex=""
+newlinecli=""
+nonewlinex=""
+onlyecho=""
+parentpid=""
+parenttty=""
+passivepopupqueuex=""
+passivepopupqueuextitle=""
+progressbaridx=""
+progressbartitlex=""
+progressbarx=""
+progressbarxprogresstxtexisting=""
+progressbarxrunning=""
+progressx=""
+status=""
+titlecli=""
+titlex=""
+typecli=""
+typecli_chosen=""
+typex=""
+typex_chosen=""
+verbose=""
+waitmessagecli=""
+my_command_line_parameters=""
+write_to_file=""
+
+## Color escape codes -- colors() fills these from helper-scripts' get_colors;
+## defaulted so a read before that (e.g. the parse_cmd_options trace) is safe.
+cyan=""
+reset=""
+green=""
+yellow=""
+red=""
+bold=""
 
 error_handler() {
    local exit_code="$?"
@@ -105,7 +152,7 @@ parse_cmd_options() {
    true "${cyan}INFO:${reset} parse_cmd_options msgcollector"
 
    while true; do
-       case $1 in
+       case "${1:-}" in
            --verbose)
                set -x
                verbose="1"
@@ -116,11 +163,11 @@ parse_cmd_options() {
                shift
                ;;
            --identifier)
-               identifier="$2"
+               identifier="${2:-}"
                shift 2
                ;;
            --icon)
-               icon="$2"
+               icon="${2:-}"
                if [ "${icon}" = "" ]; then
                   printf '%s\n' "${BASH_SOURCE[0]} ERROR: variable icon is empty."
                   exit 1
@@ -128,12 +175,12 @@ parse_cmd_options() {
                shift 2
                ;;
            --parentpid)
-               parentpid="$2"
+               parentpid="${2:-}"
                shift 2
                ;;
            --typecli)
                cli="1"
-               typecli="$2"
+               typecli="${2:-}"
                shift 2
                if [ "${typecli}" = "" ]; then
                   printf '%s\n' "${BASH_SOURCE[0]} ERROR: variable typecli is empty."
@@ -141,7 +188,7 @@ parse_cmd_options() {
                fi
                ;;
            --typex)
-               typex="$2"
+               typex="${2:-}"
                shift 2
                if [ "${typex}" = "" ]; then
                   printf '%s\n' "${BASH_SOURCE[0]} ERROR: variable typex is empty."
@@ -159,7 +206,7 @@ parse_cmd_options() {
                typecli_chosen="1"
                ;;
            --message)
-               message="$2"
+               message="${2:-}"
                shift 2
                if [ "${message}" = "" ]; then
                   printf '%s\n' "${BASH_SOURCE[0]} ERROR: variable message is empty."
@@ -168,19 +215,19 @@ parse_cmd_options() {
                ;;
            --titlecli)
                cli="1"
-               titlecli="$2"
+               titlecli="${2:-}"
                shift 2
                ;;
            --titlex)
-               titlex="$2"
+               titlex="${2:-}"
                shift 2
                ;;
            --progressbartitlex)
-               progressbartitlex="$2"
+               progressbartitlex="${2:-}"
                shift 2
                ;;
            --passivepopupqueuextitle)
-               passivepopupqueuextitle="$2"
+               passivepopupqueuextitle="${2:-}"
                shift 2
                ;;
            --messagex)
@@ -201,7 +248,7 @@ parse_cmd_options() {
                shift
                ;;
            --progressx)
-               progressx="$2"
+               progressx="${2:-}"
                shift 2
                if [ "${progressx}" = "" ]; then
                   printf '%s\n' "${BASH_SOURCE[0]} ERROR: variable progressx is empty."
@@ -233,7 +280,7 @@ parse_cmd_options() {
                shift
                ;;
            --parenttty)
-               parenttty="$2"
+               parenttty="${2:-}"
                shift 2
                ;;
            --done)
@@ -249,7 +296,7 @@ parse_cmd_options() {
                shift
                ;;
            --progressbaridx)
-               progressbaridx="$2"
+               progressbaridx="${2:-}"
                shift 2
                ;;
            --status)
@@ -290,7 +337,7 @@ preparation() {
 colors() {
    trap "error_handler" ERR
 
-   if [ "${TERM}" = "" ]; then
+   if [ "${TERM:-}" = "" ]; then
       return 0
    fi
 
