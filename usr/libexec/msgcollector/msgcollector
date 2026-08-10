@@ -65,11 +65,11 @@ error_handler() {
    if [ ! -d ~/".msgcollector" ]; then
       mkdir --parents ~/".msgcollector"
    fi
-   ## XXX: set executable bit on the folder. This has nothing to do with executable binaries. See:
-   ## https://superuser.com/questions/168578/why-must-a-folder-be-executable
-   ## This is required because otherwise the following "touch" command would fail.
-   ## Unclear why this is required. Maybe an issue in /usr/lib/tmpfiles.d/systemcheck.conf config file
-   ## This workaround is good enough.
+   ## Owner-execute so the directory is traversable: a umask that masks the 0100
+   ## bit leaves ~/.msgcollector non-traversable and the write below fails with
+   ## EACCES. Kicksecure's default umask (027) does not mask it, so this is
+   ## defensive -- for a dir pre-created without owner-x. Every error path that
+   ## writes this log does the same (msgprogress, msgprogressbar, msgdispatcher).
    chmod +x ~/".msgcollector" || true
 
    if ! touch -- ~/".msgcollector/msgdispatcher-error.log" ; then
