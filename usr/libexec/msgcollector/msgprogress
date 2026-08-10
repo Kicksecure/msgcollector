@@ -23,6 +23,10 @@ verbose=""
 
 scriptname="$(basename -- "${BASH_SOURCE[0]}")"
 
+## Bound the best-effort filesystem ops in error_handler, so a stuck home dir
+## cannot hang the error path. Matches msgprogressbar.
+timeout_command=("timeout" "--kill-after" "1" "2")
+
 error_handler() {
    local exit_code="$?"
 
@@ -44,7 +48,7 @@ error_handler() {
    fi
    ## Owner-execute for traversal (see msgcollector's error_handler): defensive
    ## against a dir pre-created under a umask that masks the 0100 bit.
-   chmod u+rwx -- ~/".msgcollector" || true
+   "${timeout_command[@]}" chmod u+rwx -- ~/".msgcollector" || true
    printf '%s\n' "${scriptname}: BASH_COMMAND: ${BASH_COMMAND} | exit_code: ${exit_code}" | tee -a ~/".msgcollector/msgdispatcher-error.log" >/dev/null
    exit 1
 }

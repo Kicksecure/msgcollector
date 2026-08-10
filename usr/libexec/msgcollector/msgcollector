@@ -18,6 +18,10 @@ shopt -s shift_verbose
 
 scriptname="$(basename -- "${BASH_SOURCE[0]}")"
 
+## Bound the best-effort filesystem ops in error_handler, so a stuck home dir
+## cannot hang the error path. Matches msgprogressbar.
+timeout_command=("timeout" "--kill-after" "1" "2")
+
 ## Every optional CLI field, defaulted so a read before its flag is parsed is
 ## safe under nounset. Also the two error_handler reads (my_command_line_
 ## parameters, write_to_file). Color variables are NOT defaulted here: colors()
@@ -108,7 +112,7 @@ error_handler() {
    ## EACCES. Kicksecure's default umask (027) does not mask it, so this is
    ## defensive -- for a dir pre-created without owner-x. Every error path that
    ## writes this log does the same (msgprogress, msgprogressbar, msgdispatcher).
-   chmod u+rwx -- ~/".msgcollector" || true
+   "${timeout_command[@]}" chmod u+rwx -- ~/".msgcollector" || true
 
    if ! touch -- ~/".msgcollector/msgdispatcher-error.log" ; then
       printf '%s\n' "${scriptname}: skipping log to ${home_var}/.msgcollector/msgdispatcher-error.log since failed to 'touch' file." >&2
