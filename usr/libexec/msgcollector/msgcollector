@@ -346,9 +346,9 @@ cli_links_to_footnotes() {
       printf '%s\n' 'Links:'
       printf '%s' "${footer}"
    else
-      ## FIXME: $message will most likely not include a trailing newline, so we
-      ## probably need '%s\n' here. We don't need it above because when $n > 0,
-      ## $footer has a newline explicitly appended to it.
+      ## No trailing newline: a plain CLI message must render verbatim
+      ## (test_cli_rendering asserts 'See: <url>' stays exactly that). The n>0
+      ## path's trailing newline comes from $footer, not a deliberate terminator.
       printf '%s' "${rest}"
    fi
 }

@@ -161,10 +161,9 @@ preparation() {
 passive_popup_tool() {
    local time title text
    time="$1"
-   ## FIXME: Why on *earth* are we guarding against $2 being unset but not $3?
-   ## If $2 is unset, certainly $3 will be.
+   ## Both guarded: under nounset an unset $3 aborts the same as an unset $2.
    title="${2:-}"
-   text="$3"
+   text="${3:-}"
 
    ## Fallback.
    ## 'notify-send' does not work if $title is unset.
