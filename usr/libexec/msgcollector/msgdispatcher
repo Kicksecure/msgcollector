@@ -24,7 +24,7 @@ verbose=""
 ## Sibling repo: absent in an isolated CI checkout. No inline SC1091 disable
 ## needed -- the CI shellcheck excludes SC1091, and a full-tree run resolves the
 ## source= path above.
-source /usr/libexec/helper-scripts/has.sh
+source "${HELPER_SCRIPTS_PATH:-}/usr/libexec/helper-scripts/has.sh"
 #trap 'sleep 1' DEBUG
 
 ## Bound the best-effort filesystem ops in error_handler, so a stuck home dir
@@ -71,7 +71,7 @@ error_handler() {
    ## Popup window with the message above.
    ## /usr/share/icons/icon-pack-dist/whonix.ico might not exist, but
    ## fortunately msgdispatcher_dispatch_x works anyway.
-   /usr/libexec/msgcollector/msgdispatcher_dispatch_x.py "warning" "$0" "${msg}" "0" "/usr/share/icons/icon-pack-dist/whonix.ico" &
+   "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/msgdispatcher_dispatch_x.py" "warning" "$0" "${msg}" "0" "/usr/share/icons/icon-pack-dist/whonix.ico" &
 
    true
 }
@@ -267,11 +267,11 @@ dispatch_x_active() {
    fi
 
    if [ "${verbose}" = "1" ]; then
-      /usr/libexec/msgcollector/msgdispatcher_dispatch_x.py "${type}" "${title}" "${msg}" "0" "${icon}"
+      "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/msgdispatcher_dispatch_x.py" "${type}" "${title}" "${msg}" "0" "${icon}"
    else
       ## Launching into background, so it doesn't block msgdispatcher until
       ## msgdispatcher_dispatch_x exits.
-      /usr/libexec/msgcollector/msgdispatcher_dispatch_x.py "${type}" "${title}" "${msg}" "0" "${icon}" &
+      "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/msgdispatcher_dispatch_x.py" "${type}" "${title}" "${msg}" "0" "${icon}" &
    fi
 }
 
@@ -475,20 +475,20 @@ msgdispatcher_loop() {
    done
 }
 
-source /usr/libexec/helper-scripts/strings.bsh
+source "${HELPER_SCRIPTS_PATH:-}/usr/libexec/helper-scripts/strings.bsh"
 
-source /usr/libexec/helper-scripts/light_sleep.bsh
+source "${HELPER_SCRIPTS_PATH:-}/usr/libexec/helper-scripts/light_sleep.bsh"
 
 ## sets: systemd_notify
-source /usr/libexec/helper-scripts/systemd-notify.bsh
+source "${HELPER_SCRIPTS_PATH:-}/usr/libexec/helper-scripts/systemd-notify.bsh"
 
 ## sets: ${msgcollector_run_dir}
 # shellcheck source=./usr/libexec/msgcollector/msgcollector_shared
-source /usr/libexec/msgcollector/msgcollector_shared
+source "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/msgcollector_shared"
 folder_init
 
 # shellcheck source=./usr/libexec/msgcollector/msgfallbacks
-source /usr/libexec/msgcollector/msgfallbacks
+source "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/msgfallbacks"
 
 parse_cmd_options "$@"
 msgdispatcher_loop

@@ -7,8 +7,12 @@
 ##
 ## No strict-mode preamble: this file is SOURCED, never executed.
 
-source /usr/libexec/helper-scripts/light_sleep.bsh
-source /usr/libexec/helper-scripts/strings.bsh
+## Sourced dependencies resolve at /usr/libexec by default; a checkout-based
+## test overrides the base (HELPER_SCRIPTS_PATH for helper-scripts, unset in
+## production -> the absolute path below), so nothing has to be installed into
+## the shared /usr/libexec to run these scripts.
+source "${HELPER_SCRIPTS_PATH:-}/usr/libexec/helper-scripts/light_sleep.bsh"
+source "${HELPER_SCRIPTS_PATH:-}/usr/libexec/helper-scripts/strings.bsh"
 
 folder_init() {
    ## Honor XDG_RUNTIME_DIR (the systemd / XDG base-dir spec env

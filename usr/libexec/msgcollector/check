@@ -14,7 +14,7 @@
 ## provides: validate_safe_filename
 ## provides: is_whole_number
 ## provides: read_integer_file
-source /usr/libexec/helper-scripts/strings.bsh
+source "${HELPER_SCRIPTS_PATH:-}/usr/libexec/helper-scripts/strings.bsh"
 
 msgcollector_check() {
   ## NOTE: 'local variable_to_check="$1"' is intentionally avoided.

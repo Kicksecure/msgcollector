@@ -3,37 +3,40 @@
 ## Copyright (C) 2012 - 2025 ENCRYPTED SUPPORT LLC <adrelanos@whonix.org>
 ## See the file COPYING for copying conditions.
 
-if [ "$pv_wrapper_debug" = "true" ]; then
+set -o errexit
+set -o nounset
+set -o pipefail
+set -o errtrace
+shopt -s inherit_errexit
+shopt -s shift_verbose
+
+if [ "${pv_wrapper_debug:-}" = 'true' ]; then
    set -x
 fi
 
-true "$0: START"
+true "${0}: START"
 
-set -e
-set -o nounset
-set -o pipefail
+error_handler() {
+   local exit_code="${?}"
+   printf '%s\n' "${0}: ERROR: BASH_COMMAND '${BASH_COMMAND}' exit code '${exit_code}'." >&2
+}
 
 trap "error_handler" ERR
 
-error_handler() {
-  local exit_code="$?"
-  local last_err="$BASH_COMMAND"
-  echo "$0: ERROR: BASH_COMMAND '$BASH_COMMAND' exit code '$exit_code'." >&2
-}
-
 ## provides: is_whole_number
 # shellcheck source=../../../../helper-scripts/usr/libexec/helper-scripts/strings.bsh
-source /usr/libexec/helper-scripts/strings.bsh
+source "${HELPER_SCRIPTS_PATH:-}/usr/libexec/helper-scripts/strings.bsh"
 
 while read -r line; do
    ## Validate that the input is strictly numeric to prevent shell injection
-   ## through $percent when referenced by eval'd commands.
-   if ! is_whole_number "$line"; then
+   ## through percent when referenced by eval'd commands.
+   if ! is_whole_number "${line}"; then
       continue
    fi
-   percent="$line"
-   eval $pv_echo_command
-   eval $pv_wrapper_command
+   # shellcheck disable=SC2034
+   percent="${line}"
+   eval "${pv_echo_command}"
+   eval "${pv_wrapper_command}"
 done
 
-true "$0: END"
+true "${0}: END"

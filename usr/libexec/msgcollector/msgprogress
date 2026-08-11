@@ -173,12 +173,12 @@ progress_bar() {
    return 0
 }
 
-source /usr/libexec/msgcollector/msgcollector_shared
+source "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/msgcollector_shared"
 ## sets: ${msgcollector_run_dir}
 folder_init
 
 ## provides: msgcollector_check, is_whole_number
-source /usr/libexec/msgcollector/check
+source "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/check"
 
 parse_cmd_options "$@"
 
