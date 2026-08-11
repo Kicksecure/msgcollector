@@ -472,31 +472,34 @@ escalate_type_file() {
    ## existing higher severity (info < warning < error). A passive popup queue
    ## aggregates several messages under one identifier, so -- like the messagex
    ## _typex escalation -- the worst severity must win, not the last write.
+   ## Concurrent same-identifier writers are expected (the passive queue and
+   ## messagex both aggregate under one identifier), so the read-modify-write
+   ## runs under an exclusive flock on a per-type-file '<file>.lock' -- otherwise
+   ## two writers can both read the old value and the last to write downgrades.
    # $1 - type file, $2 - new type
-   local type_file new old
+   local type_file new
    type_file="$1"
    new="$2"
-   old=""
-   if [ -f "${type_file}" ]; then
-      old="$(cat -- "${type_file}" 2>/dev/null)" || true
-   fi
-   case "${old}" in
-      error)
-         ## already the worst; never downgrade
-         return 0
-         ;;
-      warning)
-         if [ "${new}" != "error" ]; then
-            return 0
-         fi
-         ;;
-      info)
-         if [ "${new}" != "error" ] && [ "${new}" != "warning" ]; then
-            return 0
-         fi
-         ;;
-   esac
-   printf '%s\n' "${new}" > "${type_file}"
+   (
+      flock --exclusive 9
+      old=""
+      if [ -f "${type_file}" ]; then
+         old="$(cat -- "${type_file}" 2>/dev/null)" || true
+      fi
+      case "${old}" in
+         error)
+            ## already the worst; never downgrade
+            exit 0
+            ;;
+         warning)
+            [ "${new}" = "error" ] || exit 0
+            ;;
+         info)
+            { [ "${new}" = "error" ] || [ "${new}" = "warning" ]; } || exit 0
+            ;;
+      esac
+      printf '%s\n' "${new}" > "${type_file}"
+   ) 9>>"${type_file}.lock"
 }
 
 stdisplay_message() {
@@ -594,57 +597,69 @@ collector() {
 
    ## {{ --typecli
    if [ "${messagecli}" = "1" ]; then
-      if [ -f "${msgcollector_run_dir}/${identifier}_typecli" ]; then
-         old_typecli="$(cat -- "${msgcollector_run_dir}/${identifier}_typecli")"
-      fi
+      ## Serialize the read-modify-write against a concurrent same-identifier
+      ## writer (see escalate_type_file): flock the type file, no truncate.
+      (
+         flock --exclusive 9
+         old_typecli=""
+         if [ -f "${msgcollector_run_dir}/${identifier}_typecli" ]; then
+            old_typecli="$(cat -- "${msgcollector_run_dir}/${identifier}_typecli")"
+         fi
 
-      if [ "${old_typecli:-}" = "info" ]; then
-         if [ "${typecli}" = "error" ]; then
-            ## Upgrade from info to error.
-            write_typecli_to_file "error" "${msgcollector_run_dir}/${identifier}_typecli"
-         elif [ "${typecli}" = "warning" ]; then
-            ## Upgrade from info to warning.
-            write_typecli_to_file "warning" "${msgcollector_run_dir}/${identifier}_typecli"
+         if [ "${old_typecli:-}" = "info" ]; then
+            if [ "${typecli}" = "error" ]; then
+               ## Upgrade from info to error.
+               write_typecli_to_file "error" "${msgcollector_run_dir}/${identifier}_typecli"
+            elif [ "${typecli}" = "warning" ]; then
+               ## Upgrade from info to warning.
+               write_typecli_to_file "warning" "${msgcollector_run_dir}/${identifier}_typecli"
+            fi
+         elif [ "${old_typecli:-}" = "warning" ]; then
+            if [ "${typecli}" = "error" ]; then
+               ## Upgrade from warning to error.
+               write_typecli_to_file "error" "${msgcollector_run_dir}/${identifier}_typecli"
+            fi
+         elif [ "${old_typecli:-}" = "error" ]; then
+            true
+         else
+            if [ ! "${typecli}" = "" ]; then
+               write_typecli_to_file "${typecli}" "${msgcollector_run_dir}/${identifier}_typecli"
+            fi
          fi
-      elif [ "${old_typecli:-}" = "warning" ]; then
-         if [ "${typecli}" = "error" ]; then
-            ## Upgrade from warning to error.
-            write_typecli_to_file "error" "${msgcollector_run_dir}/${identifier}_typecli"
-         fi
-      elif [ "${old_typecli:-}" = "error" ]; then
-         true
-      else
-         if [ ! "${typecli}" = "" ]; then
-            write_typecli_to_file "${typecli}" "${msgcollector_run_dir}/${identifier}_typecli"
-         fi
-      fi
+      ) 9>>"${msgcollector_run_dir}/${identifier}_typecli.lock"
    fi
    ## }}
 
    ## {{ --typex
    if [ "${messagex}" = "1" ]; then
-      if [ -f "${msgcollector_run_dir}/${identifier}_typex" ]; then
-         old_typex="$(cat -- "${msgcollector_run_dir}/${identifier}_typex")"
-      fi
+      ## Serialize the read-modify-write against a concurrent same-identifier
+      ## writer (see escalate_type_file): flock the type file, no truncate.
+      (
+         flock --exclusive 9
+         old_typex=""
+         if [ -f "${msgcollector_run_dir}/${identifier}_typex" ]; then
+            old_typex="$(cat -- "${msgcollector_run_dir}/${identifier}_typex")"
+         fi
 
-      if [ "${old_typex:-}" = "info" ]; then
-         if [ "${typex}" = "error" ]; then
-            ## Upgrade from info to error.
-            printf '%s\n' "error" > "${msgcollector_run_dir}/${identifier}_typex"
-         elif [ "${typex}" = "warning" ]; then
-            ## Upgrade from info to warning.
-            printf '%s\n' "warning" > "${msgcollector_run_dir}/${identifier}_typex"
+         if [ "${old_typex:-}" = "info" ]; then
+            if [ "${typex}" = "error" ]; then
+               ## Upgrade from info to error.
+               printf '%s\n' "error" > "${msgcollector_run_dir}/${identifier}_typex"
+            elif [ "${typex}" = "warning" ]; then
+               ## Upgrade from info to warning.
+               printf '%s\n' "warning" > "${msgcollector_run_dir}/${identifier}_typex"
+            fi
+         elif [ "${old_typex:-}" = "warning" ]; then
+            if [ "${typex}" = "error" ]; then
+               ## Upgrade from warning to error.
+               printf '%s\n' "error" > "${msgcollector_run_dir}/${identifier}_typex"
+            fi
+         elif [ "${old_typex:-}" = "error" ]; then
+            true
+         else
+            printf '%s\n' "${typex}" > "${msgcollector_run_dir}/${identifier}_typex"
          fi
-      elif [ "${old_typex:-}" = "warning" ]; then
-         if [ "${typex}" = "error" ]; then
-            ## Upgrade from warning to error.
-            printf '%s\n' "error" > "${msgcollector_run_dir}/${identifier}_typex"
-         fi
-      elif [ "${old_typex:-}" = "error" ]; then
-         true
-      else
-         printf '%s\n' "${typex}" > "${msgcollector_run_dir}/${identifier}_typex"
-      fi
+      ) 9>>"${msgcollector_run_dir}/${identifier}_typex.lock"
    fi
    ## }}
 
