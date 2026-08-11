@@ -124,7 +124,7 @@ error_handler() {
       exit 1
    fi
 
-   printf '%s\n' "\
+   "${timeout_command[@]}" append ~/".msgcollector/msgdispatcher-error.log" "\
 scriptname: ${scriptname}
 identifier: ${identifier}
 my_command_line_parameters: ${my_command_line_parameters}
@@ -133,7 +133,7 @@ ps_p_parentpid: ${ps_p_parentpid}
 my_pstree: ${my_pstree}
 BASH_COMMAND: ${BASH_COMMAND}
 exit_code: ${exit_code}
-" | tee -a -- ~/".msgcollector/msgdispatcher-error.log" >/dev/null
+" >/dev/null || true
 
    true "INFO: end of $0 error_handler, ok."
 
