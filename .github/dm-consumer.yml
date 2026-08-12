@@ -8,8 +8,9 @@
 ## SafeTextBrowser validator (offscreen Qt); hypothesis by the property tests;
 ## bubblewrap by loop_protection_test.sh, which runs the caller under 'bwrap'
 ## with a tmpfs /usr/libexec so the sourced code cannot reach host helper-scripts.
-## safe-rm / moreutils / procps / inotify-tools back unit_tests_test.sh, the deep
-## suite that installs and RUNS the real scripts (was the in-repo unit-tests).
+## safe-rm / moreutils / procps / inotify-tools back the deep suites that RUN the
+## real scripts end-to-end: unit_tests_test.sh and integration_tests_test.sh
+## (the msgcollector message-collection pipeline).
 coverity:
   ## scan.coverity.com project name (org-ai-assisted-owned; the "/" is
   ## rejected in manual registration so the name is slash-free).
