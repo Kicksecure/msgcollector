@@ -1,3 +1,361 @@
+commit 114343adb76aa30adeb2a6977af5cd60cc8fd45b
+Merge: f799447 6929a32
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Aug 9 03:55:54 2026 -0400
+
+    Merge remote-tracking branch 'refs/remotes/ArrayBolt3/arraybolt3/trixie'
+
+commit 6929a32bd64ec3d0420c83f5677deae72c0f431f
+Author: Aaron Rainbolt <arraybolt3@gmail.com>
+Date:   Sat Aug 8 22:33:49 2026 -0400
+
+    Several fixes and TODOs, remove the --animate feature completely as it is unused and unsupported
+
+commit 343a23bf877d4c06ff4670a75c6768ce87e40c2d
+Merge: 734e7a6 2cf0915
+Author: Aaron Rainbolt <arraybolt3@gmail.com>
+Date:   Fri Aug 7 17:57:16 2026 -0400
+
+    Merge branch 'ai' into arraybolt3/trixie
+
+commit 2cf09153778f5a0c49d0ac8f19200167e5962e68
+Author: claude (dev163 38f9745c-aed1-4fb4-b6ae-9899f20f8de2) <noreply@anthropic.com>
+Date:   Fri Aug 7 15:03:54 2026 -0400
+
+    msgcollector: fallbacks aborted in the one case it exists for
+
+    usr/libexec/msgcollector/msgfallbacks
+
+    fallbacks() decides whether there is a GUI by reading DISPLAY and
+    WAYLAND_DISPLAY. In a headless or pure-Wayland session those are exactly the
+    variables that are unset, so under the callers' nounset it aborted before
+    installing the no-GUI stubs -- in precisely the environment the fallback is for.
+
+    The defaults go here rather than in the callers: msgdispatcher had already
+    normalised WAYLAND_DISPLAY for its own use, msgprogressbar had not, and both
+    source this file.
+
+    Also in msgprogressbar: yad_progress_pid
+    --------------------------------------------
+
+    It is assigned only where yad is actually launched, but cleanup_self reads it
+    and runs EARLIER on two paths -- including the 'already 100%, not even opening
+    the progress bar' race the code handles deliberately. That clean exit aborted.
+
+    Pre-existing issues in msgfallbacks, surfaced because this commit brings the
+    file into the gate's changed-file scope
+    --------------------------------------------------------------------------------
+
+    - 'style-ok: no-strict' waiver: it is SOURCED, never executed, so a preamble
+      would rewrite the CALLER's shell rather than govern this code.
+    - R-090: three 'command -v' -> has. That required msgprogressbar to source
+      has.sh, which it did not -- msgdispatcher already did, so the same shared code
+      worked in one caller and would have broken in the other.
+    - SC2317 on the dummy yad / kdialog / notify-send bodies. They SHADOW the real
+      commands, so every later call by those names reaches them; shellcheck sees
+      functions nothing in this file invokes. The indirection is the point of the
+      file, so the check is disabled with that reason.
+
+    Found by codex (all three graded P2; the error_handler '$1' one it also raised
+    was already fixed).
+
+    Testing
+    -------
+
+    Gate exit 0 in an ISOLATED checkout.
+
+    fallbacks() driven the way its callers drive it -- sourced into a nounset shell
+    with stub error_handler and has:
+
+      4 pass, 0 fail
+
+      headless: neither DISPLAY nor WAYLAND   old ABORTS, new no_gui=[1]
+      pure Wayland: DISPLAY unset only        old ABORTS, new no_gui=[0]
+      X11: both set                           unchanged,      no_gui=[0]
+      both set but EMPTY -> no GUI            unchanged,      no_gui=[1]
+
+    The last row matters: empty and unset must reach the same verdict, and only
+    'unset' was ever the bug.
+
+    Canary: restoring the bare expansions gives 2 pass / 2 fail, and the two that
+    fail are exactly the unset rows.
+
+commit 72086b928eebc7c3e97a135dc195c0b15f1dd040
+Author: claude (dev163 38f9745c-aed1-4fb4-b6ae-9899f20f8de2) <noreply@anthropic.com>
+Date:   Fri Aug 7 14:53:02 2026 -0400
+
+    restore 'set -x' dropped by the strict-mode pass
+
+    The R-010 conversion replaced each script's existing preamble wholesale and did
+    not carry 'set -x' across. That is a silent loss of diagnostic output, and for
+    several of these it is the only output there is:
+
+    - build-time scripts (hardened-kernel build / download / ci_test, tirdad
+      build.sh, initializer-dist chroot-scripts-post.d): the trace IS the build log,
+      so a failing invocation and its expanded arguments become unavailable exactly
+      when they are needed.
+    - boot-time scripts (libvirt-dist, repository-dist-initializer).
+    - scripts whose only messages are 'true "INFO: ..."' lines, which produce
+      nothing on their own -- removing xtrace silences them completely.
+    - test harnesses (tb-updater unit_test, sdwdate-gui fuzzer), where the trace is
+      the point.
+
+    It was also inconsistent: initializer-dist's 80_cleanup kept it while its four
+    siblings in the same directory lost it.
+
+    Nothing asked for this and no commit described it as intentional, so it is
+    restored everywhere it was active.
+
+    Found by codex on initializer-dist. The other 19 files came from auditing the
+    whole pass for the same pattern.
+
+    Testing
+    -------
+
+    Gate exit 0 in an ISOLATED checkout, all eleven packages.
+
+    Audit: ~/strict-pass-tests/audit-stripped-setx.sh, which compares every file
+    changed on an 'ai' branch against org-ai-assisted/master and reports any that
+    had 'set -x' and no longer do.
+
+      before:  examined 43 package(s) on branch ai, 342 changed file(s); 23 stripped
+      after:   examined 43 package(s) on branch ai, 342 changed file(s);  0 stripped
+
+    The audit prints its own coverage, and fails outright if it examines zero
+    packages. Its first version tested '[ -d "$pkg/.git" ]', which is false for a
+    submodule -- .git is a FILE there -- so it skipped all 43 and reported nothing
+    stripped. A count that can be read is the difference between "clean" and "never
+    looked".
+
+commit 9596019db279745dcfa507bc12ad92ceb122511f
+Author: claude (dev163 38f9745c-aed1-4fb4-b6ae-9899f20f8de2) <noreply@anthropic.com>
+Date:   Fri Aug 7 14:33:44 2026 -0400
+
+    msgcollector: loop_protection aborted on its own first call
+
+    usr/libexec/msgcollector/msgcollector_shared
+
+    loop_protection's first statement expands loop_counter_protection, and the line
+    that CREATES that variable is inside the branch the expansion is testing. So the
+    first call always read it unset.
+
+    That was harmless before R-010. It is not now: msgprogress and
+    msgdispatcher_run_check both carry the strict preamble and both source this
+    file, so under nounset every '--progressx' update exited before writing its
+    progress value.
+
+    The ':-' goes here, in the shared helper, rather than in either caller. Both
+    callers reach the same line, so fixing one would have left the other aborting.
+
+    This file itself gets a 'style-ok: no-strict' waiver, not a preamble: it is
+    SOURCED, never executed, so a 'set -o' block would rewrite the CALLER's shell
+    instead of governing this code. The gate only noticed because this commit
+    touches the file.
+
+    Found by codex. Four other P1s in the same report -- the yad comment placement in
+    msgprogressbar, and the verbose / icon / progress_txt_file_progress defaults --
+    were already fixed; verified against the current files rather than assumed.
+
+    Testing
+    -------
+
+    Gate exit 0 in an ISOLATED checkout.
+
+    The trap only appears when the function is exercised the way msgprogress
+    exercises it: sourced into a nounset shell and called with no counter yet. The
+    harness generates exactly that caller.
+
+      4 pass, 0 fail
+
+      first call, counter never set          old ABORTS, new counter=0
+      two calls in a row                     old ABORTS, new counter=1
+      counter preset to 60 -> timeout        unchanged, exit 2
+      counter preset to garbage -> resets    unchanged, counter=0
+
+    The first two rows are asserted to DIFFER -- the old version must abort where
+    the new one works, or the case is not exercising the trap at all. The last two
+    assert the timeout and the reset paths are untouched.
+
+    Canary: restoring the bare expansion gives 2 pass / 2 fail, and the two that
+    fail are exactly the two the fix addresses.
+
+commit 2a10aa888c346de37454da3f60eafd49c7ab0ef2
+Merge: d13f073 f799447
+Author: claude (dev163 38f9745c-aed1-4fb4-b6ae-9899f20f8de2) <noreply@anthropic.com>
+Date:   Fri Aug 7 12:31:50 2026 -0400
+
+    Merge org-ai-assisted/master into ai
+
+    The branch was created from a stale local master, so its PR diff showed
+    master's newer commits -- including a changelog version bump -- as REMOVALS.
+    Merging rather than rebasing, per the no-history-rewrites rule.
+
+commit d13f073c190d15e10ad94f637de320b589dd5eb1
+Author: claude (dev163 38f9745c-aed1-4fb4-b6ae-9899f20f8de2) <noreply@anthropic.com>
+Date:   Fri Aug 7 12:20:49 2026 -0400
+
+    msgcollector: fix five nounset defects an external review found
+
+    An ai-review pass found five paths where strict mode aborts. All five are on
+    code the previous harness never reached, and all five are the same shape: a
+    variable that only exists on one branch, read on every branch.
+
+    1. msgprogressbar's percentage_maybe_add, icon and progress_txt_file_progress
+       are DERIVED, not parsed -- each is assigned only when the file it comes from
+       exists, and all three are read unconditionally afterwards.
+    2. msgdispatcher's error_handler read '$1', but 'trap "error_handler" ERR'
+       passes NO arguments -- so the handler aborted on its own first line, losing
+       the error it exists to report.
+    3. msgdispatcher never initialised 'verbose', which dispatch_x_active reads.
+    4. '<var>="$2"' in all three scripts: when the flag is the LAST argument there
+       is no $2, and the unset read aborted before check() could say which option
+       was missing. Eight sites.
+    5. 'shift 2' in the same position: shift_verbose turns a shift past the end
+       into a reported failure, so the user got a bash diagnostic instead of
+       check()'s message. Seven sites, now guarded.
+
+    Testing
+    -------
+
+    Gate exit 0 in an ISOLATED checkout.
+
+      18 same, 0 differing
+
+    Four cases added, covering exactly the paths the review exposed: a flag given
+    as the LAST argument for each of the three scripts, and msgprogressbar with
+    neither its progress file nor its icon file present. Two of them ASSERT the new
+    behaviour rather than tolerate a difference:
+
+    - msgprogress: exit 1 with NO "Please report this bug" banner. A missing option
+      value is a USER error.
+    - msgprogressbar: exit 1 NAMING the empty variable. Its banner still prints,
+      because that script already had errtrace before this pass -- pre-existing and
+      deliberately untouched -- but previously the banner was ALL the user got,
+      since the script aborted before check() could speak.
+
+    An assertion I wrote first was wrong and the harness caught it: I asserted the
+    banner away for msgprogressbar too, which contradicts the decision recorded in
+    the strict-mode commit for this package.
+
+    Also fixed here: a comment placed BETWEEN two line-continuation lines of the
+    'yad' invocation, which ENDS the command -- yad was truncated before '--text'
+    and the message text ran as a command of its own. Same mistake as in
+    sandbox-app-launcher's bwrap call, made twice in this session; the directive
+    now sits above the whole invocation in both.
+
+commit 7ea0a4539fd8e7a2f2c41914c1d9dc0924c87fb1
+Author: claude (dev163 38f9745c-aed1-4fb4-b6ae-9899f20f8de2) <noreply@anthropic.com>
+Date:   Fri Aug 7 11:58:09 2026 -0400
+
+    msgcollector: restore the deliberate splitting of percentage_maybe_add
+
+    A blanket 'shellcheck -f diff' sweep quoted
+
+      ${percentage_maybe_add}   ->   "${percentage_maybe_add}"
+
+    and that variable is either EMPTY or the TWO words '--percentage <n>'. Quoted,
+    the progress dialog receives one argument '--percentage 42' that it does not
+    recognise -- or, when the variable is empty, a spurious empty argument.
+    Unquoted again, with an SC2086 waiver stating why.
+
+    Found by a systematic audit of every expansion these commits quoted that master
+    had left unquoted, prompted by the same mistake being found in
+    sandbox-app-launcher (bwrap_args, a pgrep PID list) and hardened-kernel
+    (curl's TLS options). An expansion that is unquoted in working code is usually
+    unquoted ON PURPOSE.
+
+    Gate exit 0 in an ISOLATED checkout; harness unchanged at 14 same, 0 differing.
+
+commit ec129aad9bd2020642fd44f89c7398b12f83aa94
+Author: claude (dev163 38f9745c-aed1-4fb4-b6ae-9899f20f8de2) <noreply@anthropic.com>
+Date:   Fri Aug 7 10:25:43 2026 -0400
+
+    msgcollector: R-010 strict mode for the 4 standalone scripts
+
+    Files: usr/libexec/msgcollector/{msgdispatcher,msgprogress,msgprogressbar,
+    msgdispatcher_xdg_autostart}.
+
+    etc/bash.bash_logout.anondist is deliberately NOT touched: dh_displace diverts
+    /etc/bash.bash_logout onto it, and that file is SOURCED by the exiting login
+    shell, so a strict-mode block there would rewrite the user's interactive shell
+    options rather than its own.
+
+    Real nounset traps
+    ------------------
+
+    - 'case $1' in all three option loops. Each runs until the arguments are
+      exhausted, so the last iteration reads an unset $1 by design.
+    - msgdispatcher read XDG_SESSION_TYPE, XDG_CURRENT_DESKTOP, DISPLAY and
+      WAYLAND_DISPLAY unconditionally in preparation(). Its fallback chain exists
+      precisely for the case where NONE of them is set -- its own message says so
+      -- and under nounset the unset read aborted before that fallback could run.
+    - msgprogress and msgprogressbar hand their required options straight to
+      check(), whose job is to report a missing value. An unset read aborted before
+      check() could name the option, replacing a precise message with a bash error.
+      All 11 option targets initialised to empty.
+    - msgprogressbar's SIGHUP/SIGTERM handler interpolated ${parentpid}, which
+      belongs to msgprogressbar_kill_helper and is never set here. It has always
+      rendered blank; under nounset the expansion aborted the handler even though
+      the command is a no-op 'true'.
+
+    errtrace changes how a user error LOOKS
+    ---------------------------------------
+
+    R-010 adds errtrace, which makes the ERR trap fire for a failure INSIDE a
+    function. msgprogress did not have errtrace before, so a missing command-line
+    option suddenly printed the "script bug ... Please report this bug!" banner on
+    top of check()'s own precise message -- inviting bug reports for a user error.
+    The ERR trap is therefore lifted around its two check() calls and restored
+    after.
+
+    'check ... || exit 1' was tried first and is WRONG: putting check() in a
+    condition context disables errexit inside it, so it ran on past the first
+    failed validation and printed a second, contradictory complaint. Lifting the
+    trap keeps errexit intact.
+
+    msgprogressbar already had errtrace, so its banner is pre-existing behaviour
+    and is left alone. Verified by the harness: lifting the trap there made the new
+    output differ from the old.
+
+    Also
+    ----
+
+    - 'set -x' removed from msgdispatcher_xdg_autostart, which had left tracing on
+      in production output.
+    - 9 'echo' -> printf (R-034); 5 'command -v' -> 'has' (R-090), with has.sh
+      sourced near the top since preparation() and the passive-popup dispatch both
+      run before the other helper-scripts sources near the bottom of the file.
+    - shellcheck braces and quoting; SC2034 waivers for options parsed for
+      compatibility with the shared option set but not read in that script, and an
+      SC2016 waiver where single quotes are deliberate so the value reaches the
+      inner bash as an argument rather than as code.
+
+    Testing
+    -------
+
+    Gate exit 0 in an ISOLATED checkout.
+
+    New harness at ~/strict-pass-tests/msgc-test/. msgdispatcher is a daemon and
+    msgprogressbar drives a GUI, so what is compared is startup: option parsing,
+    check() validation, and msgdispatcher's session-type detection across x11,
+    wayland, tty, Qubes and nothing-set.
+
+      14 same, 0 differing
+
+    Canary: with the env-var defaults removed and the ERR trap restored, the same
+    harness reports 11 same, 3 differing -- one nounset abort and two output
+    differences. Both fixes are load-bearing.
+
+    The harness itself had a bug worth noting: its 'diff ... | head' pipeline made
+    it ABORT on the first difference under errexit+pipefail, so a run could report
+    one failure while silently skipping every later case. Fixed before trusting it.
+
+commit f79944736070ef9bf1502cc2cd9260550de06db0
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Jul 31 18:04:59 2026 +0000
+
+    bumped changelog version
+
 commit a50fcad4befbb9d2dbe6f46379d029684a4d5491
 Merge: 66a60a8 1bfc0f3
 Author: Patrick Schleizer <adrelanos@whonix.org>
