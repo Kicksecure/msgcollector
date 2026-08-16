@@ -23,6 +23,10 @@ verbose=""
 
 scriptname="$(basename -- "${BASH_SOURCE[0]}")"
 
+## Bound the best-effort filesystem ops in error_handler, so a stuck home dir
+## cannot hang the error path. Matches msgprogressbar.
+timeout_command=("timeout" "--kill-after" "1" "2")
+
 error_handler() {
    local exit_code="$?"
 
@@ -42,7 +46,10 @@ error_handler() {
    if [ ! -d ~/".msgcollector" ]; then
       mkdir --parents ~/".msgcollector"
    fi
-   printf '%s\n' "${scriptname}: BASH_COMMAND: ${BASH_COMMAND} | exit_code: ${exit_code}" | tee -a ~/".msgcollector/msgdispatcher-error.log" >/dev/null
+   ## Owner-execute for traversal (see msgcollector's error_handler): defensive
+   ## against a dir pre-created under a umask that masks the 0100 bit.
+   "${timeout_command[@]}" chmod u+rwx -- ~/".msgcollector" || true
+   "${timeout_command[@]}" append ~/".msgcollector/msgdispatcher-error.log" "${scriptname}: BASH_COMMAND: ${BASH_COMMAND} | exit_code: ${exit_code}" >/dev/null || true
    exit 1
 }
 
@@ -93,7 +100,9 @@ parse_cmd_options() {
                break
                ;;
            -*)
-               printf '%s\n' "${scriptname} unknown option: $1" >&2
+               ## sanitize-echo: $1 is an untrusted caller argument; printing it
+               ## raw would let a crafted option inject terminal escapes.
+               sanitize-echo -- "${scriptname} unknown option: $1" >&2
                exit 1
                ;;
            *)
@@ -161,17 +170,15 @@ progress_bar() {
    else
       true "fifo does not exist: ${msgcollector_run_dir}/${identifier}_${progressbaridx}_fifo"
    fi
-   ## XXX
-   #progress_bar
    return 0
 }
 
-source /usr/libexec/msgcollector/msgcollector_shared
+source "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/msgcollector_shared"
 ## sets: ${msgcollector_run_dir}
 folder_init
 
-## provides: check, is_whole_number
-source /usr/libexec/msgcollector/check
+## provides: msgcollector_check, is_whole_number
+source "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/check"
 
 parse_cmd_options "$@"
 
@@ -187,8 +194,8 @@ parse_cmd_options "$@"
 ## a second, contradictory complaint. Lifting the trap keeps errexit intact --
 ## same exit code, same single message as before strict mode.
 trap - ERR
-check "${identifier}"
-check "${progressbaridx}"
+msgcollector_check "${identifier}" || exit 1
+msgcollector_check "${progressbaridx}" || exit 1
 trap "error_handler" ERR
 
 if [ "${progress}" = "" ]; then

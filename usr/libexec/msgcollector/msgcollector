@@ -3,104 +3,142 @@
 ## Copyright (C) 2012 - 2025 ENCRYPTED SUPPORT LLC <adrelanos@whonix.org>
 ## See the file COPYING for copying conditions.
 
-## style-ok: no-strict
-## errexit ('set -e') and pipefail ARE set below. nounset is intentionally
-## omitted: msgcollector reads many optional CLI fields (icon, titlecli,
-## typecli, progressbaridx, ...) that are legitimately unset, and enabling
-## nounset would abort on them. The gate's R-010 strict-triple does not fit.
-##
-## TODO: Can we make it fit? Yes, there are many optional CLI fields, but why
-## can't we default them all to blank or use "${var:-}" syntax for them?
+## Strict mode. msgcollector reads many optional CLI fields (icon, titlecli,
+## typecli, progressbaridx, ...) that are legitimately unset; they are defaulted
+## to '' below so nounset does not abort on an unset read, and parse_cmd_options
+## overwrites them when the flag is actually given.
 
 #set -x
-set -e
+set -o errexit
+set -o nounset
 set -o pipefail
-
-true "$0: START"
+set -o errtrace
+shopt -s inherit_errexit
+shopt -s shift_verbose
 
 scriptname="$(basename -- "${BASH_SOURCE[0]}")"
+
+## Bound the best-effort filesystem ops in error_handler, so a stuck home dir
+## cannot hang the error path. Matches msgprogressbar.
+timeout_command=("timeout" "--kill-after" "1" "2")
+
+## Every optional CLI field, defaulted so a read before its flag is parsed is
+## safe under nounset. Also the two error_handler reads (my_command_line_
+## parameters, write_to_file). Color variables are NOT defaulted here: colors()
+## calls get_colors (which always defines every one, '' when disabled) and runs
+## before parse_cmd_options in main().
+cli=""
+done=""
+forceactive=""
+forget=""
+forgetwaitcli=""
+icon=""
+identifier=""
+message=""
+messagecli=""
+messagex=""
+newlinecli=""
+nonewlinex=""
+onlyecho=""
+parentpid=""
+parenttty=""
+passivepopupqueuex=""
+passivepopupqueuextitle=""
+progressbaridx=""
+progressbartitlex=""
+progressbarx=""
+progressbarxprogresstxtexisting=""
+progressbarxrunning=""
+progressx=""
+status=""
+titlecli=""
+titlex=""
+typecli=""
+typecli_chosen=""
+typex=""
+typex_chosen=""
+verbose=""
+waitmessagecli=""
+my_command_line_parameters=""
+write_to_file=""
 
 error_handler() {
    local exit_code="$?"
 
    local my_pstree
    my_pstree="$(pstree -p $$)" || true
-   local ps_p_parentpid
+   local ps_p_parentpid=""
 
-   if [ ! "$parentpid" = "" ]; then
-      if [ ! "$parentpid" = "0000000000" ]; then
-         ps_p_parentpid="$(ps -p "$parentpid")" || true
+   if [ ! "${parentpid}" = "" ]; then
+      if [ ! "${parentpid}" = "0000000000" ]; then
+         ps_p_parentpid="$(ps -p "${parentpid}")" || true
       fi
    fi
 
    local msg="\
 ###############################################################################
-## $scriptname script bug.
+## ${scriptname} script bug.
 ## No panic. Nothing is broken. Just some rare condition has been hit.
 ## Try again later. There is likely a solution for this problem.
 ## Please see Whonix News, Whonix Blog and Whonix User Help Forum.
 ## Please report this bug!
 ##
-## scriptname: '$scriptname'
-## identifier: '$identifier'
-## my_command_line_parameters: '$my_command_line_parameters'
-## write_to_file: '$write_to_file'
-## parentpid: '$parentpid'
-## ps_p_parentpid: '$ps_p_parentpid'
-## my_pstree: '$my_pstree'
-## BASH_COMMAND: '$BASH_COMMAND'
-## exit_code: '$exit_code'
+## scriptname: '${scriptname}'
+## identifier: '${identifier}'
+## my_command_line_parameters: '${my_command_line_parameters}'
+## write_to_file: '${write_to_file}'
+## parentpid: '${parentpid}'
+## ps_p_parentpid: '${ps_p_parentpid}'
+## my_pstree: '${my_pstree}'
+## BASH_COMMAND: '${BASH_COMMAND}'
+## exit_code: '${exit_code}'
 ###############################################################################\
 "
-   printf '%s\n' "$msg" >&2
+   printf '%s\n' "${msg}" >&2
 
    local home_var
    home_var=~/
 
    if ! test -w ~/ ; then
-      printf '%s\n' "$scriptname: skipping log to ~/.msgcollector/msgdispatcher-error.log since not writeable home_var: $home_var" >&2
+      printf '%s\n' "${scriptname}: skipping log to ~/.msgcollector/msgdispatcher-error.log since not writeable home_var: ${home_var}" >&2
       exit 1
    fi
 
    if [ ! -d ~/".msgcollector" ]; then
       mkdir --parents ~/".msgcollector"
    fi
-   ## XXX: set executable bit on the folder. This has nothing to do with executable binaries. See:
-   ## https://superuser.com/questions/168578/why-must-a-folder-be-executable
-   ## This is required because otherwise the following "touch" command would fail.
-   ## Unclear why this is required. Maybe an issue in /usr/lib/tmpfiles.d/systemcheck.conf config file
-   ## This workaround is good enough.
-   chmod +x ~/".msgcollector" || true
+   ## Owner-execute so the directory is traversable: a umask that masks the 0100
+   ## bit leaves ~/.msgcollector non-traversable and the write below fails with
+   ## EACCES. Kicksecure's default umask (027) does not mask it, so this is
+   ## defensive -- for a dir pre-created without owner-x. Every error path that
+   ## writes this log does the same (msgprogress, msgprogressbar, msgdispatcher).
+   "${timeout_command[@]}" chmod u+rwx -- ~/".msgcollector" || true
 
    if ! touch -- ~/".msgcollector/msgdispatcher-error.log" ; then
-      printf '%s\n' "$scriptname: skipping log to $home_var/.msgcollector/msgdispatcher-error.log since failed to 'touch' file." >&2
+      printf '%s\n' "${scriptname}: skipping log to ${home_var}/.msgcollector/msgdispatcher-error.log since failed to 'touch' file." >&2
       exit 1
    fi
 
    if [ ! -w  ~/".msgcollector/msgdispatcher-error.log" ]; then
-      printf '%s\n' "$scriptname: skipping log to ~/.msgcollector/msgdispatcher-error.log since not writeable file: $home_var/.msgcollector" >&2
+      printf '%s\n' "${scriptname}: skipping log to ~/.msgcollector/msgdispatcher-error.log since not writeable file: ${home_var}/.msgcollector" >&2
       exit 1
    fi
 
-   printf '%s\n' "\
-scriptname: $scriptname
-identifier: $identifier
-my_command_line_parameters: $my_command_line_parameters
-parentpid: $parentpid
-ps_p_parentpid: $ps_p_parentpid
-my_pstree: $my_pstree
-BASH_COMMAND: $BASH_COMMAND
-exit_code: $exit_code
-" | tee -a -- ~/".msgcollector/msgdispatcher-error.log" >/dev/null
+   "${timeout_command[@]}" append ~/".msgcollector/msgdispatcher-error.log" "\
+scriptname: ${scriptname}
+identifier: ${identifier}
+my_command_line_parameters: ${my_command_line_parameters}
+parentpid: ${parentpid}
+ps_p_parentpid: ${ps_p_parentpid}
+my_pstree: ${my_pstree}
+BASH_COMMAND: ${BASH_COMMAND}
+exit_code: ${exit_code}
+" >/dev/null || true
 
    true "INFO: end of $0 error_handler, ok."
 
    exit 1
 }
-
-trap "error_handler" ERR
-
-my_command_line_parameters="$*"
 
 parse_cmd_options() {
    trap "error_handler" ERR
@@ -111,45 +149,45 @@ parse_cmd_options() {
    true "${cyan}INFO:${reset} parse_cmd_options msgcollector"
 
    while true; do
-       case $1 in
+       case "${1:-}" in
            --verbose)
                set -x
                verbose="1"
                shift
                ;;
            --debug)
-               debug="1"
+               ## Accepted for compatibility; no debug behaviour is wired up.
                shift
                ;;
            --identifier)
-               identifier="$2"
+               identifier="${2:-}"
                shift 2
                ;;
            --icon)
-               icon="$2"
-               if [ "$icon" = "" ]; then
+               icon="${2:-}"
+               if [ "${icon}" = "" ]; then
                   printf '%s\n' "${BASH_SOURCE[0]} ERROR: variable icon is empty."
                   exit 1
                fi
                shift 2
                ;;
            --parentpid)
-               parentpid="$2"
+               parentpid="${2:-}"
                shift 2
                ;;
            --typecli)
                cli="1"
-               typecli="$2"
+               typecli="${2:-}"
                shift 2
-               if [ "$typecli" = "" ]; then
+               if [ "${typecli}" = "" ]; then
                   printf '%s\n' "${BASH_SOURCE[0]} ERROR: variable typecli is empty."
                   exit 1
                fi
                ;;
            --typex)
-               typex="$2"
+               typex="${2:-}"
                shift 2
-               if [ "$typex" = "" ]; then
+               if [ "${typex}" = "" ]; then
                   printf '%s\n' "${BASH_SOURCE[0]} ERROR: variable typex is empty."
                   exit 1
                fi
@@ -165,28 +203,28 @@ parse_cmd_options() {
                typecli_chosen="1"
                ;;
            --message)
-               message="$2"
+               message="${2:-}"
                shift 2
-               if [ "$message" = "" ]; then
+               if [ "${message}" = "" ]; then
                   printf '%s\n' "${BASH_SOURCE[0]} ERROR: variable message is empty."
                   exit 1
                fi
                ;;
            --titlecli)
                cli="1"
-               titlecli="$2"
+               titlecli="${2:-}"
                shift 2
                ;;
            --titlex)
-               titlex="$2"
+               titlex="${2:-}"
                shift 2
                ;;
            --progressbartitlex)
-               progressbartitlex="$2"
+               progressbartitlex="${2:-}"
                shift 2
                ;;
            --passivepopupqueuextitle)
-               passivepopupqueuextitle="$2"
+               passivepopupqueuextitle="${2:-}"
                shift 2
                ;;
            --messagex)
@@ -207,9 +245,9 @@ parse_cmd_options() {
                shift
                ;;
            --progressx)
-               progressx="$2"
+               progressx="${2:-}"
                shift 2
-               if [ "$progressx" = "" ]; then
+               if [ "${progressx}" = "" ]; then
                   printf '%s\n' "${BASH_SOURCE[0]} ERROR: variable progressx is empty."
                   exit 1
                fi
@@ -239,7 +277,7 @@ parse_cmd_options() {
                shift
                ;;
            --parenttty)
-               parenttty="$2"
+               parenttty="${2:-}"
                shift 2
                ;;
            --done)
@@ -255,7 +293,7 @@ parse_cmd_options() {
                shift
                ;;
            --progressbaridx)
-               progressbaridx="$2"
+               progressbaridx="${2:-}"
                shift 2
                ;;
            --status)
@@ -271,7 +309,9 @@ parse_cmd_options() {
                break
                ;;
            -*)
-               printf '%s\n' "$scriptname: unknown option: $1" >&2
+               ## sanitize-echo: $1 is an untrusted caller argument; printing it
+               ## raw would let a crafted option inject terminal escapes.
+               sanitize-echo -- "${scriptname}: unknown option: $1" >&2
                exit 1
                ;;
            *)
@@ -284,7 +324,8 @@ parse_cmd_options() {
    ## will remain in the "$@" positional parameters.
 
    if (( $# != 0 )); then
-      printf '%s\n' "$scriptname: unknown option: $1" >&2
+      ## sanitize-echo: $1 is an untrusted caller argument (see above).
+      sanitize-echo -- "${scriptname}: unknown option: $1" >&2
       exit 3
    fi
 }
@@ -296,19 +337,10 @@ preparation() {
 colors() {
    trap "error_handler" ERR
 
-   if [ "$TERM" = "" ]; then
-      return 0
+   if [ ! "${TERM:-}" = "" ]; then
+      ASSUME_TERM_PRESENT=true
    fi
-
-   ## Terminal color/attribute variables (green, red, yellow, reset, bold, eel,
-   ## ebl, ...) come from helper-scripts' get_colors, which emits plain ESC[...m
-   ## sequences -- no tput, and crucially no Shift-In (0x0f) that 'tput sgr0'
-   ## appends to also reset the charset and that would then trail every colored
-   ## token in redirected CLI output. ASSUME_TERM_PRESENT keeps the previous
-   ## behaviour of defining colors whenever TERM is set (they are stored in the
-   ## message files for later display), independent of whether stderr is a tty.
-   ASSUME_TERM_PRESENT=true
-   source /usr/libexec/helper-scripts/get_colors.sh
+   source "${HELPER_SCRIPTS_PATH:-}/usr/libexec/helper-scripts/get_colors.sh"
    get_colors
 }
 
@@ -323,13 +355,13 @@ cli_links_to_footnotes() {
    ## unquoted href.
    local rest="$1" footer="" n=0 whole url text before after
    local re='<a href="?([^">]*)"?>([^<]*)</a>'
-   while [[ "$rest" =~ $re ]]; do
+   while [[ "${rest}" =~ ${re} ]]; do
       whole="${BASH_REMATCH[0]}"
       url="${BASH_REMATCH[1]}"
       text="${BASH_REMATCH[2]}"
-      before="${rest%%"$whole"*}"   # text before the first occurrence
-      after="${rest#*"$whole"}"     # text after it
-      if [ "$text" = "$url" ]; then
+      before="${rest%%"${whole}"*}"   # text before the first occurrence
+      after="${rest#*"${whole}"}"     # text after it
+      if [ "${text}" = "${url}" ]; then
          ## Link text is the URL itself, so just include verbatim
          rest="${before}${url}${after}"
          continue
@@ -338,14 +370,53 @@ cli_links_to_footnotes() {
       rest="${before}${text}[${n}]${after}"
       footer="${footer}[${n}] ${url}"$'\n'
    done
-   if [ "$n" -gt 0 ]; then
-      printf '%s\n\nLinks:\n%s' "$rest" "$footer"
+   if [ "${n}" -gt 0 ]; then
+      ## Format kept to '%s'/'%s\n' only (R-030): rest, blank line, "Links:"
+      ## header, then the footer with no trailing newline.
+      printf '%s\n' "${rest}"
+      printf '%s\n' ''
+      printf '%s\n' 'Links:'
+      printf '%s' "${footer}"
    else
-      ## FIXME: $message will most likely not include a trailing newline, so we
-      ## probably need '%s\n' here. We don't need it above because when $n > 0,
-      ## $footer has a newline explicitly appended to it.
-      printf '%s' "$rest"
+      ## No trailing newline: a plain CLI message must render verbatim
+      ## (test_cli_rendering asserts 'See: <url>' stays exactly that). The n>0
+      ## path's trailing newline comes from $footer, not a deliberate terminator.
+      printf '%s' "${rest}"
    fi
+}
+
+cli_translate_gui_markup() {
+   ## Translate a GUI (HTML) message into its CLI equivalent, in the order that
+   ## must run BEFORE strip-markup: color tags, hyperlinks, line breaks. Echoes
+   ## the transformed message. The color codes come from get_colors and are ''
+   ## when color is disabled, so nothing is inserted in that case.
+   trap "error_handler" ERR
+
+   local text
+   text="$1"
+
+   ## Translate GUI color tags (<font color="...">) to terminal ANSI colors so a
+   ## single HTML message renders colored in BOTH the GUI and the CLI. The
+   ## inserted ANSI escapes contain no HTML metacharacters and survive
+   ## strip-markup. str_replace is a literal fixed-string replace: unlike sed it
+   ## treats neither the search nor the ANSI replacement as a regex, so there are
+   ## no metacharacter, '&'/backslash, or locale pitfalls. The color codes come
+   ## from get_colors and are '' when color is disabled, removing the tag.
+   text="$(printf '%s' "${text}" | str_replace '<font color="green">' "${green:-}")"
+   text="$(printf '%s' "${text}" | str_replace '<font color="orange">' "${yellow:-}")"
+   text="$(printf '%s' "${text}" | str_replace '<font color="yellow">' "${yellow:-}")"
+   text="$(printf '%s' "${text}" | str_replace '<font color="red">' "${red:-}")"
+   text="$(printf '%s' "${text}" | str_replace '</font>' "${reset:-}")"
+   ## Translate GUI hyperlinks (<a href="url">text</a>) to footnote form.
+   text="$(cli_links_to_footnotes "${text}")"
+   ## Translate GUI line breaks (<br>, <br/>, <br />) to real newlines, so a
+   ## single HTML message keeps its line breaks on the CLI too. strip-markup
+   ## would otherwise drop <br> and run the lines together. The <br></br>
+   ## closing half is left for strip-markup to remove. This is a regex (all <br>
+   ## spellings in one pass), so sed -E stays here.
+   text="$(printf '%s' "${text}" | sed -E -e 's#<br ?/?>#\n#g')"
+
+   printf '%s' "${text}"
 }
 
 pretty_type_cli() {
@@ -372,17 +443,17 @@ pretty_type_x() {
 
    local first_three
    first_three="${message:0:3}"
-   if [ "$first_three" = "<p>" ]; then
+   if [ "${first_three}" = "<p>" ]; then
       local message_length remaining_chars message_without_p
       message_length="${#message}"
       remaining_chars="$(( message_length - 3 ))"
-      message_without_p="${message:3:$remaining_chars}"
+      message_without_p="${message:3:${remaining_chars}}"
       if [ "$1" = "info" ]; then
-         message="$msgINFO $message_without_p"
+         message="${msgINFO} ${message_without_p}"
       elif [ "$1" = "warning" ]; then
-         message="$msgWARNING $message_without_p"
+         message="${msgWARNING} ${message_without_p}"
       elif [ "$1" = "error" ]; then
-         message="$msgERROR $message_without_p"
+         message="${msgERROR} ${message_without_p}"
       fi
    fi
 }
@@ -390,10 +461,62 @@ pretty_type_x() {
 write_typecli_to_file() {
    # $1 - type
    # $2 - file
-   if [ "$onlyecho" = "1" ]; then
+   if [ "${onlyecho}" = "1" ]; then
       return 0
    fi
    printf '%s\n' "$1" > "$2"
+}
+
+escalate_type_file() {
+   ## Write $2 (info|warning|error) to the type file $1 without DOWNGRADING an
+   ## existing higher severity (info < warning < error). A passive popup queue
+   ## aggregates several messages under one identifier, so -- like the messagex
+   ## _typex escalation -- the worst severity must win, not the last write.
+   ## Concurrent same-identifier writers are expected (the passive queue and
+   ## messagex both aggregate under one identifier), so the read-modify-write
+   ## runs under an exclusive flock on a per-type-file '<file>.lock' -- otherwise
+   ## two writers can both read the old value and the last to write downgrades.
+   # $1 - type file, $2 - new type
+   local type_file new
+   type_file="$1"
+   new="$2"
+   (
+      flock --exclusive 9
+      old=""
+      if [ -f "${type_file}" ]; then
+         old="$(cat -- "${type_file}" 2>/dev/null)" || true
+      fi
+      case "${old}" in
+         error)
+            ## already the worst; never downgrade
+            exit 0
+            ;;
+         warning)
+            [ "${new}" = "error" ] || exit 0
+            ;;
+         info)
+            { [ "${new}" = "error" ] || [ "${new}" = "warning" ]; } || exit 0
+            ;;
+      esac
+      printf '%s\n' "${new}" > "${type_file}"
+   ) 9>>"${type_file}.lock"
+}
+
+stdisplay_message() {
+   ## Sanitize a CLI message from stdin with stdisplay (stcat): drop non-ASCII
+   ## and every dangerous (non-SGR) escape, keep only a safe SGR subset. Honor
+   ## msgcollector's OWN color decision: get_colors (via colors()'s
+   ## ASSUME_TERM_PRESENT) can enable color where stdisplay's own NO_COLOR /
+   ## TERM=dumb defaults would disable SGR. If they disagreed, stdisplay would
+   ## replace only the ESC of a color we just inserted and leave visible '[..m'
+   ## debris. So when color is on (${green} set) force stdisplay to allow SGR
+   ## too. Non-SGR escapes (cursor moves, clears, OSC) are neutralized either
+   ## way -- that is the security guarantee, independent of the color policy.
+   if [ -n "${green:-}" ]; then
+      env --unset=NO_COLOR COLORTERM=truecolor stcat
+   else
+      stcat
+   fi
 }
 
 collector() {
@@ -407,14 +530,14 @@ collector() {
    ## - messagex: NOT sanitized (intentional - contains caller-constructed HTML for setHtml())
 
    ## {{ --identifier
-   if ! check "$identifier"; then
+   if ! msgcollector_check "${identifier}"; then
       printf '%s\n' "${BASH_SOURCE[0]} ERROR: variable 'identifier' is empty or invalid."
       exit 1
    fi
    ## }}
 
    ## {{ --icon
-   if [ ! "$icon" = "" ]; then
+   if [ ! "${icon}" = "" ]; then
       ## Debugging.
       #ls -la "${msgcollector_run_dir}"
       #test -r "${msgcollector_run_dir}"
@@ -423,13 +546,13 @@ collector() {
       #test -w "${msgcollector_run_dir}/${identifier}_icon" || true "not writeable"
       #whoami
       ## NOTE: If not writeable, AppArmor issues?
-      icon="$(sanitize-string -- nolimit "$icon")"
-      printf '%s\n' "$icon" > "${msgcollector_run_dir}/${identifier}_icon"
+      icon="$(sanitize-string -- nolimit "${icon}")"
+      printf '%s\n' "${icon}" > "${msgcollector_run_dir}/${identifier}_icon"
    fi
    ## }}
 
    ## {{ --parentpid
-   if [ "$parentpid" = "" ]; then
+   if [ "${parentpid}" = "" ]; then
       #printf '%s\n' "${BASH_SOURCE[0]} ERROR: variable parentpid is empty."
       #exit 1
       ## Small hack, so not all applications get killed when pressing the cancel button
@@ -441,91 +564,102 @@ collector() {
    ## }}
 
    ## {{ --titlecli
-   if [ -n "$titlecli" ]; then
-      ## variable $titlecli exists
-      ## TODO
-      true "TODO: --titlecli not yet implemented in msgdispatcher"
-      #printf '%s\n' "$titlecli" > "${msgcollector_run_dir}/${identifier}_titlecli"
+   if [ -n "${titlecli}" ]; then
+      ## --titlecli is parsed but not yet consumed by msgdispatcher.
+      true
+      #printf '%s\n' "${titlecli}" > "${msgcollector_run_dir}/${identifier}_titlecli"
    fi
    ## }}
 
    ## {{ --titlex
-   if [ -n "$titlex" ]; then
+   if [ -n "${titlex}" ]; then
       ## variable $titlex exists
-      titlex="$(sanitize-string -- nolimit "$titlex")"
-      printf '%s\n' "$titlex" > "${msgcollector_run_dir}/${identifier}_titlex"
+      titlex="$(sanitize-string -- nolimit "${titlex}")"
+      printf '%s\n' "${titlex}" > "${msgcollector_run_dir}/${identifier}_titlex"
    fi
    ## }}
 
    ## {{ --passivepopupqueuextitle
-   if [ -n "$passivepopupqueuextitle" ]; then
+   if [ -n "${passivepopupqueuextitle}" ]; then
       ## variable $passivepopupqueuextitle exists
-      passivepopupqueuextitle="$(sanitize-string -- nolimit "$passivepopupqueuextitle")"
-      printf '%s\n' "$passivepopupqueuextitle" > "${msgcollector_run_dir}/${identifier}_passivepopupqueuextitle"
+      passivepopupqueuextitle="$(sanitize-string -- nolimit "${passivepopupqueuextitle}")"
+      printf '%s\n' "${passivepopupqueuextitle}" > "${msgcollector_run_dir}/${identifier}_passivepopupqueuextitle"
    fi
    ## }}
 
    ## {{ --progressbartitlex
-   if [ -n "$progressbartitlex" ]; then
+   if [ -n "${progressbartitlex}" ]; then
       ## variable $progressbartitlex exists
-      progressbartitlex="$(sanitize-string -- nolimit "$progressbartitlex")"
-      printf '%s\n' "$progressbartitlex" > "${msgcollector_run_dir}/${identifier}_${progressbaridx}_progressbartitlex"
+      progressbartitlex="$(sanitize-string -- nolimit "${progressbartitlex}")"
+      printf '%s\n' "${progressbartitlex}" > "${msgcollector_run_dir}/${identifier}_${progressbaridx}_progressbartitlex"
    fi
    ## }}
 
    ## {{ --typecli
-   if [ "$messagecli" = "1" ]; then
-      if [ -f "${msgcollector_run_dir}/${identifier}_typecli" ]; then
-         old_typecli="$(cat -- "${msgcollector_run_dir}/${identifier}_typecli")"
-      fi
+   if [ "${messagecli}" = "1" ]; then
+      ## Serialize the read-modify-write against a concurrent same-identifier
+      ## writer (see escalate_type_file): flock the type file, no truncate.
+      (
+         flock --exclusive 9
+         old_typecli=""
+         if [ -f "${msgcollector_run_dir}/${identifier}_typecli" ]; then
+            old_typecli="$(cat -- "${msgcollector_run_dir}/${identifier}_typecli")"
+         fi
 
-      if [ "$old_typecli" = "info" ]; then
-         if [ "$typecli" = "error" ]; then
-            ## Upgrade from info to error.
-            write_typecli_to_file "error" "${msgcollector_run_dir}/${identifier}_typecli"
-         elif [ "$typecli" = "warning" ]; then
-            ## Upgrade from info to warning.
-            write_typecli_to_file "warning" "${msgcollector_run_dir}/${identifier}_typecli"
+         if [ "${old_typecli:-}" = "info" ]; then
+            if [ "${typecli}" = "error" ]; then
+               ## Upgrade from info to error.
+               write_typecli_to_file "error" "${msgcollector_run_dir}/${identifier}_typecli"
+            elif [ "${typecli}" = "warning" ]; then
+               ## Upgrade from info to warning.
+               write_typecli_to_file "warning" "${msgcollector_run_dir}/${identifier}_typecli"
+            fi
+         elif [ "${old_typecli:-}" = "warning" ]; then
+            if [ "${typecli}" = "error" ]; then
+               ## Upgrade from warning to error.
+               write_typecli_to_file "error" "${msgcollector_run_dir}/${identifier}_typecli"
+            fi
+         elif [ "${old_typecli:-}" = "error" ]; then
+            true
+         else
+            if [ ! "${typecli}" = "" ]; then
+               write_typecli_to_file "${typecli}" "${msgcollector_run_dir}/${identifier}_typecli"
+            fi
          fi
-      elif [ "$old_typecli" = "warning" ]; then
-         if [ "$typecli" = "error" ]; then
-            ## Upgrade from warning to error.
-            write_typecli_to_file "error" "${msgcollector_run_dir}/${identifier}_typecli"
-         fi
-      elif [ "$old_typecli" = "error" ]; then
-         true
-      else
-         if [ ! "$typecli" = "" ]; then
-            write_typecli_to_file "$typecli" "${msgcollector_run_dir}/${identifier}_typecli"
-         fi
-      fi
+      ) 9>>"${msgcollector_run_dir}/${identifier}_typecli.lock"
    fi
    ## }}
 
    ## {{ --typex
-   if [ "$messagex" = "1" ]; then
-      if [ -f "${msgcollector_run_dir}/${identifier}_typex" ]; then
-         old_typex="$(cat -- "${msgcollector_run_dir}/${identifier}_typex")"
-      fi
+   if [ "${messagex}" = "1" ]; then
+      ## Serialize the read-modify-write against a concurrent same-identifier
+      ## writer (see escalate_type_file): flock the type file, no truncate.
+      (
+         flock --exclusive 9
+         old_typex=""
+         if [ -f "${msgcollector_run_dir}/${identifier}_typex" ]; then
+            old_typex="$(cat -- "${msgcollector_run_dir}/${identifier}_typex")"
+         fi
 
-      if [ "$old_typex" = "info" ]; then
-         if [ "$typex" = "error" ]; then
-            ## Upgrade from info to error.
-            printf '%s\n' "error" > "${msgcollector_run_dir}/${identifier}_typex"
-         elif [ "$typex" = "warning" ]; then
-            ## Upgrade from info to warning.
-            printf '%s\n' "warning" > "${msgcollector_run_dir}/${identifier}_typex"
+         if [ "${old_typex:-}" = "info" ]; then
+            if [ "${typex}" = "error" ]; then
+               ## Upgrade from info to error.
+               printf '%s\n' "error" > "${msgcollector_run_dir}/${identifier}_typex"
+            elif [ "${typex}" = "warning" ]; then
+               ## Upgrade from info to warning.
+               printf '%s\n' "warning" > "${msgcollector_run_dir}/${identifier}_typex"
+            fi
+         elif [ "${old_typex:-}" = "warning" ]; then
+            if [ "${typex}" = "error" ]; then
+               ## Upgrade from warning to error.
+               printf '%s\n' "error" > "${msgcollector_run_dir}/${identifier}_typex"
+            fi
+         elif [ "${old_typex:-}" = "error" ]; then
+            true
+         else
+            printf '%s\n' "${typex}" > "${msgcollector_run_dir}/${identifier}_typex"
          fi
-      elif [ "$old_typex" = "warning" ]; then
-         if [ "$typex" = "error" ]; then
-            ## Upgrade from warning to error.
-            printf '%s\n' "error" > "${msgcollector_run_dir}/${identifier}_typex"
-         fi
-      elif [ "$old_typex" = "error" ]; then
-         true
-      else
-         printf '%s\n' "$typex" > "${msgcollector_run_dir}/${identifier}_typex"
-      fi
+      ) 9>>"${msgcollector_run_dir}/${identifier}_typex.lock"
    fi
    ## }}
 
@@ -535,85 +669,73 @@ collector() {
    ## that is rendered via setHtml() in msgdispatcher_dispatch_x.
    ## sanitize-string would strip this HTML and break the GUI output.
    ## Callers are responsible for providing safe HTML content.
-   if [ "$messagex" = "1" ]; then
-      pretty_type_x "$typex"
+   if [ "${messagex}" = "1" ]; then
+      pretty_type_x "${typex}"
       write_to_file="${msgcollector_run_dir}/${identifier}_messagex"
       append_to_file
    fi
    ## }}
 
    ## {{ --messagecli
-   if [ "$messagecli" = "1" ]; then
+   if [ "${messagecli}" = "1" ]; then
       write_to_file="${msgcollector_run_dir}/${identifier}_messagecli"
-      if [ -n "$message" ]; then
+      if [ -n "${message}" ]; then
          ## variable $message exists
-         ## NOTE: Cannot use 'sanitize-string' as it would remove terminal colors,
-         ## such as for login security check table.
-         ## The application using 'msgcollector' needs to provide sanitized strings.
-         #message="$(sanitize-string -- nolimit "$message")"
-         ## TODO: Let's make it safe to pass unsanitized strings here. Run the
-         ## string through stdisplay here to sanitize any Unicode or SGR codes
-         ## that might confuse strip-markup.
-         ##
-         ## Translate GUI color tags (<font color="...">) to terminal ANSI
-         ## colors so a single HTML message renders colored in BOTH the GUI and
-         ## the CLI. Must run BEFORE strip-markup (which strips all tags); the
-         ## inserted ANSI escapes contain no HTML metacharacters and survive it.
-         ##
-         ## TODO: Break this color tag translation code and the accompanying
-         ## comment into a new function for consistency.
-         message="$(printf '%s' "$message" | sed \
-            -e "s/<font color=\"green\">/${green:-}/g" \
-            -e "s/<font color=\"orange\">/${yellow:-}/g" \
-            -e "s/<font color=\"yellow\">/${yellow:-}/g" \
-            -e "s/<font color=\"red\">/${red:-}/g" \
-            -e "s#</font>#${reset:-}#g")"
-         ## Translate GUI hyperlinks (<a href="url">text</a>) to footnote form.
-         message="$(cli_links_to_footnotes "$message")"
-         ## Translate GUI line breaks (<br>, <br/>, <br />) to real newlines, so a
-         ## single HTML message keeps its line breaks on the CLI too. strip-markup
-         ## would otherwise drop <br> and run the lines together. The <br></br>
-         ## closing half is left for strip-markup to remove. Run BEFORE strip-markup.
-         message="$(printf '%s' "$message" | sed -E -e 's#<br ?/?>#\n#g')"
-         ## Instead, "only" use 'strip-markup' (strips HTML tags for CLI display).
-         message="$(strip-markup "$message")"
-         ## TODO: Run the string through stdisplay one more time here, to
-         ## remove any SGR escapes that strip-markup created from entities it
-         ## expanded. In combination with the initial stdisplay, the HTML tag
-         ## translation, and the strip-markup call, this routine will be
-         ## equivalent in strength to a `sanitize-string` call and we will be
-         ## able to safely pass unsanitized input to this.
-         #
-         pretty_type_cli "$typecli"
-         message="[$p_type] [$identifier] $message"
-         printf '%s\n' "$message"
+         ## Sanitize untrusted input up front: stdisplay (stcat) drops non-ASCII
+         ## and dangerous escape sequences, keeping only a safe SGR subset, so a
+         ## crafted string cannot confuse the markup translation or strip-markup
+         ## below. Terminal colors a caller legitimately embedded (e.g. the login
+         ## security check table) fall in that safe subset and survive.
+         message="$(printf '%s' "${message}" | stdisplay_message)"
+         ## Translate GUI markup (color tags, hyperlinks, line breaks) to CLI.
+         message="$(cli_translate_gui_markup "${message}")"
+         ## Strip the remaining HTML tags for CLI display.
+         message="$(strip-markup "${message}")"
+         ## Sanitize once more: strip-markup expands HTML entities, which can
+         ## reintroduce escape sequences. This second pass neutralizes them while
+         ## preserving the SGR the markup translation inserted. Combined with the
+         ## first pass, the color translation and strip-markup, this is as strong
+         ## as a 'sanitize-string' call, so unsanitized input is safe here.
+         message="$(printf '%s' "${message}" | stdisplay_message)"
+         pretty_type_cli "${typecli}"
+         message="[${p_type}] [${identifier}] ${message}"
+         printf '%s\n' "${message}"
       fi
       append_to_file
    fi
    ## }}
 
    ## {{ --waitmessagecli
-   if [ "$waitmessagecli" = "1" ]; then
+   if [ "${waitmessagecli}" = "1" ]; then
       write_to_file="${msgcollector_run_dir}/${identifier}_waitmessagecli"
-      if [ -n "$message" ]; then
+      if [ -n "${message}" ]; then
          ## variable $message exists
-         message="$(sanitize-string -- nolimit "$message")"
-         pretty_type_cli "$typecli"
-         message="[$p_type] [$identifier] $message"
-         printf '%s\n' "$message"
+         message="$(sanitize-string -- nolimit "${message}")"
+         pretty_type_cli "${typecli}"
+         message="[${p_type}] [${identifier}] ${message}"
+         printf '%s\n' "${message}"
       fi
       append_to_file
    fi
    ## }}
 
    ## {{ --passivepopupqueuex
-   if [ "$passivepopupqueuex" = "1" ]; then
-      if [ "$message" = "" ]; then
+   if [ "${passivepopupqueuex}" = "1" ]; then
+      if [ "${message}" = "" ]; then
          message="message was empty."
       fi
-      message="$(sanitize-string -- nolimit "$message")"
-      if [ "$message" = "" ]; then
+      message="$(sanitize-string -- nolimit "${message}")"
+      if [ "${message}" = "" ]; then
          message="message was empty after sanitize-string."
+      fi
+      if [ -n "${typex}" ]; then
+         ## Dedicated passive-popup type file, kept separate from messagex's
+         ## _typex so msgdispatcher's passive path reads the caller's type
+         ## without colliding with a concurrent messagex for the same identifier.
+         ## msgdispatcher only maps this to a per-type icon, never runs it.
+         ## Escalate (never downgrade): a queued error keeps its error icon even
+         ## if a later info message is appended to the same popup.
+         escalate_type_file "${msgcollector_run_dir}/${identifier}_passivepopupqueuextype" "${typex}"
       fi
       write_to_file="${msgcollector_run_dir}/${identifier}_passivepopupqueuex"
       append_to_file
@@ -621,8 +743,8 @@ collector() {
    ## }}
 
    ## {{ --progressx
-   if [ ! "$progressx" = "" ]; then
-      if ! check "$progressbaridx"; then
+   if [ ! "${progressx}" = "" ]; then
+      if ! msgcollector_check "${progressbaridx}"; then
          error "Variable 'progressbaridx' is empty or invalid."
          exit 4
       fi
@@ -631,40 +753,40 @@ collector() {
       #caller="$(ps -p $PPID)" || true
       #printf '%s\n' "msgcollector: progressx: $progressx | caller: $PPID | $caller" >> /home/user/progresslog
 
-      if [ "$verbose" = "1" ]; then
-         bash -x /usr/libexec/msgcollector/msgprogress --identifier "$identifier" --progressbaridx "${progressbaridx}" --progress "$progressx"
+      if [ "${verbose}" = "1" ]; then
+         bash -x "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/msgprogress" --identifier "${identifier}" --progressbaridx "${progressbaridx}" --progress "${progressx}"
       else
          ## & disown to prevent long waiting.
-         /usr/libexec/msgcollector/msgprogress --identifier "$identifier" --progressbaridx "${progressbaridx}" --progress "$progressx" & disown
+         "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/msgprogress" --identifier "${identifier}" --progressbaridx "${progressbaridx}" --progress "${progressx}" & disown
       fi
    fi
    ## }}
 
    ## {{ --forceactive
-   if [ "$forceactive" = "1" ]; then
+   if [ "${forceactive}" = "1" ]; then
       touch -- "${msgcollector_run_dir}/${identifier}_forceactive"
    fi
    ## }}
 
    ## {{ --parenttty
-   if [ -n "$parenttty" ]; then
-      printf '%s\n' "$parenttty" > "${msgcollector_run_dir}/${identifier}_parenttty"
+   if [ -n "${parenttty}" ]; then
+      printf '%s\n' "${parenttty}" > "${msgcollector_run_dir}/${identifier}_parenttty"
    fi
    ## }}
 
    ## {{ --progressbarx
-   if [ "$progressbarx" = "1" ]; then
-      if ! check "$progressbaridx"; then
+   if [ "${progressbarx}" = "1" ]; then
+      if ! msgcollector_check "${progressbaridx}"; then
          error "Variable 'progressbaridx' is empty or invalid."
          exit 4
       fi
-      printf '%s\n' "$parentpid" > "${msgcollector_run_dir}/${identifier}_${progressbaridx}_parentpid"
-      message="$(sanitize-string -- nolimit "$message")"
+      printf '%s\n' "${parentpid}" > "${msgcollector_run_dir}/${identifier}_${progressbaridx}_parentpid"
+      message="$(sanitize-string -- nolimit "${message}")"
       write_to_file="${msgcollector_run_dir}/${identifier}_${progressbaridx}_progressbarx"
       append_to_file
 
       ## Cannot run from msgdispatcher due to user mismatch permission issues.
-      /usr/libexec/msgcollector/msgprogressbar --identifier "${identifier}" --progressbaridx "${progressbaridx}" --progressbartitlex "$progressbartitlex" --message "$message" & disown
+      "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/msgprogressbar" --identifier "${identifier}" --progressbaridx "${progressbaridx}" --progressbartitlex "${progressbartitlex}" --message "${message}" & disown
    fi
    ## }}
 }
@@ -672,30 +794,30 @@ collector() {
 append_to_file() {
    trap "error_handler" ERR
 
-   if [ "$onlyecho" = "1" ]; then
+   if [ "${onlyecho}" = "1" ]; then
       true "onlyecho"
       return 0
    fi
 
-   if [ -n "$message" ]; then
+   if [ -n "${message}" ]; then
       ## variable $message exists
-      if [ "$newlinecli" = "1" ]; then
+      if [ "${newlinecli}" = "1" ]; then
          printf '%s\n' "
-$message" >> "$write_to_file"
-      elif [ "$messagex" = 1 ]; then
-         if [ "$nonewlinex" = "1" ]; then
-            printf '%s\n' "$message" >> "$write_to_file"
+${message}" >> "${write_to_file}"
+      elif [ "${messagex}" = 1 ]; then
+         if [ "${nonewlinex}" = "1" ]; then
+            printf '%s\n' "${message}" >> "${write_to_file}"
          else
-            printf '%s\n' "$message
-" >> "$write_to_file"
+            printf '%s\n' "${message}
+" >> "${write_to_file}"
          fi
       else
-         printf '%s\n' "$message" >> "$write_to_file"
+         printf '%s\n' "${message}" >> "${write_to_file}"
       fi
    fi
 
    ## {{ --done
-   if [ "$done" = "1" ]; then
+   if [ "${done}" = "1" ]; then
       touch -- "${write_to_file}_done"
    fi
    ## }}
@@ -705,43 +827,43 @@ return_status() {
    trap "error_handler" ERR
 
    ## {{ --identifier
-   if ! check "$identifier"; then
+   if ! msgcollector_check "${identifier}"; then
       printf '%s\n' "${BASH_SOURCE[0]} ERROR: variable identifier is empty or invalid."
       exit 1
    fi
    ## }}
 
    ## {{ --messagex
-   if [ "$messagex" = "1" ]; then
+   if [ "${messagex}" = "1" ]; then
       write_to_file="${msgcollector_run_dir}/${identifier}_messagex"
       return_status_file
    fi
    ## }}
 
    ## {{ --messagecli
-   if [ "$messagecli" = "1" ]; then
+   if [ "${messagecli}" = "1" ]; then
       write_to_file="${msgcollector_run_dir}/${identifier}_messagecli"
       return_status_file
    fi
    ## }}
 
    ## {{ --waitmessagecli
-   if [ "$waitmessagecli" = "1" ]; then
+   if [ "${waitmessagecli}" = "1" ]; then
       write_to_file="${msgcollector_run_dir}/${identifier}_waitmessagecli"
       return_status_file
    fi
    ## }}
 
    ## {{ --passivepopupqueuex
-   if [ "$passivepopupqueuex" = "1" ]; then
+   if [ "${passivepopupqueuex}" = "1" ]; then
       write_to_file="${msgcollector_run_dir}/${identifier}_passivepopupqueuex"
       return_status_file
    fi
    ## }}
 
    ## {{ --progressbarx
-   if [ "$progressbarx" = "1" ]; then
-      if ! check "$progressbaridx"; then
+   if [ "${progressbarx}" = "1" ]; then
+      if ! msgcollector_check "${progressbaridx}"; then
          error "Variable progressbaridx is empty or invalid."
          exit 4
       fi
@@ -751,19 +873,19 @@ return_status() {
    ## }}
 
    ## {{ --progressbarxrunning
-   if [ "$progressbarxrunning" = "1" ]; then
+   if [ "${progressbarxrunning}" = "1" ]; then
       if [ -f "${msgcollector_run_dir}/${identifier}_${progressbaridx}_yadprogresspid" ]; then
          local pid
          ## || true to prevent race condition
          yad_progress_pid="$(cat -- "${msgcollector_run_dir}/${identifier}_${progressbaridx}_yadprogresspid")" || true
-         if ! is_whole_number "$yad_progress_pid"; then
+         if ! is_whole_number "${yad_progress_pid}"; then
             exit 1
          fi
          ## Check if still running.
          local ps__p_exit_code
          ps__p_exit_code="0"
-         ps -p "$yad_progress_pid" >/dev/null 2>/dev/null || { ps__p_exit_code="$?"; true; };
-         if [ "$ps__p_exit_code" = "0" ]; then
+         ps -p "${yad_progress_pid}" >/dev/null 2>/dev/null || { ps__p_exit_code="$?"; true; };
+         if [ "${ps__p_exit_code}" = "0" ]; then
             exit 0
          else
             exit 1
@@ -775,7 +897,7 @@ return_status() {
    ## }}
 
    ## {{ --progressbarxprogresstxtexisting
-   if [ "$progressbarxprogresstxtexisting" = "1" ]; then
+   if [ "${progressbarxprogresstxtexisting}" = "1" ]; then
       if [ -f "${msgcollector_run_dir}/${identifier}_${progressbaridx}_progresstxt" ]; then
          exit 0
       else
@@ -785,24 +907,24 @@ return_status() {
    ## }}
 
    ## {{ --typexstatus
-   if [ "$typex_chosen" = "1" ]; then
+   if [ "${typex_chosen}" = "1" ]; then
       write_to_file="${msgcollector_run_dir}/${identifier}_typex"
-      if [ -f "$write_to_file" ]; then
+      if [ -f "${write_to_file}" ]; then
          local TYPE
-         TYPE="$(cat -- "$write_to_file")"
-         printf '%s\n' "$TYPE"
+         TYPE="$(cat -- "${write_to_file}")"
+         printf '%s\n' "${TYPE}"
       fi
       exit 0
    fi
    ## }}
 
    ## {{ --typeclistatus
-   if [ "$typecli_chosen" = "1" ]; then
+   if [ "${typecli_chosen}" = "1" ]; then
       write_to_file="${msgcollector_run_dir}/${identifier}_typecli"
-      if [ -f "$write_to_file" ]; then
+      if [ -f "${write_to_file}" ]; then
          local TYPE
-         TYPE="$(cat -- "$write_to_file")"
-         printf '%s\n' "$TYPE"
+         TYPE="$(cat -- "${write_to_file}")"
+         printf '%s\n' "${TYPE}"
       fi
       exit 0
    fi
@@ -815,7 +937,7 @@ return_status() {
 return_status_file() {
    trap "error_handler" ERR
 
-   if [ -f "$write_to_file" ]; then
+   if [ -f "${write_to_file}" ]; then
       exit 0
    else
       exit 1
@@ -836,6 +958,7 @@ forget() {
       "${msgcollector_run_dir}/${identifier}_titlecli"
       "${msgcollector_run_dir}/${identifier}_titlex"
       "${msgcollector_run_dir}/${identifier}_passivepopupqueuextitle"
+      "${msgcollector_run_dir}/${identifier}_passivepopupqueuextype"
       "${msgcollector_run_dir}/${identifier}_${progressbaridx}_progressbartitlex"
       "${msgcollector_run_dir}/${identifier}_typecli"
       "${msgcollector_run_dir}/${identifier}_typex"
@@ -862,8 +985,8 @@ forget() {
 
    local file_name
    for file_name in "${file_list[@]}"; do
-      if [ -e "$file_name" ]; then
-         safe-rm --force -- "$file_name"
+      if [ -e "${file_name}" ]; then
+         safe-rm --force -- "${file_name}"
       fi
    done
    unset file_name
@@ -879,8 +1002,8 @@ forgetwaitcli() {
 
    local file_name
    for file_name in "${file_list[@]}"; do
-      if [ -e "$file_name" ]; then
-         safe-rm --force -- "$file_name"
+      if [ -e "${file_name}" ]; then
+         safe-rm --force -- "${file_name}"
       fi
    done
    unset file_name
@@ -890,32 +1013,44 @@ forgetwaitcli() {
 #printf '%s\n' "${BASH_SOURCE[0]} $@
 #" >> "/home/user/msgcollector"
 
-parse_cmd_options "$@"
+main() {
+   true "$0: START"
+   trap "error_handler" ERR
+   my_command_line_parameters="$*"
 
-source /usr/libexec/msgcollector/msgcollector_shared
-## sets: ${msgcollector_run_dir}
-folder_init
+   ## Before parse: parse_cmd_options' trace reads ${cyan}/${reset}.
+   colors
 
-## provides: check, is_whole_number
-source /usr/libexec/msgcollector/check
+   parse_cmd_options "$@"
 
-if [ "$forget" = "1" ]; then
-   forget
-   exit 0
+   source "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/msgcollector_shared"
+   ## sets: ${msgcollector_run_dir}
+   folder_init
+
+   ## provides: msgcollector_check, is_whole_number
+   source "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/check"
+
+   if [ "${forget}" = "1" ]; then
+      forget
+      exit 0
+   fi
+
+   if [ "${forgetwaitcli}" = "1" ]; then
+      forgetwaitcli
+      exit 0
+   fi
+
+   preparation
+
+   if [ "${status}" = "1" ]; then
+      return_status
+   else
+      collector
+   fi
+
+   true "$0: END"
+}
+
+if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
+   main "$@"
 fi
-
-if [ "$forgetwaitcli" = "1" ]; then
-   forgetwaitcli
-   exit 0
-fi
-
-preparation
-colors
-
-if [ "$status" = "1" ]; then
-   return_status
-else
-   collector
-fi
-
-true "$0: END"

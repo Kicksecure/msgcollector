@@ -7,13 +7,15 @@ set -o errexit
 set -o nounset
 set -o errtrace
 set -o pipefail
+shopt -s inherit_errexit
+shopt -s shift_verbose
 
-source /usr/libexec/msgcollector/msgcollector_shared
+source "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/msgcollector_shared"
 ## sets: ${msgcollector_run_dir}
 folder_init
 
-## provides: check, check_is_not_empty_and_only_one_line, read_integer_file
-source /usr/libexec/msgcollector/check
+## provides: msgcollector_check, check_is_not_empty_and_only_one_line, read_integer_file
+source "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/check"
 
 if ! [[ -v 1 ]]; then
   stecho "$0: ERROR: missing parameter 1!" >&2
@@ -27,24 +29,24 @@ fi
 identifier="$1"
 progressbaridx="$2"
 
-check "$identifier"
-check "$progressbaridx"
+msgcollector_check "${identifier}" || exit 1
+msgcollector_check "${progressbaridx}" || exit 1
 
 full_path="${msgcollector_run_dir}/${identifier}_${progressbaridx}_parentpid"
 check_is_not_empty_and_only_one_line full_path
 
-if [ ! -f "$full_path" ]; then
+if [ ! -f "${full_path}" ]; then
   true "$0: INFO: parentpid file does not exist."
   exit 0
 fi
 
-parentpid="$(read_integer_file "$full_path")"
+parentpid="$(read_integer_file "${full_path}")"
 
-true "$0: INFO: parentpid: '$parentpid'"
+true "$0: INFO: parentpid: '${parentpid}'"
 
-if ps -p "$parentpid" &>/dev/null; then
-  true "$0: INFO: Sending signal sigusr2 to $parentpid."
-  kill -s sigusr2 "$parentpid"
+if ps -p "${parentpid}" &>/dev/null; then
+  true "$0: INFO: Sending signal sigusr2 to ${parentpid}."
+  kill -s sigusr2 "${parentpid}"
 else
-  true "$0: INFO: Not sending signal sigusr2 to parentpid $parentpid, because it is already terminated."
+  true "$0: INFO: Not sending signal sigusr2 to parentpid ${parentpid}, because it is already terminated."
 fi

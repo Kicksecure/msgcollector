@@ -15,10 +15,11 @@ set -o errtrace
 shopt -s inherit_errexit
 shopt -s shift_verbose
 
-## TODO: Should ALLOW_LOCAL also be checked here?
-if [ "${CI:-}" != "true" ]; then
+## Refuse outside CI unless ALLOW_LOCAL=true is set explicitly (matches
+## derivative-maker/ci/lint-*), so the sanctioned local runner can override.
+if [ "${CI:-}" != "true" ] && [ "${ALLOW_LOCAL:-}" != "true" ]; then
    printf '%s\n' \
-      'error: this script must run with CI=true (GitHub Actions or equivalent).' >&2
+      'error: run under CI=true, or set ALLOW_LOCAL=true to run locally.' >&2
    exit 1
 fi
 

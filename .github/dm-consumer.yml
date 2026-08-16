@@ -5,7 +5,12 @@
 
 ## Per-repo parameters for developer-meta-files consumer workflows, read at
 ## workflow runtime. python3-pyqt5 is needed by the dist-ai msgcollector-tests
-## SafeTextBrowser validator (offscreen Qt); hypothesis by the property tests.
+## SafeTextBrowser validator (offscreen Qt); hypothesis by the property tests;
+## bubblewrap by loop_protection_test.sh, which runs the caller under 'bwrap'
+## with a tmpfs /usr/libexec so the sourced code cannot reach host helper-scripts.
+## safe-rm / moreutils / procps / inotify-tools back the deep suites that RUN the
+## real scripts end-to-end: unit_tests_test.sh and integration_tests_test.sh
+## (the msgcollector message-collection pipeline).
 coverity:
   ## scan.coverity.com project name (org-ai-assisted-owned; the "/" is
   ## rejected in manual registration so the name is slash-free).
@@ -13,4 +18,8 @@ coverity:
   canonical-repos: "org-ai-assisted/msgcollector"
 
 dist-ai-tests:
-  apt-packages: "python3 python3-pytest python3-hypothesis python3-pyqt5"
+  apt-packages: "python3 python3-pytest python3-hypothesis python3-pyqt5 bubblewrap safe-rm moreutils procps inotify-tools"
+  ## msgfallbacks (and its callers) source helper-scripts' has.sh by absolute
+  ## path; provide helper-scripts at the system /usr/libexec path so the
+  ## sourced code resolves in the isolated CI checkout.
+  helper-scripts: true

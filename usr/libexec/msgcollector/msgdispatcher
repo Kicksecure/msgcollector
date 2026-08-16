@@ -21,14 +21,15 @@ verbose=""
 ## this file: preparation() and the passive-popup dispatch below both run
 ## before that point.
 # shellcheck source=../../../../helper-scripts/usr/libexec/helper-scripts/has.sh
-## Sibling repo: absent in an isolated CI checkout, so shellcheck cannot follow
-## it there. The source= path above still documents where it lives.
-##
-## TODO: We can probably just not shellcheck this unless we're working with a
-## full derivative-maker tree, and then get rid of this exception.
-# shellcheck disable=SC1091
-source /usr/libexec/helper-scripts/has.sh
+## Sibling repo: absent in an isolated CI checkout. No inline SC1091 disable
+## needed -- the CI shellcheck excludes SC1091, and a full-tree run resolves the
+## source= path above.
+source "${HELPER_SCRIPTS_PATH:-}/usr/libexec/helper-scripts/has.sh"
 #trap 'sleep 1' DEBUG
+
+## Bound the best-effort filesystem ops in error_handler, so a stuck home dir
+## cannot hang the error path. Matches msgprogressbar.
+timeout_command=("timeout" "--kill-after" "1" "2")
 
 error_handler() {
    local last_exit_code="$?"
@@ -48,8 +49,8 @@ error_handler() {
 <br></br>Please see News, Blog and User Help Forum.
 <br></br>Please report this bug!
 <br></br>
-<br></br>msgdispatcher_identifier: '<code>${msgdispatcher_identifier}</code>'
-<br></br>msgdispatcher_appendix: '<code>${msgdispatcher_appendix}</code>'
+<br></br>msgdispatcher_identifier: '<code>${msgdispatcher_identifier:-}</code>'
+<br></br>msgdispatcher_appendix: '<code>${msgdispatcher_appendix:-}</code>'
 <br></br>
 <br></br>error_text: '<code>${error_text}</code>'
 <br></br>last_exit_code: '<code>${last_exit_code}</code>'
@@ -62,12 +63,15 @@ error_handler() {
    if [ ! -d ~/".msgcollector" ]; then
       mkdir --parents -- ~/".msgcollector"
    fi
-   printf '%s\n' "$0: BASH_COMMAND: ${BASH_COMMAND} | exit_code: ${last_exit_code}" | sponge -a -- ~/".msgcollector/msgdispatcher-error.log" >/dev/null
+   ## Owner-execute for traversal (see msgcollector's error_handler): defensive
+   ## against a dir pre-created under a umask that masks the 0100 bit.
+   "${timeout_command[@]}" chmod u+rwx -- ~/".msgcollector" || true
+   "${timeout_command[@]}" append ~/".msgcollector/msgdispatcher-error.log" "$0: BASH_COMMAND: ${BASH_COMMAND} | exit_code: ${last_exit_code}" >/dev/null || true
 
    ## Popup window with the message above.
    ## /usr/share/icons/icon-pack-dist/whonix.ico might not exist, but
    ## fortunately msgdispatcher_dispatch_x works anyway.
-   /usr/libexec/msgcollector/msgdispatcher_dispatch_x.py "warning" "$0" "${msg}" "0" "/usr/share/icons/icon-pack-dist/whonix.ico" &
+   "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/msgdispatcher_dispatch_x.py" "warning" "$0" "${msg}" "0" "/usr/share/icons/icon-pack-dist/whonix.ico" &
 
    true
 }
@@ -90,7 +94,9 @@ parse_cmd_options() {
                break
                ;;
            -*)
-               printf '%s\n' "$0: unknown option: $1" >&2
+               ## sanitize-echo: $1 is an untrusted caller argument; printing it
+               ## raw would let a crafted option inject terminal escapes.
+               sanitize-echo -- "$0: unknown option: $1" >&2
                exit 1
                ;;
            *)
@@ -112,6 +118,11 @@ preparation() {
    true "XDG_SESSION_TYPE: ${XDG_SESSION_TYPE}"
    true "DISPLAY: ${DISPLAY}"
    true "WAYLAND_DISPLAY: ${WAYLAND_DISPLAY}"
+   ## Declared before the chain, not just in the tty arm: the tty arm set only
+   ## cli, so msgdispatcher_handler's unconditional '${gui}' read aborted.
+   gui=0
+   cli=0
+
    if [ "${XDG_SESSION_TYPE}" = "x11" ]; then
       gui=1
       cli=0
@@ -153,13 +164,29 @@ preparation() {
 }
 
 ## {{ Small wrapper to use either 'kdialog', 'notify-send' or nothing.
+msgdispatcher_passive_type_icon() {
+   ## Map a passive-popup type to a freedesktop icon name, so the popup shows
+   ## its severity like the active dialog does. Unknown types fall back to info.
+   case "$1" in
+      error)
+         printf '%s' 'dialog-error'
+         ;;
+      warning)
+         printf '%s' 'dialog-warning'
+         ;;
+      *)
+         printf '%s' 'dialog-information'
+         ;;
+   esac
+}
+
 passive_popup_tool() {
-   local time title text
+   local time title text icon icon_opts
    time="$1"
-   ## FIXME: Why on *earth* are we guarding against $2 being unset but not $3?
-   ## If $2 is unset, certainly $3 will be.
+   ## Both guarded: under nounset an unset $3 aborts the same as an unset $2.
    title="${2:-}"
-   text="$3"
+   text="${3:-}"
+   icon="${4:-}"
 
    ## Fallback.
    ## 'notify-send' does not work if $title is unset.
@@ -167,11 +194,17 @@ passive_popup_tool() {
       title="${msgdispatcher_identifier}"
    fi
 
+   ## Pass --icon only when set, so an empty icon does not reach the tool.
+   icon_opts=()
+   if [ -n "${icon}" ]; then
+      icon_opts=("--icon" "${icon}")
+   fi
+
    ## 'notify-send' timeout in milliseconds.
 
    if has "qubesdb-read" ; then
       if has "notify-send" ; then
-         notify-send --expire-time "${time}000" -- "${title}" "${text}"
+         notify-send "${icon_opts[@]}" --expire-time "${time}000" -- "${title}" "${text}"
          return 0
       fi
    fi
@@ -181,9 +214,9 @@ passive_popup_tool() {
    ## - that may not be the case for Gnome users
    if has "kdialog" ; then
       ## 'kdialog' does not support end-of-options.
-      kdialog --title "${title}" --passivepopup "${text}" "${time}"
+      kdialog "${icon_opts[@]}" --title "${title}" --passivepopup "${text}" "${time}"
    elif has "notify-send" ; then
-      notify-send --expire-time "${time}000" -- "${title}" "${text}"
+      notify-send "${icon_opts[@]}" --expire-time "${time}000" -- "${title}" "${text}"
    fi
 }
 ## }}
@@ -234,16 +267,21 @@ dispatch_x_active() {
    fi
 
    if [ "${verbose}" = "1" ]; then
-      /usr/libexec/msgcollector/msgdispatcher_dispatch_x.py "${type}" "${title}" "${msg}" "0" "${icon}"
+      "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/msgdispatcher_dispatch_x.py" "${type}" "${title}" "${msg}" "0" "${icon}"
    else
       ## Launching into background, so it doesn't block msgdispatcher until
       ## msgdispatcher_dispatch_x exits.
-      /usr/libexec/msgcollector/msgdispatcher_dispatch_x.py "${type}" "${title}" "${msg}" "0" "${icon}" &
+      "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/msgdispatcher_dispatch_x.py" "${type}" "${title}" "${msg}" "0" "${icon}" &
    fi
 }
 
 dispatch_x_passive() {
-   passive_popup_tool "20" "${title}" "${msg}"
+   local icon
+   ## Give the passive popup a per-type icon, so its severity is visible like
+   ## the active dialog's. ${type} is the caller's type read from the dedicated
+   ## passive-popup type file (info when unset).
+   icon="$(msgdispatcher_passive_type_icon "${type:-}")"
+   passive_popup_tool "20" "${title}" "${msg}" "${icon}"
 }
 
 inotifywait_setup() {
@@ -308,13 +346,20 @@ msgdispatcher_handler() {
       if [ "${file_name}" = "${msgcollector_run_dir}/${msgdispatcher_identifier}_passivepopupqueuex_done" ]; then
          if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_passivepopupqueuex" ]; then
             msg="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_passivepopupqueuex")" || true
-            title="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_passivepopupqueuextitle")" || true
-            ## TODO: do not use "_typex" to avoid conflicts with "messagex_done".
-            #type="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_typex")" || true
-            type="info"
+            ## 2>/dev/null: the title and type files are optional (written only
+            ## when the caller gives --passivepopupqueuextitle / --typex), so a
+            ## missing one must not spam this daemon's journal with 'cat: ... No
+            ## such file'. The || true keeps the read non-fatal.
+            title="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_passivepopupqueuextitle" 2>/dev/null)" || true
+            ## Read the caller's type from the dedicated passive-popup type file,
+            ## NOT _typex, so a concurrent messagex for the same identifier cannot
+            ## clobber it. dispatch_x_passive maps it to a per-type icon only.
+            type="$(cat -- "${msgcollector_run_dir}/${msgdispatcher_identifier}_passivepopupqueuextype" 2>/dev/null)" || true
+            if [ "${type}" = "" ]; then
+               type="info"
+            fi
             if [ -f "${msgcollector_run_dir}/${msgdispatcher_identifier}_forceactive" ]; then
-               ## TODO: --forceactive not yet implemented.
-               #dispatch_x_active "$type" "$msg"
+               #dispatch_x_active "${type}" "${msg}"
                dispatch_x_passive "${type}" "${title}" "${msg}" || true
             else
                dispatch_x_passive "${type}" "${title}" "${msg}" || true
@@ -323,6 +368,7 @@ msgdispatcher_handler() {
             msgdispatcher_delete_wrapper "passivepopupqueuex_done"
             msgdispatcher_delete_wrapper "passivepopupqueuex"
             msgdispatcher_delete_wrapper "passivepopupqueuextitle"
+            msgdispatcher_delete_wrapper "passivepopupqueuextype"
          else
             msgdispatcher_delete_wrapper "passivepopupqueuex_done"
          fi
@@ -429,20 +475,20 @@ msgdispatcher_loop() {
    done
 }
 
-source /usr/libexec/helper-scripts/strings.bsh
+source "${HELPER_SCRIPTS_PATH:-}/usr/libexec/helper-scripts/strings.bsh"
 
-source /usr/libexec/helper-scripts/light_sleep.bsh
+source "${HELPER_SCRIPTS_PATH:-}/usr/libexec/helper-scripts/light_sleep.bsh"
 
 ## sets: systemd_notify
-source /usr/libexec/helper-scripts/systemd-notify.bsh
+source "${HELPER_SCRIPTS_PATH:-}/usr/libexec/helper-scripts/systemd-notify.bsh"
 
 ## sets: ${msgcollector_run_dir}
 # shellcheck source=./usr/libexec/msgcollector/msgcollector_shared
-source /usr/libexec/msgcollector/msgcollector_shared
+source "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/msgcollector_shared"
 folder_init
 
 # shellcheck source=./usr/libexec/msgcollector/msgfallbacks
-source /usr/libexec/msgcollector/msgfallbacks
+source "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/msgfallbacks"
 
 parse_cmd_options "$@"
 msgdispatcher_loop

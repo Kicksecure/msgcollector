@@ -38,7 +38,7 @@ verbose=""
 ## clean exit aborted instead.
 yad_progress_pid=""
 
-source /usr/libexec/helper-scripts/light_sleep.bsh
+source "${HELPER_SCRIPTS_PATH:-}/usr/libexec/helper-scripts/light_sleep.bsh"
 
 scriptname="$(basename -- "${BASH_SOURCE[0]}")"
 
@@ -72,7 +72,10 @@ error_handler() {
    if [ ! -d ~/".msgcollector" ]; then
       "${timeout_command[@]}" mkdir --parents -- ~/".msgcollector"
    fi
-   printf '%s\n' "$0: BASH_COMMAND: ${BASH_COMMAND} | exit_code: ${exit_code}" | "${timeout_command[@]}" tee -a -- ~/".msgcollector/msgdispatcher-error.log" >/dev/null
+   ## Owner-execute for traversal (see msgcollector's error_handler): defensive
+   ## against a dir pre-created under a umask that masks the 0100 bit.
+   "${timeout_command[@]}" chmod u+rwx -- ~/".msgcollector" || true
+   "${timeout_command[@]}" append ~/".msgcollector/msgdispatcher-error.log" "$0: BASH_COMMAND: ${BASH_COMMAND} | exit_code: ${exit_code}" >/dev/null || true
    exit 1
 }
 
@@ -115,19 +118,24 @@ parse_cmd_options() {
                fi
                ;;
            --message)
+               ## Empty is tolerated: start_progress_bar renders it gracefully.
+               ## Guard the shift like the other options, so a trailing --message
+               ## with no value does not abort under shift_verbose.
                message="${2:-}"
-               if [ "${message}" = "" ]; then
-                  printf '%s\n' "$0: ERROR: variable message is empty."
-                  exit 1
+               if [ "$#" -ge 2 ]; then
+                  shift 2
+               else
+                  shift 1
                fi
-               shift 2
                ;;
            --)
                shift
                break
                ;;
            -*)
-               printf '%s\n' "$0: unknown option: $1" >&2
+               ## sanitize-echo: $1 is an untrusted caller argument; printing it
+               ## raw would let a crafted option inject terminal escapes.
+               sanitize-echo -- "$0: unknown option: $1" >&2
                exit 1
                ;;
            *)
@@ -172,7 +180,7 @@ output_ex() {
    #printf '%s\n' "progress: $progress | caller: $PPID | $caller | killing $yad_progress_pid" >> /home/user/progresslog
 
    if [ -f "${parent_pid_file}" ]; then
-      "${timeout_command[@]}" "/usr/libexec/msgcollector/msgprogressbar_kill_helper" "${identifier}" "${progressbaridx}"
+      "${timeout_command[@]}" "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/msgprogressbar_kill_helper" "${identifier}" "${progressbaridx}"
    else
       true "${output_signal_caught} caught. Not killing parentpid, because ${parent_pid_file} does not exist."
    fi
@@ -197,12 +205,18 @@ output_sigterm() {
 }
 
 start_progress_bar() {
-   if [ "${message}" = "" ]; then
-      message="Progress bar message is empty, please report this msgcollector bug!"
+   ## An empty title or message is a caller omission, not a user-actionable bug.
+   ## Never surface an alarming "please report this bug" popup to the user for it.
+   ## Title: fall back to the identifier, matching msgdispatcher's convention.
+   ## ${identifier} is validated non-empty by msgcollector_check before we get here.
+   ## Message: leave the progress text empty; yad renders that cleanly.
+   if [ "${progressbartitlex}" = "" ]; then
+      true "INFO: ${scriptname}: progressbartitlex empty; falling back to identifier."
+      progressbartitlex="${identifier}"
    fi
 
-   if [ "${progressbartitlex}" = "" ]; then
-      progressbartitlex="Variable progressbartitlex is empty. Please report this bug!"
+   if [ "${message}" = "" ]; then
+      true "INFO: ${scriptname}: message empty; rendering an empty progress text."
    fi
 
    if [ -f "${msgcollector_run_dir}/${identifier}_icon" ]; then
@@ -211,7 +225,7 @@ start_progress_bar() {
    fi
 
    if [ "${icon}" = "" ]; then
-      ## TODO: write error log
+      true "${scriptname}: no icon set for this progress bar; using the default info icon."
       local icon="/usr/share/icons/gnome/24x24/status/info.png"
    fi
 
@@ -312,30 +326,22 @@ trap "output_sighup" SIGHUP
 trap "output_sigterm" SIGTERM
 trap "output_sigint" SIGINT
 
-source /usr/libexec/msgcollector/msgcollector_shared
+source "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/msgcollector_shared"
 ## sets: ${msgcollector_run_dir}
 folder_init
 
-## provides: check, is_whole_number
-source /usr/libexec/msgcollector/check
+## provides: msgcollector_check, is_whole_number
+source "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/check"
 
-## msgfallbacks (sourced below) calls 'has', which is a FUNCTION from this
-## file, not an executable. msgdispatcher already sourced it; this one did not,
-## so the same shared code worked in one caller and not the other.
-##
-## TODO: Maybe we should just source 'has' in msgfallbacks itself? We're going
-## to have a source_once mechanism eventually, which will make this more
-## efficient later.
 # shellcheck source=../../../../helper-scripts/usr/libexec/helper-scripts/has.sh
-# shellcheck disable=SC1091
-source /usr/libexec/helper-scripts/has.sh
+source "${HELPER_SCRIPTS_PATH:-}/usr/libexec/helper-scripts/has.sh"
 
-source /usr/libexec/msgcollector/msgfallbacks
+source "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/msgfallbacks"
 fallbacks ## provided by /usr/libexec/msgcollector/msgfallbacks
 parse_cmd_options "$@"
 
-check "${identifier}"
-check "${progressbaridx}"
+msgcollector_check "${identifier}" || exit 1
+msgcollector_check "${progressbaridx}" || exit 1
 
 preparation
 start_progress_bar

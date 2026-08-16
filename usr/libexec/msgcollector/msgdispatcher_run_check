@@ -3,7 +3,10 @@
 ## Copyright (C) 2012 - 2025 ENCRYPTED SUPPORT LLC <adrelanos@whonix.org>
 ## See the file COPYING for copying conditions.
 
-source /usr/libexec/helper-scripts/strings.bsh
+## style-ok: no-strict
+## No strict-mode preamble: this file is SOURCED, never executed.
+
+source "${HELPER_SCRIPTS_PATH:-}/usr/libexec/helper-scripts/strings.bsh"
 
 msgdispatcher_pid_check() {
    if [ "cli" = "$1" ]; then
@@ -17,7 +20,8 @@ msgdispatcher_pid_check() {
       if &>/dev/null systemctl --no-pager --no-block --user is-active msgcollector-gui.service ; then
          return 0
       else
-         ## TODO: Prevents "systemcheck --gui" to write msgcollector gui status files.
+         ## Not running: return 1 so systemcheck --gui does not write gui status
+         ## files that no running dispatcher would consume.
          return 1
       fi
    else
@@ -27,17 +31,17 @@ msgdispatcher_pid_check() {
 }
 
 msgdispatcher_run_check() {
-   source /usr/libexec/msgcollector/msgcollector_shared
+   source "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/msgcollector_shared"
    ## sets: ${msgcollector_run_dir}
    folder_init
 
    ## systemcheck sets GUI / CLI variables
-   if [ "$GUI" = "true" ]; then
+   if [ "${GUI}" = "true" ]; then
       if msgdispatcher_pid_check "gui" ; then
          msgdispatcher_running_x="true"
       fi
    fi
-   if [ "$CLI" = "true" ]; then
+   if [ "${CLI}" = "true" ]; then
       if msgdispatcher_pid_check "cli" ; then
          msgdispatcher_running_cli="true"
       fi
@@ -60,7 +64,7 @@ msgdispatcher_init() {
    #arg_max_bytes=138300
    arg_max_bytes=32768
 
-   output_tool="/usr/libexec/msgcollector/msgcollector"
+   output_tool="${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/msgcollector"
    output_general="output_func_general"
    output_x="output_func_x"
    output_cli="output_func_cli"
@@ -69,7 +73,7 @@ msgdispatcher_init() {
 
 msgdispatcher_wait() {
    while true; do
-      if [ "$msgdispatcher_running_x" = "true" ] || [ "$msgdispatcher_running_cli" = "true" ]; then
+      if [ "${msgdispatcher_running_x}" = "true" ] || [ "${msgdispatcher_running_cli}" = "true" ]; then
          break
       fi
       msgdispatcher_run_check
@@ -84,7 +88,7 @@ output_func_general() {
 }
 
 output_func_x() {
-   if [ "$msgdispatcher_running_x" = "true" ]; then
+   if [ "${msgdispatcher_running_x}" = "true" ]; then
       output_func "$@"
       return "$?"
    fi
@@ -92,7 +96,7 @@ output_func_x() {
 }
 
 output_func_cli() {
-   if [ "$msgdispatcher_running_cli" = "true" ]; then
+   if [ "${msgdispatcher_running_cli}" = "true" ]; then
       output_func "$@"
       return "$?"
    fi
@@ -101,11 +105,11 @@ output_func_cli() {
 }
 
 output_func_core() {
-   if [ "$output_func_verbose" = "true" ]; then
-      echo "Running: bash -x $output_tool --identifier $IDENTIFIER ${1+$@}"
-      bash -x "$output_tool" --identifier "$IDENTIFIER" "$@"
+   if [ "${output_func_verbose}" = "true" ]; then
+      printf '%s\n' "Running: bash -x ${output_tool} --identifier ${IDENTIFIER} ${1+$@}"
+      bash -x "${output_tool}" --identifier "${IDENTIFIER}" "$@"
    else
-      "$output_tool" --identifier "$IDENTIFIER" "$@"
+      "${output_tool}" --identifier "${IDENTIFIER}" "$@"
    fi
 }
 
@@ -142,7 +146,7 @@ output_func() {
    [ -v arg_max_bytes ] || arg_max_bytes=32768
    ## Guard against a malicious arg_max_bytes environment variable if
    ## output_func gets called before msgdispatcher_init.
-   is_whole_number "$arg_max_bytes" || arg_max_bytes=32768
+   is_whole_number "${arg_max_bytes}" || arg_max_bytes=32768
 
    for (( loop_idx = 0; loop_idx < max_loop_count; loop_idx++ )); do
       (( msg_idx = cut_start_idx + ( arg_max_bytes - 1 ) )) || true
