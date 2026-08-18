@@ -148,7 +148,14 @@ def main():
     ## an arbitrarily large accumulated message without hitting ARG_MAX. Read only
     ## after a successful parse, so an argv error (e.g. bad message_type) still
     ## exits without blocking on stdin.
-    args.message = sys.stdin.read()
+    ##
+    ## Decode as UTF-8 with 'surrogateescape', NOT sys.stdin.read(): the message
+    ## is caller-constructed HTML that may carry invalid UTF-8 (a raw journal
+    ## line) and the daemon may run under a C/POSIX locale (ASCII default). A
+    ## strict text read would raise UnicodeDecodeError and silently drop the
+    ## dialog; surrogateescape is lossless and matches how the former argv path
+    ## decoded (PEP 383).
+    args.message = sys.stdin.buffer.read().decode('utf-8', 'surrogateescape')
 
     idir = "/usr/share/icons/gnome-colors-common/scalable/status/"
     if args.message_type == "info":
