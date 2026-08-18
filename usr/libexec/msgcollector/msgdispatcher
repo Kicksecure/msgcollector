@@ -72,7 +72,7 @@ error_handler() {
    ## msgdispatcher_dispatch_x.py reads it from stdin so no ARG_MAX cap applies.
    ## /usr/share/icons/icon-pack-dist/whonix.ico might not exist, but
    ## fortunately msgdispatcher_dispatch_x works anyway.
-   printf '%s' "${msg}" | "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/msgdispatcher_dispatch_x.py" "warning" "$0" "0" "/usr/share/icons/icon-pack-dist/whonix.ico" &
+   printf '%s' "${msg}" | "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/msgdispatcher_dispatch_x.py" -- "warning" "$0" "0" "/usr/share/icons/icon-pack-dist/whonix.ico" &
 
    true
 }
@@ -263,11 +263,11 @@ dispatch_x_active() {
    ## render (e.g. systemcheck's verbose run, whose large journal dump would
    ## otherwise push later tests past an argv cap and out of the GUI).
    if [ "${verbose}" = "1" ]; then
-      printf '%s' "${msg}" | "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/msgdispatcher_dispatch_x.py" "${type}" "${title}" "0" "${icon}"
+      printf '%s' "${msg}" | "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/msgdispatcher_dispatch_x.py" -- "${type}" "${title}" "0" "${icon}"
    else
       ## Launching into background, so it doesn't block msgdispatcher until
       ## msgdispatcher_dispatch_x exits.
-      printf '%s' "${msg}" | "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/msgdispatcher_dispatch_x.py" "${type}" "${title}" "0" "${icon}" &
+      printf '%s' "${msg}" | "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/msgdispatcher_dispatch_x.py" -- "${type}" "${title}" "0" "${icon}" &
    fi
 }
 
