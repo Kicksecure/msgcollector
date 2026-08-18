@@ -1,3 +1,1062 @@
+commit c5c676deb70df335c8f551dfb5e6e5d096e4c2d5
+Merge: 4d1ec7d 83e3144
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Aug 16 01:31:19 2026 -0400
+
+    Merge remote-tracking branch 'org-ai-assisted/ai'
+
+commit 4d1ec7d50dd96008f48520f54ea78b57607eb2d0
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Aug 15 16:11:33 2026 +0000
+
+    bumped changelog version
+
+commit 83e3144e05e06480e541858f2167430728897b8b
+Author: claude (dev190 fd9e700b-d511-4b49-9fe4-2d4a4fb74c82) <noreply@anthropic.com>
+Date:   Wed Aug 12 04:40:58 2026 -0400
+
+    msgcollector: move the integration suite to dist-ai
+
+    - remove tests/integration-tests.bash and the local-integration-tests.yml
+      workflow; the pipeline integration tests now live in the dist-ai
+      msgcollector-tests suite, run via consumer-dist-ai-tests
+    - dm-consumer.yml already declares the deps (safe-rm, moreutils, procps,
+      inotify-tools); comment now covers both the unit and integration suites
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit 6607448755957bf190f4c75ab412be1ca4c09b2c
+Author: claude (dev180 9d183bca-c1ec-46a0-8d1b-71048fd8d710) <noreply@anthropic.com>
+Date:   Tue Aug 11 19:46:29 2026 -0400
+
+    msgcollector: flock the type-file escalations against a concurrent same-identifier downgrade
+
+    escalate_type_file (passive popup) and the inline typecli/typex escalations do a
+    read-modify-write (read old severity, decide, write) that was UNLOCKED.
+    Concurrent same-identifier writers are expected -- the passive queue and messagex
+    both aggregate under one identifier (see msgdispatcher) -- so two writers could
+    both read the old value and the last to write downgrades severity (error to
+    info), violating the documented no-downgrade contract. Serialize each via an
+    exclusive flock on a per-type-file .lock.
+
+    Verified: dist-ai escalate_type_lock_test.sh passes flocked, fails unlocked
+    (canary), full msgcollector-tests green.
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit b3bd413f93aeb51bf0564e54f146038e3e7d8c46
+Author: claude (dev180 9d183bca-c1ec-46a0-8d1b-71048fd8d710) <noreply@anthropic.com>
+Date:   Tue Aug 11 12:12:36 2026 -0400
+
+    msgcollector: resolve siblings and helper-scripts via overridable bases
+
+    Every dependency source/exec now goes through ${MSGCOLLECTOR_REPO:-} (own
+    siblings) or ${HELPER_SCRIPTS_PATH:-} (helper-scripts), each defaulting to the
+    current absolute /usr/libexec path when unset -- production is byte-identical.
+    Lets the dist-ai suite drive the REAL scripts from a checkout with nothing
+    installed into the shared /usr/libexec. pv_wrapper modernized to strict style
+    (the touch surfaced the legacy gate gaps).
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit 3f246f92a24493d0469393b931e7409a20d61de5
+Author: claude (dev180 9d183bca-c1ec-46a0-8d1b-71048fd8d710) <noreply@anthropic.com>
+Date:   Tue Aug 11 01:12:41 2026 -0400
+
+    msgcollector: append error-log entries via helper-scripts append
+
+    Replace the hand-rolled 'printf | tee -a' / 'printf | sponge -a' error-log
+    appends in all four error_handlers with the helper-scripts 'append' tool
+    (FILE CONTENT), timeout-guarded like the surrounding chmod/mkdir. append
+    supplies its own trailing newline and is a single write rather than a pipe;
+    redirect its INFO line to /dev/null and keep the write best-effort (|| true)
+    so a logging failure never aborts the error path.
+
+    Verified: triggering a real error still writes the multi-line entry to
+    ~/.msgcollector/msgdispatcher-error.log, with no stdout pollution; integration
+    (66) and the dist-ai unit_tests case (44) stay green.
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit 961067195753a30ee0639aa4d03df959f1973960
+Author: claude (dev180 9d183bca-c1ec-46a0-8d1b-71048fd8d710) <noreply@anthropic.com>
+Date:   Mon Aug 10 15:02:25 2026 -0400
+
+    msgprogress: add -- end-of-options to the error-log tee
+
+    The other error_handler append sites (msgcollector, msgdispatcher, msgprogressbar)
+    pass -- before the log path; msgprogress's tee did not. Add it so a home dir
+    that somehow resolved to a leading-dash path is not read as a tee option.
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit fad0015f0188e71fcc284b80939082e6a8fd9859
+Author: claude (dev180 9d183bca-c1ec-46a0-8d1b-71048fd8d710) <noreply@anthropic.com>
+Date:   Mon Aug 10 14:42:52 2026 -0400
+
+    msgcollector: move unit tests to the dist-ai suite
+
+    The in-repo tests/unit-tests.bash now lives in dist-ai as
+    usr/share/msgcollector-tests/unit_tests_test.sh (a suite shell case that
+    resolves the checkout and installs it before running the real scripts). It runs
+    in the consumer dist-ai-tests lane, so the standalone local-unit-tests.yml is
+    redundant -- remove both it and the in-repo copy. dm-consumer.yml gains
+    safe-rm/moreutils/procps/inotify-tools, which that deep case needs.
+
+    Integration tests stay in-repo for now.
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit 99cb3d722fac8715eed9e0f77434d76846c9604e
+Author: claude (dev180 9d183bca-c1ec-46a0-8d1b-71048fd8d710) <noreply@anthropic.com>
+Date:   Mon Aug 10 14:25:00 2026 -0400
+
+    msgcollector: timeout-guard the error_handler chmod, consistently
+
+    msgprogressbar wraps its error_handler chmod with ${timeout_command[@]};
+    msgcollector, msgdispatcher and msgprogress used a bare chmod. Define the
+    same timeout_command array in each (before the ERR trap is set, so nounset
+    is satisfied when error_handler fires) and wrap the chmod, so a stuck home
+    directory cannot hang the error path in any of them.
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit 77a8ca36f30ce5231953562051e44822dcbc13d6
+Author: claude (dev180 9d183bca-c1ec-46a0-8d1b-71048fd8d710) <noreply@anthropic.com>
+Date:   Mon Aug 10 13:59:58 2026 -0400
+
+    msgcollector: address ai-review findings on #30/#31
+
+    - messagecli color mangling (codex P2): under NO_COLOR / TERM=dumb, colors()
+      still enables SGR (ASSUME_TERM_PRESENT) while the final stcat pass rejected
+      it, so a translated color rendered as visible '[..m' debris. Add
+      stdisplay_message(): when get_colors enabled color (${green} set), force
+      stdisplay to allow SGR too, so the inserted colors survive; non-SGR escapes
+      are still neutralized either way. Use it for both messagecli stdisplay passes.
+    - passive-popup type downgrade (codex P2): a passive popup queue aggregates
+      several messages under one identifier, but the type file was overwritten, so
+      an error followed by info showed an info icon. Add escalate_type_file() and
+      use it -- the worst severity wins, matching the messagex _typex escalation.
+    - msgdispatcher journal spam (agy): the optional passive-popup title and type
+      files are read with `cat ... || true`; a missing one spammed 'cat: ... No such
+      file' into the daemon's journal. Silence stderr (2>/dev/null); still non-fatal.
+    - weak color regression test (codex P3): the assertion only checked that some
+      ESC existed, which the [INFO] prefix's own color satisfied even if markup
+      conversion were removed. Match an SGR sequence immediately before GREENWORD;
+      now fails if the conversion is dropped.
+
+    Verified: NO_COLOR/TERM=dumb no longer mangle; error-then-info keeps error; the
+    color test fails when the conversion is removed. All suites green.
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit 19ac395fe038ee59c73348571ae9ea89c66498c8
+Author: claude (dev182 e09ec5cf-4ebf-4e1b-88e5-55fbac6ef1d3) <noreply@anthropic.com>
+Date:   Mon Aug 10 13:53:45 2026 -0400
+
+    error_handler: default ps_p_parentpid to empty
+
+    ps_p_parentpid is only assigned when parentpid is a real PID. With an
+    empty or all-zero parentpid it stayed unset, so the diagnostic block
+    referencing it aborted the error_handler itself under nounset -- masking
+    the original failure it was meant to report. Default it to '' like the
+    other diagnostic fields.
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit dfe790341eb129d3e8be2463f29168fdcc7a6dd4
+Author: claude (dev180 9d183bca-c1ec-46a0-8d1b-71048fd8d710) <noreply@anthropic.com>
+Date:   Mon Aug 10 12:55:58 2026 -0400
+
+    msgcollector: raise test coverage (unit + integration)
+
+    Integration coverage 63.75% -> 67.16% (299 -> 315 / 469 lines).
+
+    Integration tests for previously-uncovered argument handling:
+    - trailing positional argument -> exit 3 (also covers the sanitize-echo
+      path added in the unknown-option hardening)
+    - empty --typex and empty --progressx values are rejected
+    - --newlinecli append variant writes the message
+
+    Source-based unit tests for more pure functions:
+    - pretty_type_x: <p> messages get typed spans; non-<p> and unknown type
+      left unchanged
+    - cli_translate_gui_markup with color enabled: <font color> becomes the
+      color code (the str_replace path, not just the disabled path)
+
+    unit-tests 41 -> 43, integration-tests 62 -> 66.
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit d7c60ae58018460e0cb86289ad71666c8178e35f
+Author: claude (dev180 9d183bca-c1ec-46a0-8d1b-71048fd8d710) <noreply@anthropic.com>
+Date:   Mon Aug 10 12:12:13 2026 -0400
+
+    msgcollector: source-based unit tests for pure functions (#33)
+
+    msgcollector is source-able, so drive its pure functions directly instead
+    of only through the CLI. Add source-based unit tests that source the real
+    shipped script (functions defined, main() guarded) and exercise:
+
+    - cli_links_to_footnotes: distinct link text -> footnote, link-text-equals-
+      URL -> bare URL, plain message unchanged.
+    - cli_translate_gui_markup: color tags removed when color disabled, <br>
+      becomes a real newline.
+    - pretty_type_cli: info/error -> INFO/ERROR labels.
+
+    Color globals are forced empty in the child shell for a deterministic
+    color-disabled path. unit-tests.bash: 35 -> 41 assertions.
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit b9c6cc918c045374ae71fd3feb034cf5b98f5d31
+Author: claude (dev180 9d183bca-c1ec-46a0-8d1b-71048fd8d710) <noreply@anthropic.com>
+Date:   Mon Aug 10 12:08:13 2026 -0400
+
+    msgcollector: sanitize untrusted unknown-option echo (#29)
+
+    Every script echoed an unknown option verbatim to stderr:
+      printf '%s\n' "... unknown option: $1" >&2
+    $1 is an untrusted caller argument, so a crafted option could inject
+    terminal escape sequences into the user's terminal. Route all five spots
+    (msgcollector x2, msgprogress, msgprogressbar, msgdispatcher) through
+    helper-scripts sanitize-echo, which neutralizes escapes and non-ASCII.
+
+    Audit result: the other variable-derived terminal output is already
+    safe -- messagecli goes through stdisplay (#30), waitmessagecli and the
+    passive-popup message through sanitize-string, msgdispatcher's error text
+    through sanitize-string, and identifiers are validated alphanumeric. The
+    unknown-option echo was the remaining raw untrusted-to-terminal path.
+
+    Regression test: an unknown option carrying ESC[2J must not reach stderr
+    raw while still reporting "unknown option". Fails on the old printf code.
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit 6945250c4ec56e06151e0b41879ac364203949e7
+Author: claude (dev180 9d183bca-c1ec-46a0-8d1b-71048fd8d710) <noreply@anthropic.com>
+Date:   Mon Aug 10 11:58:55 2026 -0400
+
+    msgcollector: typed passive popups via dedicated file + per-type icon (#31)
+
+    A passive popup's type was ignored: msgdispatcher hardcoded "info" and
+    dispatch_x_passive dropped the type argument, so a caller's --typex
+    "warning" (e.g. systemcheck's unrestricted-mode check) showed as a plain
+    info popup. It could not read _typex because that is messagex's type file
+    and a concurrent messagex for the same identifier would clobber it.
+
+    - msgcollector writes the passive-popup type to a dedicated
+      _passivepopupqueuextype file (only when --typex is given), separate from
+      messagex's _typex, and cleans it up on --forget. The existing --typex
+      caller interface is unchanged.
+    - msgdispatcher reads the type from that file (info fallback) and deletes it.
+    - dispatch_x_passive maps the type to a freedesktop icon
+      (info/warning/error -> dialog-information/-warning/-error) and passes it
+      as --icon to notify-send / kdialog. Icon only: the popup stays transient
+      (no urgency / sticky change).
+
+    Regression tests: the dedicated type file is written and cleaned up (fails
+    on the old code that never wrote it), and the icon mapping is exercised by
+    extracting the real function.
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit 9fd7a08691942b21c2f1d39136dc27cfc2659809
+Author: claude (dev180 9d183bca-c1ec-46a0-8d1b-71048fd8d710) <noreply@anthropic.com>
+Date:   Mon Aug 10 11:41:25 2026 -0400
+
+    msgcollector: harden collector() messagecli sanitization (#30)
+
+    Resolve the three messagecli TODOs so unsanitized CLI input is safe:
+
+    - stdisplay (stcat) the message BEFORE markup translation: drops non-ASCII
+      and dangerous escapes up front, keeping only the safe SGR subset, so a
+      crafted string cannot confuse the translation or strip-markup.
+    - stdisplay the message AGAIN after strip-markup: neutralizes escapes that
+      entity expansion can reintroduce, while preserving the ANSI colors the
+      translation inserted (they are in stdisplay's allowed SGR subset). The two
+      passes plus the translation and strip-markup are as strong as sanitize-string.
+    - Extract the GUI-markup translation (color tags, hyperlinks, line breaks)
+      into cli_translate_gui_markup(). The fixed <font color> tags now go through
+      helper-scripts str_replace (a literal fixed-string replace, no regex/locale
+      pitfalls of sed); the <br> pass stays sed -E as it needs a regex.
+
+    Terminal colors a caller legitimately embedded survive; a non-SGR control
+    sequence (e.g. ESC[2J) and non-ASCII bytes are neutralized. Regression tests
+    drive the real messagecli path and assert both, and that <font> still
+    converts to a preserved ANSI color. The sanitize assertions fail if either
+    stdisplay pass is removed.
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit 25b19b239eb76fbc35898a7eea4a5e89bfcb4ea7
+Author: claude (dev180 9d183bca-c1ec-46a0-8d1b-71048fd8d710) <noreply@anthropic.com>
+Date:   Mon Aug 10 11:28:05 2026 -0400
+
+    msgcollector: fix #35 test to force GUI mode in headless CI
+
+    msgfallbacks shadows yad with a no-op bash function when no_gui=1 (no
+    DISPLAY reachable, e.g. the CI runner), which shadows the PATH stub too.
+    The argv capture then came back empty and the test read "yad never
+    launched". The empty-title popup only exists in GUI mode anyway, so the
+    test must exercise that path: set a dummy DISPLAY so 'has yad' finds the
+    stub and no dummy is defined. The stub records argv without connecting
+    to X, so no real server is needed. Verified with real yad hidden and
+    DISPLAY unset (the exact CI condition): 53 pass, and the canary (old
+    alarming code) still fails 3.
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit ba1fef4c9eff7640a6f0b3d23f204c7c1725eccf
+Author: claude (dev180 9d183bca-c1ec-46a0-8d1b-71048fd8d710) <noreply@anthropic.com>
+Date:   Mon Aug 10 11:20:02 2026 -0400
+
+    msgcollector: graceful empty progressbar title/message (#35)
+
+    An empty title or message is a caller omission, not a user-actionable
+    bug. msgprogressbar surfaced alarming "please report this bug" popups to
+    real users for it. Make it graceful:
+
+    - Empty title falls back to the identifier (msgdispatcher's convention;
+      the identifier is validated non-empty before start_progress_bar).
+    - Empty message renders an empty progress text.
+    - --message now tolerates empty/missing, shift-guarded like the sibling
+      options, instead of hard-exiting.
+
+    Caller audit: every in-tree --progressbarx caller already guarantees a
+    non-empty title (systemcheck's literal " | " in TITLE_X, tb-updater's
+    tb_title "Tor Browser" default), so the library fallback is the durable
+    catch-all for any remaining or out-of-tree caller.
+
+    Regression test drives the real msgprogressbar with a yad-arg-capture
+    stub: asserts the alarming text is gone, the identifier fallback is used,
+    and a real title still passes through verbatim. Fails on the old code.
+
+    Also fix a pre-existing SC2155 in the integration test harness.
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit 291ea74408b21200b6fa2e8aabb8f2fa002725a1
+Author: claude (dev172 95595d52-ccfe-4088-99f2-560955a081b5) <noreply@anthropic.com>
+Date:   Mon Aug 10 10:37:44 2026 -0400
+
+    msgcollector: fix nounset deep paths, rely on get_colors, fix in-repo unit tests
+
+    - Default old_typecli/old_typex reads (assigned only when the type file exists);
+      the type-escalation path aborted under nounset -- the in-repo integration
+      tests caught it (message/status files not created).
+    - Colors from get_colors (drop hand-rolled defaults); colors() runs before
+      parse_cmd_options and always defines every color var.
+    - tests/unit-tests.bash: complete the check()->msgcollector_check() rename (the
+      single-quoted / $'...' reject-payload calls were missed, so they passed on
+      command-not-found rather than rejection); add the two missing R-010
+      directives; waive SC2016/R-034 (file-wide) for the deliberate injection
+      payloads.
+
+    Sandbox: in-repo unit 35/0 + integration 49/0; no unbound across dispatch paths.
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit 600b600b48f5eaadba39b27aa697c52aa91d68ac
+Author: claude (dev172 95595d52-ccfe-4088-99f2-560955a081b5) <noreply@anthropic.com>
+Date:   Mon Aug 10 10:20:09 2026 -0400
+
+    msgcollector: convert to nounset (strict mode)
+
+    Enable the full strict set (adds nounset, errtrace, inherit_errexit,
+    shift_verbose; errexit/pipefail were already on) and drop the 'style-ok:
+    no-strict' waiver + the 'can we make it fit' TODO -- resolved: yes.
+
+    Default every optional CLI field (and the two error_handler reads +
+    colors() names) to '' at the top so an unset read is safe; parse_cmd_options
+    overwrites them when the flag is given. Guard the parse loop with
+    'case "${1:-}"', the option arms with '${2:-}', and the TERM read.
+
+    Verified nounset-clean: the cli-render suite (deep) passes, and executing the
+    script across the messagecli / messagex / waitmessagecli / progressx / status /
+    forget / passivepopupqueuex / onlyecho dispatch paths produces no 'unbound
+    variable'. Comprehensive deep-branch coverage lands with #33.
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit 48dc504f0fa8fe8642d22a7ede498790cf4b4e7d
+Author: claude (dev172 95595d52-ccfe-4088-99f2-560955a081b5) <noreply@anthropic.com>
+Date:   Mon Aug 10 10:03:36 2026 -0400
+
+    msgcollector: drop the dead 'debug' variable (--debug is a no-op)
+
+    'debug' was assigned in the --debug arm and never read (SC2034). Accept --debug
+    for compatibility but stop setting the unused variable. cli/pid and the rest of
+    the pre-existing static items are handled in the nounset conversion (#27), which
+    audits every variable.
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit 851b314de78eef1f5c017aed7074d07508c50a05
+Author: claude (dev172 95595d52-ccfe-4088-99f2-560955a081b5) <noreply@anthropic.com>
+Date:   Mon Aug 10 10:01:34 2026 -0400
+
+    msgcollector: rename the generic check() to msgcollector_check()
+
+    'check' is a too-generic name for a function a sourced lib injects into the
+    global namespace. Rename to msgcollector_check() across the definition (the
+    'check' file), all five 'if ! check' sites in msgcollector, and the two bare
+    calls each in msgprogress, msgprogressbar and msgprogressbar_kill_helper; update
+    the 'provides:' comments. The 'check' FILE name is unchanged.
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit c2bb884fbd8edb03ae54c1075b3e2f24c0265c4a
+Author: claude (dev172 95595d52-ccfe-4088-99f2-560955a081b5) <noreply@anthropic.com>
+Date:   Mon Aug 10 09:56:59 2026 -0400
+
+    msgcollector: make source-able (main() + BASH_SOURCE guard)
+
+    Wrap the top-level execution (START, ERR trap, my_command_line_parameters,
+    parse_cmd_options, the source/dispatch pipeline) in main(), run it only when
+    executed via a '[ "${BASH_SOURCE[0]}" = "${0}" ]' guard. Keeps the standard
+    header (set -e / pipefail) and all globals at the top. Sourcing the file now
+    defines its functions -- collector, cli_links_to_footnotes, ... -- without
+    running anything, so unit tests can drive them directly.
+
+    Regression test in dist-ai (canary-verified: fails on the old top-level form).
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit 4c17315f8e85b5e81c7d3b323346077280805c4e
+Author: claude (dev172 95595d52-ccfe-4088-99f2-560955a081b5) <noreply@anthropic.com>
+Date:   Mon Aug 10 09:37:56 2026 -0400
+
+    msgcollector: chmod u+rwx -- on the .msgcollector error paths
+
+    Explicit owner rwx (the dir must be traversable AND writable by its owner) with
+    end-of-options, replacing the bare 'chmod +x'. Applied on all four error paths.
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit f08d92d6d223050d23a69fa630015a418c00f1d4
+Author: claude (dev172 95595d52-ccfe-4088-99f2-560955a081b5) <noreply@anthropic.com>
+Date:   Mon Aug 10 09:32:49 2026 -0400
+
+    msgcollector: drop the redundant has-source convention comment
+
+    The 'source' + 'shellcheck source=' lines are self-explanatory.
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit bd2f31b3d594c7fa8b2e49c919f12e1bce18cacc
+Author: claude (dev172 95595d52-ccfe-4088-99f2-560955a081b5) <noreply@anthropic.com>
+Date:   Mon Aug 10 09:12:34 2026 -0400
+
+    msgcollector: source has.sh unconditionally; provide helper-scripts in CI
+
+    Follow the convention of sourcing every helper-script explicitly and
+    unconditionally (the libs are double-source-safe): msgfallbacks sources has.sh
+    (it calls 'has'), and msgprogressbar sources it too (it drives msgfallbacks).
+    No declare-F guard.
+
+    The earlier "move it into msgfallbacks" attempt broke dist-ai-tests: the
+    isolated CI checkout has no /usr/libexec/helper-scripts, so the source failed
+    and fallbacks_no_gui_test's caller aborted. Fix at the root -- declare
+    'helper-scripts: true' in dm-consumer.yml so CI checks out helper-scripts and
+    installs it at the system /usr/libexec path (dist-ai-tests-ci-hs-runtime.sh).
+
+    Suite green (sandbox, real has.sh): pytest 9, shell 12 incl. fallbacks_no_gui.
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit f2fee1de919c83f04793979791cba78561ae2cbc
+Author: claude (dev172 95595d52-ccfe-4088-99f2-560955a081b5) <noreply@anthropic.com>
+Date:   Mon Aug 10 08:52:03 2026 -0400
+
+    rereview: progress_bar dead recursion, icon log, source has in msgfallbacks
+
+    - msgprogress: delete the '## XXX' + commented-out '#progress_bar'. It was a
+      recursive self-call at the end of progress_bar() with no base case -- an
+      abandoned retry that would infinite-loop if enabled. progress_bar is invoked
+      properly elsewhere; the disabled duplicate documented nothing.
+    - msgprogressbar: resolve the "write error log" TODO in the empty-icon branch --
+      an absent icon is a normal optional case, so trace it via the codebase's
+      'true "..."' debug idiom rather than a spurious error, then fall back to the
+      default icon.
+    - msgfallbacks + msgprogressbar: source 'has' inside msgfallbacks (which is the
+      only reason msgprogressbar sourced it), so every caller gets it there; drop
+      msgprogressbar's now-redundant source. msgdispatcher keeps its own 'has'
+      source for 'has flock' in preparation(), which runs before msgfallbacks loads.
+
+    Suite green (sandbox): pytest 9, shell 12 (incl. fallbacks_no_gui), 0 fail.
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit 9b991d9f749e7c4dd56ccd37c19037791a97b3ac
+Author: claude (dev172 95595d52-ccfe-4088-99f2-560955a081b5) <noreply@anthropic.com>
+Date:   Mon Aug 10 08:39:02 2026 -0400
+
+    rereview: msgdispatcher_run_check -- reword the mislabeled TODO; bring to style
+
+    The "systemcheck --gui" note was a TODO but describes correct behavior: when the
+    gui service is inactive the dispatcher is not running, so return 1 rightly stops
+    systemcheck --gui writing gui status files nothing would consume. Reworded to a
+    plain rationale.
+
+    Editing the file pulled it into the gate, so brought it to style (behaviour
+    unchanged): SC2250 braces, '## style-ok: no-strict' (it is sourced, never
+    executed), and the one echo -> printf.
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit 2dffe72a0f1b0f79f893384429ad68158772c93f
+Author: claude (dev172 95595d52-ccfe-4088-99f2-560955a081b5) <noreply@anthropic.com>
+Date:   Mon Aug 10 08:26:01 2026 -0400
+
+    rereview: resolve titlecli, forceactive, and the redundant SC1091 disable
+
+    - msgcollector: de-TODO the --titlecli placeholder (decided not to implement);
+      keep the parse + commented-out future write, drop the TODO framing.
+    - msgdispatcher: drop the "--forceactive not yet implemented" TODO; behavior
+      (passive dispatch) and the commented-out active line are unchanged.
+    - msgdispatcher + msgprogressbar: drop the inline '# shellcheck disable=SC1091'
+      on the has.sh source -- redundant: CI's shellcheck excludes SC1091 and a
+      full-tree run resolves the source= path (packages/kicksecure/helper-scripts).
+      Verified with 'shellcheck -x': SC1091 does not fire.
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit 07ffb69f9e775d4b33b1c160b4f72be526c3a594
+Author: claude (dev172 95595d52-ccfe-4088-99f2-560955a081b5) <noreply@anthropic.com>
+Date:   Mon Aug 10 07:26:33 2026 -0400
+
+    rereview: apply the .msgcollector chmod +x consistently on all error paths
+
+    Live reproduction pinned the XXX "unclear why": a umask masking the owner-
+    execute bit (0100) makes 'mkdir ~/.msgcollector' non-traversable (mode 600), so
+    the error-log write fails with EACCES; 'chmod +x' restores it. Kicksecure's
+    default umask (027) does NOT mask it, so the guard is defensive -- for a dir
+    pre-created without owner-x. Patrick's tmpfiles.d guess is disproven
+    (systemcheck.conf does not create the dir).
+
+    Only msgcollector's error path had the chmod; msgprogress, msgprogressbar and
+    msgdispatcher create and write the same dir without it. Apply it to all four so
+    the defensive recovery is consistent, and replace the misleading XXX with the
+    reproduced rationale.
+
+    Suite green (sandbox): pytest 9 pass, shell 12 pass, 0 fail.
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit f8ae6b5249d1dc9705251e75ba38250ae49bd1b5
+Author: claude (dev172 95595d52-ccfe-4088-99f2-560955a081b5) <noreply@anthropic.com>
+Date:   Mon Aug 10 07:14:45 2026 -0400
+
+    rereview: rename fuzz workflow; check() returns instead of exiting
+
+    - .github/workflows: rename dist-ai-fuzz.yml -> local-dist-ai-fuzz.yml to match
+      the in-tree local-* convention (local-unit-tests, local-python-lint, ...);
+      resolves the naming FIXME.
+    - check(): return non-zero on every failure instead of exit()ing or leaning on
+      errexit. Callers use 'if ! check ...' where errexit is disabled in the
+      condition, so the old code either killed the caller (unicode exit 1) or let a
+      failed sub-check fall through to success. Resolves the check() FIXME.
+    - All six bare/if callers made explicit: the four in msgprogress/msgprogressbar
+      and the two in msgprogressbar_kill_helper now 'check ... || exit 1' rather than
+      relying on errexit. kill_helper brought to style too (SC2250 braces, the two
+      missing R-010 directives).
+
+    Regression test (dist-ai, canary-verified): fails on the old exit-based check()
+    (not-empty falls through to success; unicode exits the caller), passes on this.
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit 9d468fb2c4f2a8a88ecada829dc0364c8c2d2106
+Author: claude (dev172 95595d52-ccfe-4088-99f2-560955a081b5) <noreply@anthropic.com>
+Date:   Mon Aug 10 06:34:23 2026 -0400
+
+    rereview: resolve three markers (ALLOW_LOCAL, $3 guard, newline FIXME)
+
+    - ci/{pycodestyle,pyflakes}-run.sh: honor ALLOW_LOCAL=true to run outside CI,
+      matching derivative-maker/ci/lint-*; resolves the "should ALLOW_LOCAL be
+      checked" TODO.
+    - msgdispatcher passive_popup_tool: guard $3 like $2 ('text="${3:-}"'); under
+      nounset an unset $3 would abort the same way. Resolves the asymmetry FIXME.
+    - msgcollector cli_links_to_footnotes: the n==0 FIXME asking for '%s\n' is
+      wrong -- test_cli_rendering asserts a plain 'See: <url>' renders with no
+      trailing newline, and adding one fails it. Keep '%s', replace the FIXME with
+      a note recording why.
+
+    Suite green (sandbox): pytest 9 pass, shell 12 pass, 0 fail.
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit 039d2a8a98aae7bf61bcb7f2e98ba1f9f7faded3
+Author: claude (dev172 95595d52-ccfe-4088-99f2-560955a081b5) <noreply@anthropic.com>
+Date:   Mon Aug 10 05:41:06 2026 -0400
+
+    dm-consumer.yml: declare bubblewrap for the dist-ai tests
+
+    The dist-ai msgcollector-tests suite's loop_protection_test.sh runs the
+    caller under 'bwrap' (tmpfs /usr/libexec, so the sourced code cannot reach
+    host helper-scripts). The CI runner had no bwrap, so the suite failed with
+    'bwrap: command not found'. Tooling is assumed present -- declare it, do
+    not skip the test.
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit 25d147075dff1b4d06f9038ddbae3c32618ff9ce
+Merge: e29672f 6929a32
+Author: claude (dev172 95595d52-ccfe-4088-99f2-560955a081b5) <noreply@anthropic.com>
+Date:   Mon Aug 10 05:27:24 2026 -0400
+
+    Merge ArrayBolt3/arraybolt3/trixie into ai
+
+    Aaron Rainbolt's cleanup on top of our strict-mode work:
+    - remove the unused, unsupported --animate feature (code + dead block)
+    - add his TODO/FIXME notes across the scripts
+    - trim verbose rationale comments (the behavioural fixes stay)
+
+    His --animate edit is the first change to the upstream msgcollector main
+    file on our ai branch, so the mandatory style gate now covers it. Brought
+    it to our style (no behaviour change): SC2250 brace autofix, the one
+    multi-part printf split to '%s'/'%s\n' calls (R-030), and '## style-ok:
+    no-strict' on the sourced 'check' lib (matching msgcollector_shared /
+    msgfallbacks).
+
+    Reconciled toward ArrayBolt3 per request; our surviving changes kept
+    because they still hold:
+    - msgdispatcher: gui/cli both set before the session chain -- a real fix
+      Aaron's branch lacks; its comment trimmed to match his density
+    - error_handler: :- guards on identifier/appendix, consistent with his
+      kept ${1:-}
+    - ai-review-todo.md stays deleted (the review queue is global, not in-tree)
+
+    His commits are signature-verified (cert EB29139EF6701B170FE8F1147038636170FDB8E0,
+    Aaron Rainbolt, corroborated via github.com/ArrayBolt3.gpg + keyserver.ubuntu.com).
+
+    Suite green on the merged tree (sandbox): pytest 9 pass, shell 12 pass
+    (fallbacks / loop_protection / session_type_dispatch), 0 fail, 0 skip.
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit 114343adb76aa30adeb2a6977af5cd60cc8fd45b
+Merge: f799447 6929a32
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Aug 9 03:55:54 2026 -0400
+
+    Merge remote-tracking branch 'refs/remotes/ArrayBolt3/arraybolt3/trixie'
+
+commit 6929a32bd64ec3d0420c83f5677deae72c0f431f
+Author: Aaron Rainbolt <arraybolt3@gmail.com>
+Date:   Sat Aug 8 22:33:49 2026 -0400
+
+    Several fixes and TODOs, remove the --animate feature completely as it is unused and unsupported
+
+commit e29672f81f1a7f9cbfa607928a07c3affd5d2cd7
+Author: claude (dev163 38f9745c-aed1-4fb4-b6ae-9899f20f8de2) <noreply@anthropic.com>
+Date:   Sat Aug 8 00:45:55 2026 -0400
+
+    ai-review-todo: all pending reviews completed
+
+    ai-review removes this file when nothing is left pending. The coderabbit
+    backlog drained, so the entries it tracked are done.
+
+commit f72883ad5c5ab14906bd07eb2ab729f88ae2b61e
+Author: claude (dev163 38f9745c-aed1-4fb4-b6ae-9899f20f8de2) <noreply@anthropic.com>
+Date:   Fri Aug 7 22:08:19 2026 -0400
+
+    msgdispatcher: the tty session arm left 'gui' unset
+
+    The session-type chain has six arms. Five set BOTH gui and cli; the tty arm set
+    only cli. msgdispatcher_handler then reads '${gui}' unconditionally, so under
+    nounset the first CLI message aborted the dispatcher instead of being shown.
+
+    It survived review by eye because every arm around it looks right -- the gap is
+    one missing assignment in the middle of five correct pairs.
+
+    Both are declared BEFORE the chain rather than patching the tty arm alone, so a
+    future arm cannot reintroduce the same half-set state.
+
+    Also: error_handler interpolated msgdispatcher_identifier and
+    msgdispatcher_appendix, which are unset until a message is actually being
+    handled. An error before that aborted the handler on its own first lines --
+    losing the failure it exists to report. Both take ':-' now.
+
+    Found by coderabbit.
+
+    Testing
+    -------
+
+    Gate exit 0 in an ISOLATED checkout.
+
+    The dispatch block is driven directly; reaching it through the real
+    msgdispatcher needs inotify, a run directory and a live session.
+
+      4 pass, 0 fail
+
+      tty session (the broken arm)        old ABORTS, new gui=[0] cli=[1]
+      x11 session                         unchanged,      gui=[1] cli=[0]
+      wayland session                     unchanged,      gui=[1] cli=[0]
+      DISPLAY set, session type unknown   unchanged,      gui=[1] cli=[0]
+
+    Canary: removing the initialisation gives 3 pass / 1 fail, failing exactly the
+    tty arm.
+
+    Three harness defects on the way, all of them cases that measured the fixture
+    rather than the code:
+    - 'env FOO=bar --unset=X' takes '--unset=X' as the COMMAND. env parses options
+      only BEFORE the first assignment, so every case ran with the wrong
+      environment and the tty case silently took a GUI arm. A run whose output
+      starts 'env:' or 'timeout:' now fails outright.
+    - the extraction anchored on 'XDG_SESSION_TYPE="${XDG_SESSION_TYPE:-}"', a line
+      THIS PASS added. The range never started on the old side, so the extraction
+      was empty and every case failed on an unbound 'gui' unrelated to the test.
+    - re-anchoring on the x11 'if' then excluded the new gui/cli initialisation,
+      making the FIXED version look broken. The range starts at the WAYLAND_DISPLAY
+      trace line, which exists in both fixtures and precedes the initialisation.
+
+commit 343a23bf877d4c06ff4670a75c6768ce87e40c2d
+Merge: 734e7a6 2cf0915
+Author: Aaron Rainbolt <arraybolt3@gmail.com>
+Date:   Fri Aug 7 17:57:16 2026 -0400
+
+    Merge branch 'ai' into arraybolt3/trixie
+
+commit 2cf09153778f5a0c49d0ac8f19200167e5962e68
+Author: claude (dev163 38f9745c-aed1-4fb4-b6ae-9899f20f8de2) <noreply@anthropic.com>
+Date:   Fri Aug 7 15:03:54 2026 -0400
+
+    msgcollector: fallbacks aborted in the one case it exists for
+
+    usr/libexec/msgcollector/msgfallbacks
+
+    fallbacks() decides whether there is a GUI by reading DISPLAY and
+    WAYLAND_DISPLAY. In a headless or pure-Wayland session those are exactly the
+    variables that are unset, so under the callers' nounset it aborted before
+    installing the no-GUI stubs -- in precisely the environment the fallback is for.
+
+    The defaults go here rather than in the callers: msgdispatcher had already
+    normalised WAYLAND_DISPLAY for its own use, msgprogressbar had not, and both
+    source this file.
+
+    Also in msgprogressbar: yad_progress_pid
+    --------------------------------------------
+
+    It is assigned only where yad is actually launched, but cleanup_self reads it
+    and runs EARLIER on two paths -- including the 'already 100%, not even opening
+    the progress bar' race the code handles deliberately. That clean exit aborted.
+
+    Pre-existing issues in msgfallbacks, surfaced because this commit brings the
+    file into the gate's changed-file scope
+    --------------------------------------------------------------------------------
+
+    - 'style-ok: no-strict' waiver: it is SOURCED, never executed, so a preamble
+      would rewrite the CALLER's shell rather than govern this code.
+    - R-090: three 'command -v' -> has. That required msgprogressbar to source
+      has.sh, which it did not -- msgdispatcher already did, so the same shared code
+      worked in one caller and would have broken in the other.
+    - SC2317 on the dummy yad / kdialog / notify-send bodies. They SHADOW the real
+      commands, so every later call by those names reaches them; shellcheck sees
+      functions nothing in this file invokes. The indirection is the point of the
+      file, so the check is disabled with that reason.
+
+    Found by codex (all three graded P2; the error_handler '$1' one it also raised
+    was already fixed).
+
+    Testing
+    -------
+
+    Gate exit 0 in an ISOLATED checkout.
+
+    fallbacks() driven the way its callers drive it -- sourced into a nounset shell
+    with stub error_handler and has:
+
+      4 pass, 0 fail
+
+      headless: neither DISPLAY nor WAYLAND   old ABORTS, new no_gui=[1]
+      pure Wayland: DISPLAY unset only        old ABORTS, new no_gui=[0]
+      X11: both set                           unchanged,      no_gui=[0]
+      both set but EMPTY -> no GUI            unchanged,      no_gui=[1]
+
+    The last row matters: empty and unset must reach the same verdict, and only
+    'unset' was ever the bug.
+
+    Canary: restoring the bare expansions gives 2 pass / 2 fail, and the two that
+    fail are exactly the unset rows.
+
+commit 72086b928eebc7c3e97a135dc195c0b15f1dd040
+Author: claude (dev163 38f9745c-aed1-4fb4-b6ae-9899f20f8de2) <noreply@anthropic.com>
+Date:   Fri Aug 7 14:53:02 2026 -0400
+
+    restore 'set -x' dropped by the strict-mode pass
+
+    The R-010 conversion replaced each script's existing preamble wholesale and did
+    not carry 'set -x' across. That is a silent loss of diagnostic output, and for
+    several of these it is the only output there is:
+
+    - build-time scripts (hardened-kernel build / download / ci_test, tirdad
+      build.sh, initializer-dist chroot-scripts-post.d): the trace IS the build log,
+      so a failing invocation and its expanded arguments become unavailable exactly
+      when they are needed.
+    - boot-time scripts (libvirt-dist, repository-dist-initializer).
+    - scripts whose only messages are 'true "INFO: ..."' lines, which produce
+      nothing on their own -- removing xtrace silences them completely.
+    - test harnesses (tb-updater unit_test, sdwdate-gui fuzzer), where the trace is
+      the point.
+
+    It was also inconsistent: initializer-dist's 80_cleanup kept it while its four
+    siblings in the same directory lost it.
+
+    Nothing asked for this and no commit described it as intentional, so it is
+    restored everywhere it was active.
+
+    Found by codex on initializer-dist. The other 19 files came from auditing the
+    whole pass for the same pattern.
+
+    Testing
+    -------
+
+    Gate exit 0 in an ISOLATED checkout, all eleven packages.
+
+    Audit: ~/strict-pass-tests/audit-stripped-setx.sh, which compares every file
+    changed on an 'ai' branch against org-ai-assisted/master and reports any that
+    had 'set -x' and no longer do.
+
+      before:  examined 43 package(s) on branch ai, 342 changed file(s); 23 stripped
+      after:   examined 43 package(s) on branch ai, 342 changed file(s);  0 stripped
+
+    The audit prints its own coverage, and fails outright if it examines zero
+    packages. Its first version tested '[ -d "$pkg/.git" ]', which is false for a
+    submodule -- .git is a FILE there -- so it skipped all 43 and reported nothing
+    stripped. A count that can be read is the difference between "clean" and "never
+    looked".
+
+commit 9596019db279745dcfa507bc12ad92ceb122511f
+Author: claude (dev163 38f9745c-aed1-4fb4-b6ae-9899f20f8de2) <noreply@anthropic.com>
+Date:   Fri Aug 7 14:33:44 2026 -0400
+
+    msgcollector: loop_protection aborted on its own first call
+
+    usr/libexec/msgcollector/msgcollector_shared
+
+    loop_protection's first statement expands loop_counter_protection, and the line
+    that CREATES that variable is inside the branch the expansion is testing. So the
+    first call always read it unset.
+
+    That was harmless before R-010. It is not now: msgprogress and
+    msgdispatcher_run_check both carry the strict preamble and both source this
+    file, so under nounset every '--progressx' update exited before writing its
+    progress value.
+
+    The ':-' goes here, in the shared helper, rather than in either caller. Both
+    callers reach the same line, so fixing one would have left the other aborting.
+
+    This file itself gets a 'style-ok: no-strict' waiver, not a preamble: it is
+    SOURCED, never executed, so a 'set -o' block would rewrite the CALLER's shell
+    instead of governing this code. The gate only noticed because this commit
+    touches the file.
+
+    Found by codex. Four other P1s in the same report -- the yad comment placement in
+    msgprogressbar, and the verbose / icon / progress_txt_file_progress defaults --
+    were already fixed; verified against the current files rather than assumed.
+
+    Testing
+    -------
+
+    Gate exit 0 in an ISOLATED checkout.
+
+    The trap only appears when the function is exercised the way msgprogress
+    exercises it: sourced into a nounset shell and called with no counter yet. The
+    harness generates exactly that caller.
+
+      4 pass, 0 fail
+
+      first call, counter never set          old ABORTS, new counter=0
+      two calls in a row                     old ABORTS, new counter=1
+      counter preset to 60 -> timeout        unchanged, exit 2
+      counter preset to garbage -> resets    unchanged, counter=0
+
+    The first two rows are asserted to DIFFER -- the old version must abort where
+    the new one works, or the case is not exercising the trap at all. The last two
+    assert the timeout and the reset paths are untouched.
+
+    Canary: restoring the bare expansion gives 2 pass / 2 fail, and the two that
+    fail are exactly the two the fix addresses.
+
+commit 2a10aa888c346de37454da3f60eafd49c7ab0ef2
+Merge: d13f073 f799447
+Author: claude (dev163 38f9745c-aed1-4fb4-b6ae-9899f20f8de2) <noreply@anthropic.com>
+Date:   Fri Aug 7 12:31:50 2026 -0400
+
+    Merge org-ai-assisted/master into ai
+
+    The branch was created from a stale local master, so its PR diff showed
+    master's newer commits -- including a changelog version bump -- as REMOVALS.
+    Merging rather than rebasing, per the no-history-rewrites rule.
+
+commit d13f073c190d15e10ad94f637de320b589dd5eb1
+Author: claude (dev163 38f9745c-aed1-4fb4-b6ae-9899f20f8de2) <noreply@anthropic.com>
+Date:   Fri Aug 7 12:20:49 2026 -0400
+
+    msgcollector: fix five nounset defects an external review found
+
+    An ai-review pass found five paths where strict mode aborts. All five are on
+    code the previous harness never reached, and all five are the same shape: a
+    variable that only exists on one branch, read on every branch.
+
+    1. msgprogressbar's percentage_maybe_add, icon and progress_txt_file_progress
+       are DERIVED, not parsed -- each is assigned only when the file it comes from
+       exists, and all three are read unconditionally afterwards.
+    2. msgdispatcher's error_handler read '$1', but 'trap "error_handler" ERR'
+       passes NO arguments -- so the handler aborted on its own first line, losing
+       the error it exists to report.
+    3. msgdispatcher never initialised 'verbose', which dispatch_x_active reads.
+    4. '<var>="$2"' in all three scripts: when the flag is the LAST argument there
+       is no $2, and the unset read aborted before check() could say which option
+       was missing. Eight sites.
+    5. 'shift 2' in the same position: shift_verbose turns a shift past the end
+       into a reported failure, so the user got a bash diagnostic instead of
+       check()'s message. Seven sites, now guarded.
+
+    Testing
+    -------
+
+    Gate exit 0 in an ISOLATED checkout.
+
+      18 same, 0 differing
+
+    Four cases added, covering exactly the paths the review exposed: a flag given
+    as the LAST argument for each of the three scripts, and msgprogressbar with
+    neither its progress file nor its icon file present. Two of them ASSERT the new
+    behaviour rather than tolerate a difference:
+
+    - msgprogress: exit 1 with NO "Please report this bug" banner. A missing option
+      value is a USER error.
+    - msgprogressbar: exit 1 NAMING the empty variable. Its banner still prints,
+      because that script already had errtrace before this pass -- pre-existing and
+      deliberately untouched -- but previously the banner was ALL the user got,
+      since the script aborted before check() could speak.
+
+    An assertion I wrote first was wrong and the harness caught it: I asserted the
+    banner away for msgprogressbar too, which contradicts the decision recorded in
+    the strict-mode commit for this package.
+
+    Also fixed here: a comment placed BETWEEN two line-continuation lines of the
+    'yad' invocation, which ENDS the command -- yad was truncated before '--text'
+    and the message text ran as a command of its own. Same mistake as in
+    sandbox-app-launcher's bwrap call, made twice in this session; the directive
+    now sits above the whole invocation in both.
+
+commit 7ea0a4539fd8e7a2f2c41914c1d9dc0924c87fb1
+Author: claude (dev163 38f9745c-aed1-4fb4-b6ae-9899f20f8de2) <noreply@anthropic.com>
+Date:   Fri Aug 7 11:58:09 2026 -0400
+
+    msgcollector: restore the deliberate splitting of percentage_maybe_add
+
+    A blanket 'shellcheck -f diff' sweep quoted
+
+      ${percentage_maybe_add}   ->   "${percentage_maybe_add}"
+
+    and that variable is either EMPTY or the TWO words '--percentage <n>'. Quoted,
+    the progress dialog receives one argument '--percentage 42' that it does not
+    recognise -- or, when the variable is empty, a spurious empty argument.
+    Unquoted again, with an SC2086 waiver stating why.
+
+    Found by a systematic audit of every expansion these commits quoted that master
+    had left unquoted, prompted by the same mistake being found in
+    sandbox-app-launcher (bwrap_args, a pgrep PID list) and hardened-kernel
+    (curl's TLS options). An expansion that is unquoted in working code is usually
+    unquoted ON PURPOSE.
+
+    Gate exit 0 in an ISOLATED checkout; harness unchanged at 14 same, 0 differing.
+
+commit ec129aad9bd2020642fd44f89c7398b12f83aa94
+Author: claude (dev163 38f9745c-aed1-4fb4-b6ae-9899f20f8de2) <noreply@anthropic.com>
+Date:   Fri Aug 7 10:25:43 2026 -0400
+
+    msgcollector: R-010 strict mode for the 4 standalone scripts
+
+    Files: usr/libexec/msgcollector/{msgdispatcher,msgprogress,msgprogressbar,
+    msgdispatcher_xdg_autostart}.
+
+    etc/bash.bash_logout.anondist is deliberately NOT touched: dh_displace diverts
+    /etc/bash.bash_logout onto it, and that file is SOURCED by the exiting login
+    shell, so a strict-mode block there would rewrite the user's interactive shell
+    options rather than its own.
+
+    Real nounset traps
+    ------------------
+
+    - 'case $1' in all three option loops. Each runs until the arguments are
+      exhausted, so the last iteration reads an unset $1 by design.
+    - msgdispatcher read XDG_SESSION_TYPE, XDG_CURRENT_DESKTOP, DISPLAY and
+      WAYLAND_DISPLAY unconditionally in preparation(). Its fallback chain exists
+      precisely for the case where NONE of them is set -- its own message says so
+      -- and under nounset the unset read aborted before that fallback could run.
+    - msgprogress and msgprogressbar hand their required options straight to
+      check(), whose job is to report a missing value. An unset read aborted before
+      check() could name the option, replacing a precise message with a bash error.
+      All 11 option targets initialised to empty.
+    - msgprogressbar's SIGHUP/SIGTERM handler interpolated ${parentpid}, which
+      belongs to msgprogressbar_kill_helper and is never set here. It has always
+      rendered blank; under nounset the expansion aborted the handler even though
+      the command is a no-op 'true'.
+
+    errtrace changes how a user error LOOKS
+    ---------------------------------------
+
+    R-010 adds errtrace, which makes the ERR trap fire for a failure INSIDE a
+    function. msgprogress did not have errtrace before, so a missing command-line
+    option suddenly printed the "script bug ... Please report this bug!" banner on
+    top of check()'s own precise message -- inviting bug reports for a user error.
+    The ERR trap is therefore lifted around its two check() calls and restored
+    after.
+
+    'check ... || exit 1' was tried first and is WRONG: putting check() in a
+    condition context disables errexit inside it, so it ran on past the first
+    failed validation and printed a second, contradictory complaint. Lifting the
+    trap keeps errexit intact.
+
+    msgprogressbar already had errtrace, so its banner is pre-existing behaviour
+    and is left alone. Verified by the harness: lifting the trap there made the new
+    output differ from the old.
+
+    Also
+    ----
+
+    - 'set -x' removed from msgdispatcher_xdg_autostart, which had left tracing on
+      in production output.
+    - 9 'echo' -> printf (R-034); 5 'command -v' -> 'has' (R-090), with has.sh
+      sourced near the top since preparation() and the passive-popup dispatch both
+      run before the other helper-scripts sources near the bottom of the file.
+    - shellcheck braces and quoting; SC2034 waivers for options parsed for
+      compatibility with the shared option set but not read in that script, and an
+      SC2016 waiver where single quotes are deliberate so the value reaches the
+      inner bash as an argument rather than as code.
+
+    Testing
+    -------
+
+    Gate exit 0 in an ISOLATED checkout.
+
+    New harness at ~/strict-pass-tests/msgc-test/. msgdispatcher is a daemon and
+    msgprogressbar drives a GUI, so what is compared is startup: option parsing,
+    check() validation, and msgdispatcher's session-type detection across x11,
+    wayland, tty, Qubes and nothing-set.
+
+      14 same, 0 differing
+
+    Canary: with the env-var defaults removed and the ERR trap restored, the same
+    harness reports 11 same, 3 differing -- one nounset abort and two output
+    differences. Both fixes are load-bearing.
+
+    The harness itself had a bug worth noting: its 'diff ... | head' pipeline made
+    it ABORT on the first difference under errexit+pipefail, so a run could report
+    one failure while silently skipping every later case. Fixed before trusting it.
+
+commit f79944736070ef9bf1502cc2cd9260550de06db0
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Jul 31 18:04:59 2026 +0000
+
+    bumped changelog version
+
 commit a50fcad4befbb9d2dbe6f46379d029684a4d5491
 Merge: 66a60a8 1bfc0f3
 Author: Patrick Schleizer <adrelanos@whonix.org>
