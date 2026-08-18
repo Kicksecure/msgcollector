@@ -431,17 +431,18 @@ cli_translate_gui_markup() {
    text="$1"
 
    ## Translate GUI color tags (<font color="...">) to terminal ANSI colors so a
-   ## single HTML message renders colored in BOTH the GUI and the CLI. The
-   ## inserted ANSI escapes contain no HTML metacharacters and survive
-   ## strip-markup. str_replace is a literal fixed-string replace: unlike sed it
-   ## treats neither the search nor the ANSI replacement as a regex, so there are
-   ## no metacharacter, '&'/backslash, or locale pitfalls. The color codes come
-   ## from get_colors and are '' when color is disabled, removing the tag.
-   text="$(printf '%s' "${text}" | str_replace '<font color="green">' "${green:-}")"
-   text="$(printf '%s' "${text}" | str_replace '<font color="orange">' "${yellow:-}")"
-   text="$(printf '%s' "${text}" | str_replace '<font color="yellow">' "${yellow:-}")"
-   text="$(printf '%s' "${text}" | str_replace '<font color="red">' "${red:-}")"
-   text="$(printf '%s' "${text}" | str_replace '</font>' "${reset:-}")"
+   ## single HTML message renders colored in BOTH the GUI and the CLI, in ONE
+   ## sed process. Safe here without regex escaping: the search tags are fixed
+   ## and carry no regex metacharacter, and the replacements come from get_colors
+   ## as raw SGR escapes ('\033[..m', no '&'/backslash/delimiter), so neither
+   ## side is reinterpreted. The delimiter is '#' for the '</font>' expression
+   ## because that tag contains '/'. Empty when color is disabled -> tag removed.
+   text="$(printf '%s' "${text}" | sed \
+      -e "s/<font color=\"green\">/${green:-}/g" \
+      -e "s/<font color=\"orange\">/${yellow:-}/g" \
+      -e "s/<font color=\"yellow\">/${yellow:-}/g" \
+      -e "s/<font color=\"red\">/${red:-}/g" \
+      -e "s#</font>#${reset:-}#g")"
    ## Translate GUI hyperlinks (<a href="url">text</a>) to footnote form.
    text="$(cli_links_to_footnotes "${text}")"
    ## Translate GUI line breaks (<br>, <br/>, <br />) to real newlines, so a
