@@ -140,6 +140,20 @@ exit_code: ${exit_code}
    exit 1
 }
 
+require_option_value() {
+   ## Fail cleanly when a value-taking option is given with no value (it is the
+   ## last argument). Otherwise the following 'shift 2' would shift past the end
+   ## under 'set -o errexit' + 'shopt -s shift_verbose', trip the ERR trap and
+   ## report a bogus "script bug" instead of this clear message.
+   ## $1 - option name (for the message).
+   ## $2 - remaining argument count ("$#" at the call site, which counts the
+   ##      option itself); a value is present only when it is >= 2.
+   if [ "${2}" -lt "2" ]; then
+      printf '%s\n' "${BASH_SOURCE[0]}: ERROR: option ${1} requires a value."
+      exit 1
+   fi
+}
+
 parse_cmd_options() {
    trap "error_handler" ERR
 
@@ -160,10 +174,12 @@ parse_cmd_options() {
                shift
                ;;
            --identifier)
+               require_option_value "--identifier" "$#"
                identifier="${2:-}"
                shift 2
                ;;
            --icon)
+               require_option_value "--icon" "$#"
                icon="${2:-}"
                if [ "${icon}" = "" ]; then
                   printf '%s\n' "${BASH_SOURCE[0]} ERROR: variable icon is empty."
@@ -172,10 +188,12 @@ parse_cmd_options() {
                shift 2
                ;;
            --parentpid)
+               require_option_value "--parentpid" "$#"
                parentpid="${2:-}"
                shift 2
                ;;
            --typecli)
+               require_option_value "--typecli" "$#"
                cli="1"
                typecli="${2:-}"
                shift 2
@@ -185,12 +203,21 @@ parse_cmd_options() {
                fi
                ;;
            --typex)
+               require_option_value "--typex" "$#"
                typex="${2:-}"
                shift 2
                if [ "${typex}" = "" ]; then
                   printf '%s\n' "${BASH_SOURCE[0]} ERROR: variable typex is empty."
                   exit 1
                fi
+               case "${typex}" in
+                  info|warning|error)
+                     ;;
+                  *)
+                     printf '%s\n' "${BASH_SOURCE[0]}: ERROR: invalid typex '${typex}' (expected info, warning, or error)."
+                     exit 1
+                     ;;
+               esac
                ;;
            --typexstatus)
                ## for --status
@@ -203,6 +230,7 @@ parse_cmd_options() {
                typecli_chosen="1"
                ;;
            --message)
+               require_option_value "--message" "$#"
                message="${2:-}"
                shift 2
                if [ "${message}" = "" ]; then
@@ -211,19 +239,23 @@ parse_cmd_options() {
                fi
                ;;
            --titlecli)
+               require_option_value "--titlecli" "$#"
                cli="1"
                titlecli="${2:-}"
                shift 2
                ;;
            --titlex)
+               require_option_value "--titlex" "$#"
                titlex="${2:-}"
                shift 2
                ;;
            --progressbartitlex)
+               require_option_value "--progressbartitlex" "$#"
                progressbartitlex="${2:-}"
                shift 2
                ;;
            --passivepopupqueuextitle)
+               require_option_value "--passivepopupqueuextitle" "$#"
                passivepopupqueuextitle="${2:-}"
                shift 2
                ;;
@@ -245,6 +277,7 @@ parse_cmd_options() {
                shift
                ;;
            --progressx)
+               require_option_value "--progressx" "$#"
                progressx="${2:-}"
                shift 2
                if [ "${progressx}" = "" ]; then
@@ -277,6 +310,7 @@ parse_cmd_options() {
                shift
                ;;
            --parenttty)
+               require_option_value "--parenttty" "$#"
                parenttty="${2:-}"
                shift 2
                ;;
@@ -293,6 +327,7 @@ parse_cmd_options() {
                shift
                ;;
            --progressbaridx)
+               require_option_value "--progressbaridx" "$#"
                progressbaridx="${2:-}"
                shift 2
                ;;
