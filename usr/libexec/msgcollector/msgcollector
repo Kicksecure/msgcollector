@@ -412,9 +412,20 @@ cli_translate_gui_markup() {
    ## Translate GUI line breaks (<br>, <br/>, <br />) to real newlines, so a
    ## single HTML message keeps its line breaks on the CLI too. strip-markup
    ## would otherwise drop <br> and run the lines together. The <br></br>
-   ## closing half is left for strip-markup to remove. This is a regex (all <br>
-   ## spellings in one pass), so sed -E stays here.
-   text="$(printf '%s' "${text}" | sed -E -e 's#<br ?/?>#\n#g')"
+   ## closing half is left for strip-markup to remove.
+   ##
+   ## Callers build multi-line HTML strings that carry BOTH a literal source
+   ## newline AND a <br> on each line (the newline is insignificant HTML
+   ## whitespace a browser collapses; the <br> is the actual break). Absorb the
+   ## whitespace on both sides of each <br> into the single newline it becomes,
+   ## so one logical break renders as one newline, not a blank line. -z (NUL
+   ## record separator) slurps the whole message into one pattern space so
+   ## [[:space:]] spans the source newlines; without it sed works line-by-line
+   ## and cannot see the newline adjacent to a line-leading <br>. An intentional
+   ## blank line (<br><br>, no whitespace between) still yields two newlines, and
+   ## a CLI-native message with literal newlines but no <br> is untouched. This
+   ## is a regex (all <br> spellings in one pass), so sed -zE stays here.
+   text="$(printf '%s' "${text}" | sed -zE -e 's#[[:space:]]*<br ?/?>[[:space:]]*#\n#g')"
 
    printf '%s' "${text}"
 }
