@@ -8,17 +8,23 @@ This script creates a GUI message dialog using PyQt5. It allows the user to spec
 the type of message, title, and content, as well as customize the icon and position of the dialog.
 
 Usage:
-/usr/libexec/msgcollector/msgdispatcher_dispatch_x.py <message_type> <title> <message> <position> [icon]
+/usr/libexec/msgcollector/msgdispatcher_dispatch_x.py <message_type> <title> <position> [icon]
+
+The message body is read from STDIN, not argv: the accumulated caller message
+(e.g. systemcheck's whole verbose run) can exceed the kernel ARG_MAX, and
+passing it on argv forced a lossy truncation that silently dropped every later
+test. STDIN has no such limit, so the full document renders.
 
 Arguments:
 1. message_type: 'info', 'warning', or 'error'
 2. title: The window title
-3. message: The main message text
-4. position: The position of the dialog (e.g., "1" for top-left corner)
-5. icon (optional): Path to a custom icon (defaults to a specific icon if not provided)
+3. position: The position of the dialog (e.g., "1" for top-left corner)
+4. icon (optional): Path to a custom icon (defaults to a specific icon if not provided)
+STDIN: The main message text (HTML).
 
 Example:
-/usr/libexec/msgcollector/msgdispatcher_dispatch_x.py warning "Warning Title" "This is a warning message." "1" "/path/to/custom/icon.svg"
+printf '%s' "This is a warning message." | \
+  /usr/libexec/msgcollector/msgdispatcher_dispatch_x.py warning "Warning Title" "1" "/path/to/custom/icon.svg"
 """
 
 import os
@@ -133,11 +139,16 @@ def main():
     parser = argparse.ArgumentParser(description="Create a GUI message dialog using PyQt5.")
     parser.add_argument('message_type', choices=['info', 'warning', 'error'], help="Type of the message ('info', 'warning', or 'error')")
     parser.add_argument('title', help="The window title")
-    parser.add_argument('message', help="The main message text")
     parser.add_argument('position', help="The position of the dialog (e.g., '1' for top-left corner)")
     parser.add_argument('icon', nargs='?', default="/usr/share/icons/gnome/24x24/status/info.png", help="Path to a custom icon (optional)")
 
     args = parser.parse_args()
+
+    ## Read the message body from stdin (see module docstring): argv cannot carry
+    ## an arbitrarily large accumulated message without hitting ARG_MAX. Read only
+    ## after a successful parse, so an argv error (e.g. bad message_type) still
+    ## exits without blocking on stdin.
+    args.message = sys.stdin.read()
 
     idir = "/usr/share/icons/gnome-colors-common/scalable/status/"
     if args.message_type == "info":
