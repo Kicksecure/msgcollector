@@ -68,10 +68,11 @@ error_handler() {
    "${timeout_command[@]}" chmod u+rwx -- ~/".msgcollector" || true
    "${timeout_command[@]}" append ~/".msgcollector/msgdispatcher-error.log" "$0: BASH_COMMAND: ${BASH_COMMAND} | exit_code: ${last_exit_code}" >/dev/null || true
 
-   ## Popup window with the message above.
+   ## Popup window with the message above. Message body on stdin (not argv):
+   ## msgdispatcher_dispatch_x.py reads it from stdin so no ARG_MAX cap applies.
    ## /usr/share/icons/icon-pack-dist/whonix.ico might not exist, but
    ## fortunately msgdispatcher_dispatch_x works anyway.
-   "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/msgdispatcher_dispatch_x.py" "warning" "$0" "${msg}" "0" "/usr/share/icons/icon-pack-dist/whonix.ico" &
+   printf '%s' "${msg}" | "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/msgdispatcher_dispatch_x.py" -- "warning" "$0" "0" "/usr/share/icons/icon-pack-dist/whonix.ico" &
 
    true
 }
@@ -257,21 +258,16 @@ dispatch_x_active() {
       type="info"
    fi
 
-   ## Nov 23 06:43:10 work-main msgdispatcher[362757]: /usr/libexec/msgcollector/msgdispatcher: line 203: /usr/libexec/msgcollector/msgdispatcher_dispatch_x.py: Argument list too long
-   ## Avoid "Argument list too long" by truncating overly long messages.
-   ## This is character-based, not exact bytes, but good enough and simple.
-   local max_msg_chars=32768
-   if ((${#msg} > max_msg_chars)); then
-      msg="${msg:0:max_msg_chars}"
-      msg="${msg} [truncated - try command line interface (CLI) version for complete output]"
-   fi
-
+   ## The message body is passed on STDIN, not argv, so no "Argument list too
+   ## long" (ARG_MAX) limit caps its length: the full accumulated message must
+   ## render (e.g. systemcheck's verbose run, whose large journal dump would
+   ## otherwise push later tests past an argv cap and out of the GUI).
    if [ "${verbose}" = "1" ]; then
-      "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/msgdispatcher_dispatch_x.py" "${type}" "${title}" "${msg}" "0" "${icon}"
+      printf '%s' "${msg}" | "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/msgdispatcher_dispatch_x.py" -- "${type}" "${title}" "0" "${icon}"
    else
       ## Launching into background, so it doesn't block msgdispatcher until
       ## msgdispatcher_dispatch_x exits.
-      "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/msgdispatcher_dispatch_x.py" "${type}" "${title}" "${msg}" "0" "${icon}" &
+      printf '%s' "${msg}" | "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/msgdispatcher_dispatch_x.py" -- "${type}" "${title}" "0" "${icon}" &
    fi
 }
 
