@@ -1,3 +1,126 @@
+commit 887321a53a4f4df5992d13e9a5a743300d322d04
+Merge: f90e7a3 482fb48
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Aug 18 23:11:17 2026 -0400
+
+    Merge remote-tracking branch 'org-ai-assisted/ai'
+
+commit f90e7a37169657937b19eec83eae6c6a4bbf7a0c
+Merge: 4acc54f d3b7448
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Aug 18 23:01:27 2026 -0400
+
+    Merge remote-tracking branch 'org-ai-assisted/ai'
+
+commit 482fb4874b1da4acbae244b5b4940663d7cd63db
+Author: claude (dev226 179d234f-88ec-4eaa-993f-32d2ac59580e) <noreply@anthropic.com>
+Date:   Tue Aug 18 12:03:33 2026 -0400
+
+    cli_translate_gui_markup: color tags via one sed, not five str_replace
+
+    str_replace bought no safety here: the search tags are fixed (no regex
+    metacharacter) and the replacements are get_colors' raw SGR escapes (no
+    '&'/backslash/delimiter), so a single sed reinterprets neither side. Since the
+    <br> pass still needs sed regardless, restore the color translation to one sed
+    process (was five str_replace subprocesses).
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit d3b744816838039f7d9b974609c0552004b777aa
+Author: claude (dev226 179d234f-88ec-4eaa-993f-32d2ac59580e) <noreply@anthropic.com>
+Date:   Tue Aug 18 11:50:31 2026 -0400
+
+    msgcollector: validate --typex and error cleanly on a missing option value
+
+    Two option-parser hardenings (ai-review, claude pass):
+
+    - --typex now rejects a severity outside info|warning|error at collection time
+      with a clear error, instead of writing it through to the GUI dialog whose
+      argparse rejects it -- a rejection that, being on the backgrounded dispatch,
+      silently produced no dialog. Audited every --typex caller first: all pass
+      info/warning/error (emit_message/emit_status_line severities), so nothing
+      legitimate is broken.
+    - A value-taking option given with no value (it is the last argument) now fails
+      with "option --X requires a value" via require_option_value, checked before
+      the 'shift 2'. Previously the bare 'shift 2' shifted past the end under
+      errexit + shift_verbose, tripped the ERR trap and printed the alarming
+      "script bug -- please report" banner.
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit bdc169cc85a47d81335d8f39a9a5795ae8784dc2
+Author: claude (dev226 179d234f-88ec-4eaa-993f-32d2ac59580e) <noreply@anthropic.com>
+Date:   Tue Aug 18 11:38:52 2026 -0400
+
+    msgdispatcher: pass -- before the dispatch positionals
+
+    Guard the msgdispatcher_dispatch_x.py invocations with an end-of-options '--'
+    so a type or title beginning with '-' (e.g. a '-h' title) is treated as a
+    positional instead of being parsed as an option, which would print argparse
+    help/errors and suppress the dialog. (ai-review, claude pass.)
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit 3b6f12459c0d99d77c619732732cb0e902d8a4df
+Author: claude (dev226 179d234f-88ec-4eaa-993f-32d2ac59580e) <noreply@anthropic.com>
+Date:   Tue Aug 18 02:02:18 2026 -0400
+
+    msgdispatcher_dispatch_x: surrogateescape-decode the stdin message body
+
+    sys.stdin.read() uses the STRICT error handler under a full UTF-8 locale (e.g.
+    en_US.UTF-8), so a message carrying invalid UTF-8 (a raw journal line) raised
+    UnicodeDecodeError and silently dropped the GUI dialog. Read sys.stdin.buffer
+    and decode utf-8 with 'surrogateescape' -- lossless, never raises, and matches
+    how the former argv path decoded (PEP 383). (Found by ai-review: codex + agy.)
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit 7640e9e1d72b102ab4128e96de98d6156ee74152
+Author: claude (dev226 179d234f-88ec-4eaa-993f-32d2ac59580e) <noreply@anthropic.com>
+Date:   Tue Aug 18 01:36:20 2026 -0400
+
+    msgdispatcher: pass GUI message body on stdin, not argv
+
+    - The GUI dialog message was passed as an argv to msgdispatcher_dispatch_x.py,
+      so an ARG_MAX guard truncated it at 32768 chars. In systemcheck's verbose run
+      a large journal dump pushed the accumulated message past the cap, dropping
+      every later test from the GUI (the whole run renders in one setHtml).
+    - Feed the body on stdin instead (no ARG_MAX limit) and drop the cap;
+      msgdispatcher_dispatch_x.py reads the message from stdin after argparse.
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit d00d75cff1ea43e97057ccf467571edf9810548a
+Author: claude (dev226 179d234f-88ec-4eaa-993f-32d2ac59580e) <noreply@anthropic.com>
+Date:   Tue Aug 18 01:36:17 2026 -0400
+
+    cli_translate_gui_markup: collapse whitespace around <br> to one newline
+
+    - CLI messages built as multi-line HTML carry BOTH a literal source newline and
+      a <br> per line (the newline is insignificant HTML whitespace, the <br> is
+      the break). The old <br>-to-newline pass kept the adjacent literal newline,
+      rendering a blank line between every field (systemcheck's "Time
+      Synchronization Result" etc.).
+    - Absorb the whitespace on both sides of each <br> into the single newline it
+      becomes, via a slurped (sed -z) pass so [[:space:]] spans source newlines. An
+      intentional blank line (<br><br>) still yields two newlines; a CLI-native
+      message with literal newlines but no <br> is untouched.
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit 737c798d416b338a8aae64586b2374f64eaf3428
+Merge: 83e3144 4acc54f
+Author: claude (dev226 179d234f-88ec-4eaa-993f-32d2ac59580e) <noreply@anthropic.com>
+Date:   Tue Aug 18 00:31:02 2026 -0400
+
+    Merge branch 'master' into ai
+
+commit 4acc54f281c2d83eb1478c308852ef6f4771af5e
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Aug 16 08:21:44 2026 +0000
+
+    bumped changelog version
+
 commit c5c676deb70df335c8f551dfb5e6e5d096e4c2d5
 Merge: 4d1ec7d 83e3144
 Author: Patrick Schleizer <adrelanos@whonix.org>
