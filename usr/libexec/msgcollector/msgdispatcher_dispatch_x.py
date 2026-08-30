@@ -8,19 +8,16 @@ This script creates a GUI message dialog using PyQt5. It allows the user to spec
 the type of message, title, and content, as well as customize the icon and position of the dialog.
 
 Usage:
-/usr/libexec/msgcollector/msgdispatcher_dispatch_x.py <message_type> <title> <position> [icon]
+printf '%s' "<msg>" | /usr/libexec/msgcollector/msgdispatcher_dispatch_x.py <message_type> <title> <position> [icon]
 
-The message body is read from STDIN, not argv: the accumulated caller message
-(e.g. systemcheck's whole verbose run) can exceed the kernel ARG_MAX, and
-passing it on argv forced a lossy truncation that silently dropped every later
-test. STDIN has no such limit, so the full document renders.
+Note that the message body is read from stdin to circumvent argument length
+limits.
 
 Arguments:
 1. message_type: 'info', 'warning', or 'error'
 2. title: The window title
 3. position: The position of the dialog (e.g., "1" for top-left corner)
 4. icon (optional): Path to a custom icon (defaults to a specific icon if not provided)
-STDIN: The main message text (HTML).
 
 Example:
 printf '%s' "This is a warning message." | \
@@ -55,10 +52,10 @@ def signal_handler(sig, frame):
 
 
 class Ui_Dialog(object):
-    def setupUi(self, Dialog, args):
+    def setupUi(self, Dialog, args, message_str):
         self.Dialog = Dialog
         self.title = args.title
-        self.msg = args.message
+        self.msg = message_str
         self.icon = args.icon
         self.pos = args.position
 
@@ -144,18 +141,10 @@ def main():
 
     args = parser.parse_args()
 
-    ## Read the message body from stdin (see module docstring): argv cannot carry
-    ## an arbitrarily large accumulated message without hitting ARG_MAX. Read only
-    ## after a successful parse, so an argv error (e.g. bad message_type) still
-    ## exits without blocking on stdin.
-    ##
-    ## Decode as UTF-8 with 'surrogateescape', NOT sys.stdin.read(): the message
-    ## is caller-constructed HTML that may carry invalid UTF-8 (a raw journal
-    ## line) and the daemon may run under a C/POSIX locale (ASCII default). A
-    ## strict text read would raise UnicodeDecodeError and silently drop the
-    ## dialog; surrogateescape is lossless and matches how the former argv path
-    ## decoded (PEP 383).
-    args.message = sys.stdin.buffer.read().decode('utf-8', 'surrogateescape')
+    message_str = sys.stdin.buffer.read().decode(
+        encoding='utf-8',
+        errors='surrogateescape',
+    )
 
     idir = "/usr/share/icons/gnome-colors-common/scalable/status/"
     if args.message_type == "info":
@@ -174,7 +163,7 @@ def main():
     Dialog = QtWidgets.QDialog()
 
     ui = Ui_Dialog()
-    ui.setupUi(Dialog, args)
+    ui.setupUi(Dialog, args, message_str)
     Dialog.show()
 
     signal.signal(signal.SIGINT, signal_handler)

@@ -3,30 +3,25 @@
 ## Copyright (C) 2012 - 2025 ENCRYPTED SUPPORT LLC <adrelanos@whonix.org>
 ## See the file COPYING for copying conditions.
 
-## Strict mode. msgcollector reads many optional CLI fields (icon, titlecli,
-## typecli, progressbaridx, ...) that are legitimately unset; they are defaulted
-## to '' below so nounset does not abort on an unset read, and parse_cmd_options
-## overwrites them when the flag is actually given.
+# shellcheck source=../../../../helper-scripts/usr/libexec/helper-scripts/check_runtime.bsh
+source "${HELPER_SCRIPTS_PATH:-}"/usr/libexec/helper-scripts/check_runtime.bsh
 
-#set -x
-set -o errexit
-set -o nounset
-set -o pipefail
-set -o errtrace
-shopt -s inherit_errexit
-shopt -s shift_verbose
+if was_executed "${BASH_SOURCE[0]}"; then
+   #set -x
+   set -o errexit
+   set -o nounset
+   set -o pipefail
+   set -o errtrace
+   shopt -s inherit_errexit
+   shopt -s shift_verbose
+
+   true "$0: START"
+fi
 
 scriptname="$(basename -- "${BASH_SOURCE[0]}")"
 
-## Bound the best-effort filesystem ops in error_handler, so a stuck home dir
-## cannot hang the error path. Matches msgprogressbar.
 timeout_command=("timeout" "--kill-after" "1" "2")
 
-## Every optional CLI field, defaulted so a read before its flag is parsed is
-## safe under nounset. Also the two error_handler reads (my_command_line_
-## parameters, write_to_file). Color variables are NOT defaulted here: colors()
-## calls get_colors (which always defines every one, '' when disabled) and runs
-## before parse_cmd_options in main().
 cli=""
 done=""
 forceactive=""
@@ -107,11 +102,8 @@ error_handler() {
    if [ ! -d ~/".msgcollector" ]; then
       mkdir --parents ~/".msgcollector"
    fi
-   ## Owner-execute so the directory is traversable: a umask that masks the 0100
-   ## bit leaves ~/.msgcollector non-traversable and the write below fails with
-   ## EACCES. Kicksecure's default umask (027) does not mask it, so this is
-   ## defensive -- for a dir pre-created without owner-x. Every error path that
-   ## writes this log does the same (msgprogress, msgprogressbar, msgdispatcher).
+   ## Make sure permissions (including the execute bit, needed to access a dir)
+   ## are set properly
    "${timeout_command[@]}" chmod u+rwx -- ~/".msgcollector" || true
 
    if ! touch -- ~/".msgcollector/msgdispatcher-error.log" ; then
@@ -141,13 +133,6 @@ exit_code: ${exit_code}
 }
 
 require_option_value() {
-   ## Fail cleanly when a value-taking option is given with no value (it is the
-   ## last argument). Otherwise the following 'shift 2' would shift past the end
-   ## under 'set -o errexit' + 'shopt -s shift_verbose', trip the ERR trap and
-   ## report a bogus "script bug" instead of this clear message.
-   ## $1 - option name (for the message).
-   ## $2 - remaining argument count ("$#" at the call site, which counts the
-   ##      option itself); a value is present only when it is >= 2.
    if [ "${2}" -lt "2" ]; then
       printf '%s\n' "${BASH_SOURCE[0]}: ERROR: option ${1} requires a value."
       exit 1
@@ -167,10 +152,6 @@ parse_cmd_options() {
            --verbose)
                set -x
                verbose="1"
-               shift
-               ;;
-           --debug)
-               ## Accepted for compatibility; no debug behaviour is wired up.
                shift
                ;;
            --identifier)
@@ -210,14 +191,10 @@ parse_cmd_options() {
                   printf '%s\n' "${BASH_SOURCE[0]} ERROR: variable typex is empty."
                   exit 1
                fi
-               case "${typex}" in
-                  info|warning|error)
-                     ;;
-                  *)
-                     printf '%s\n' "${BASH_SOURCE[0]}: ERROR: invalid typex '${typex}' (expected info, warning, or error)."
-                     exit 1
-                     ;;
-               esac
+               if ! [[ "${typex}" =~ ^(info|warning|error)$ ]]; then
+                  printf '%s\n' "${BASH_SOURCE[0]}: ERROR: invalid typex '${typex}' (expected info, warning, or error)."
+                  exit 1
+               fi
                ;;
            --typexstatus)
                ## for --status
@@ -344,8 +321,7 @@ parse_cmd_options() {
                break
                ;;
            -*)
-               ## sanitize-echo: $1 is an untrusted caller argument; printing it
-               ## raw would let a crafted option inject terminal escapes.
+               ## $1 is potentially attacker-controlled.
                sanitize-echo -- "${scriptname}: unknown option: $1" >&2
                exit 1
                ;;
@@ -359,7 +335,6 @@ parse_cmd_options() {
    ## will remain in the "$@" positional parameters.
 
    if (( $# != 0 )); then
-      ## sanitize-echo: $1 is an untrusted caller argument (see above).
       sanitize-echo -- "${scriptname}: unknown option: $1" >&2
       exit 3
    fi
@@ -406,61 +381,36 @@ cli_links_to_footnotes() {
       footer="${footer}[${n}] ${url}"$'\n'
    done
    if [ "${n}" -gt 0 ]; then
-      ## Format kept to '%s'/'%s\n' only (R-030): rest, blank line, "Links:"
-      ## header, then the footer with no trailing newline.
       printf '%s\n' "${rest}"
       printf '%s\n' ''
       printf '%s\n' 'Links:'
       printf '%s' "${footer}"
    else
-      ## No trailing newline: a plain CLI message must render verbatim
-      ## (test_cli_rendering asserts 'See: <url>' stays exactly that). The n>0
-      ## path's trailing newline comes from $footer, not a deliberate terminator.
+      ## No trailing newline needed, the --messagecli code adds one when
+      ## printing to the terminal.
       printf '%s' "${rest}"
    fi
 }
 
 cli_translate_gui_markup() {
-   ## Translate a GUI (HTML) message into its CLI equivalent, in the order that
-   ## must run BEFORE strip-markup: color tags, hyperlinks, line breaks. Echoes
-   ## the transformed message. The color codes come from get_colors and are ''
-   ## when color is disabled, so nothing is inserted in that case.
-   trap "error_handler" ERR
-
+   ## Translate an HTML message into its CLI equivalent, in the order that must
+   ## run before strip-markup.
    local text
    text="$1"
 
-   ## Translate GUI color tags (<font color="...">) to terminal ANSI colors so a
-   ## single HTML message renders colored in BOTH the GUI and the CLI, in ONE
-   ## sed process. Safe here without regex escaping: the search tags are fixed
-   ## and carry no regex metacharacter, and the replacements come from get_colors
-   ## as raw SGR escapes ('\033[..m', no '&'/backslash/delimiter), so neither
-   ## side is reinterpreted. The delimiter is '#' for the '</font>' expression
-   ## because that tag contains '/'. Empty when color is disabled -> tag removed.
+   ## Translate color tags (<font color="...">) to terminal ANSI colors.
    text="$(printf '%s' "${text}" | sed \
       -e "s/<font color=\"green\">/${green:-}/g" \
       -e "s/<font color=\"orange\">/${yellow:-}/g" \
       -e "s/<font color=\"yellow\">/${yellow:-}/g" \
       -e "s/<font color=\"red\">/${red:-}/g" \
       -e "s#</font>#${reset:-}#g")"
-   ## Translate GUI hyperlinks (<a href="url">text</a>) to footnote form.
+
+   ## Translate hyperlinks to footnote form.
    text="$(cli_links_to_footnotes "${text}")"
-   ## Translate GUI line breaks (<br>, <br/>, <br />) to real newlines, so a
-   ## single HTML message keeps its line breaks on the CLI too. strip-markup
-   ## would otherwise drop <br> and run the lines together. The <br></br>
-   ## closing half is left for strip-markup to remove.
-   ##
-   ## Callers build multi-line HTML strings that carry BOTH a literal source
-   ## newline AND a <br> on each line (the newline is insignificant HTML
-   ## whitespace a browser collapses; the <br> is the actual break). Absorb the
-   ## whitespace on both sides of each <br> into the single newline it becomes,
-   ## so one logical break renders as one newline, not a blank line. -z (NUL
-   ## record separator) slurps the whole message into one pattern space so
-   ## [[:space:]] spans the source newlines; without it sed works line-by-line
-   ## and cannot see the newline adjacent to a line-leading <br>. An intentional
-   ## blank line (<br><br>, no whitespace between) still yields two newlines, and
-   ## a CLI-native message with literal newlines but no <br> is untouched. This
-   ## is a regex (all <br> spellings in one pass), so sed -zE stays here.
+
+   ## Translate line break taks to real newlines, but beware that these tags
+   ## are often accompanied by real newlines already.
    text="$(printf '%s' "${text}" | sed -zE -e 's#[[:space:]]*<br ?/?>[[:space:]]*#\n#g')"
 
    printf '%s' "${text}"
@@ -505,60 +455,42 @@ pretty_type_x() {
    fi
 }
 
-write_typecli_to_file() {
-   # $1 - type
-   # $2 - file
-   if [ "${onlyecho}" = "1" ]; then
-      return 0
-   fi
-   printf '%s\n' "$1" > "$2"
-}
-
 escalate_type_file() {
-   ## Write $2 (info|warning|error) to the type file $1 without DOWNGRADING an
-   ## existing higher severity (info < warning < error). A passive popup queue
-   ## aggregates several messages under one identifier, so -- like the messagex
-   ## _typex escalation -- the worst severity must win, not the last write.
-   ## Concurrent same-identifier writers are expected (the passive queue and
-   ## messagex both aggregate under one identifier), so the read-modify-write
-   ## runs under an exclusive flock on a per-type-file '<file>.lock' -- otherwise
-   ## two writers can both read the old value and the last to write downgrades.
-   # $1 - type file, $2 - new type
-   local type_file new
+   ## Write $2 (info|warning|error) to the type file $1 without downgrading an
+   ## existing higher severity
+   local type_file new lock_fd
    type_file="$1"
    new="$2"
+
    (
-      flock --exclusive 9
+      exec {lock_fd}>>"${type_file}.lock"
+      flock --exclusive -- "${lock_fd}"
+
       old=""
       if [ -f "${type_file}" ]; then
          old="$(cat -- "${type_file}" 2>/dev/null)" || true
       fi
+
       case "${old}" in
          error)
-            ## already the worst; never downgrade
             exit 0
             ;;
          warning)
-            [ "${new}" = "error" ] || exit 0
+           [ "${new}" = "error" ] || exit 0
             ;;
          info)
-            { [ "${new}" = "error" ] || [ "${new}" = "warning" ]; } || exit 0
+            [ "${new}" = "error" ] || [ "${new}" = "warning" ] || exit 0
             ;;
       esac
-      printf '%s\n' "${new}" > "${type_file}"
-   ) 9>>"${type_file}.lock"
+
+      if ! [ "${new}" = '' ]; then
+         printf '%s\n' "${new}" > "${type_file}"
+      fi
+   )
 }
 
-stdisplay_message() {
-   ## Sanitize a CLI message from stdin with stdisplay (stcat): drop non-ASCII
-   ## and every dangerous (non-SGR) escape, keep only a safe SGR subset. Honor
-   ## msgcollector's OWN color decision: get_colors (via colors()'s
-   ## ASSUME_TERM_PRESENT) can enable color where stdisplay's own NO_COLOR /
-   ## TERM=dumb defaults would disable SGR. If they disagreed, stdisplay would
-   ## replace only the ESC of a color we just inserted and leave visible '[..m'
-   ## debris. So when color is on (${green} set) force stdisplay to allow SGR
-   ## too. Non-SGR escapes (cursor moves, clears, OSC) are neutralized either
-   ## way -- that is the security guarantee, independent of the color policy.
+stcat_message() {
+   ## Sanitize a CLI message from stdin with stcat.
    if [ -n "${green:-}" ]; then
       env --unset=NO_COLOR COLORTERM=truecolor stcat
    else
@@ -612,8 +544,9 @@ collector() {
 
    ## {{ --titlecli
    if [ -n "${titlecli}" ]; then
-      ## --titlecli is parsed but not yet consumed by msgdispatcher.
-      true
+      ## variable ${titlecli} exists
+      ## TODO
+      true "TODO: --titlecli not yet implemented in msgdispatcher"
       #printf '%s\n' "${titlecli}" > "${msgcollector_run_dir}/${identifier}_titlecli"
    fi
    ## }}
@@ -643,70 +576,14 @@ collector() {
    ## }}
 
    ## {{ --typecli
-   if [ "${messagecli}" = "1" ]; then
-      ## Serialize the read-modify-write against a concurrent same-identifier
-      ## writer (see escalate_type_file): flock the type file, no truncate.
-      (
-         flock --exclusive 9
-         old_typecli=""
-         if [ -f "${msgcollector_run_dir}/${identifier}_typecli" ]; then
-            old_typecli="$(cat -- "${msgcollector_run_dir}/${identifier}_typecli")"
-         fi
-
-         if [ "${old_typecli:-}" = "info" ]; then
-            if [ "${typecli}" = "error" ]; then
-               ## Upgrade from info to error.
-               write_typecli_to_file "error" "${msgcollector_run_dir}/${identifier}_typecli"
-            elif [ "${typecli}" = "warning" ]; then
-               ## Upgrade from info to warning.
-               write_typecli_to_file "warning" "${msgcollector_run_dir}/${identifier}_typecli"
-            fi
-         elif [ "${old_typecli:-}" = "warning" ]; then
-            if [ "${typecli}" = "error" ]; then
-               ## Upgrade from warning to error.
-               write_typecli_to_file "error" "${msgcollector_run_dir}/${identifier}_typecli"
-            fi
-         elif [ "${old_typecli:-}" = "error" ]; then
-            true
-         else
-            if [ ! "${typecli}" = "" ]; then
-               write_typecli_to_file "${typecli}" "${msgcollector_run_dir}/${identifier}_typecli"
-            fi
-         fi
-      ) 9>>"${msgcollector_run_dir}/${identifier}_typecli.lock"
+   if [ "${messagecli}" = "1" ] && [ "${onlyecho}" != "1" ]; then
+      escalate_type_file "${msgcollector_run_dir}/${identifier}_typecli" "${typecli}"
    fi
    ## }}
 
    ## {{ --typex
    if [ "${messagex}" = "1" ]; then
-      ## Serialize the read-modify-write against a concurrent same-identifier
-      ## writer (see escalate_type_file): flock the type file, no truncate.
-      (
-         flock --exclusive 9
-         old_typex=""
-         if [ -f "${msgcollector_run_dir}/${identifier}_typex" ]; then
-            old_typex="$(cat -- "${msgcollector_run_dir}/${identifier}_typex")"
-         fi
-
-         if [ "${old_typex:-}" = "info" ]; then
-            if [ "${typex}" = "error" ]; then
-               ## Upgrade from info to error.
-               printf '%s\n' "error" > "${msgcollector_run_dir}/${identifier}_typex"
-            elif [ "${typex}" = "warning" ]; then
-               ## Upgrade from info to warning.
-               printf '%s\n' "warning" > "${msgcollector_run_dir}/${identifier}_typex"
-            fi
-         elif [ "${old_typex:-}" = "warning" ]; then
-            if [ "${typex}" = "error" ]; then
-               ## Upgrade from warning to error.
-               printf '%s\n' "error" > "${msgcollector_run_dir}/${identifier}_typex"
-            fi
-         elif [ "${old_typex:-}" = "error" ]; then
-            true
-         else
-            printf '%s\n' "${typex}" > "${msgcollector_run_dir}/${identifier}_typex"
-         fi
-      ) 9>>"${msgcollector_run_dir}/${identifier}_typex.lock"
+      escalate_type_file "${msgcollector_run_dir}/${identifier}_typex" "${typex}"
    fi
    ## }}
 
@@ -728,22 +605,15 @@ collector() {
       write_to_file="${msgcollector_run_dir}/${identifier}_messagecli"
       if [ -n "${message}" ]; then
          ## variable $message exists
-         ## Sanitize untrusted input up front: stdisplay (stcat) drops non-ASCII
-         ## and dangerous escape sequences, keeping only a safe SGR subset, so a
-         ## crafted string cannot confuse the markup translation or strip-markup
-         ## below. Terminal colors a caller legitimately embedded (e.g. the login
-         ## security check table) fall in that safe subset and survive.
-         message="$(printf '%s' "${message}" | stdisplay_message)"
-         ## Translate GUI markup (color tags, hyperlinks, line breaks) to CLI.
+         ## Sanitize non-ASCII first.
+         message="$(printf '%s' "${message}" | stcat_message)"
+         ## Translate GUI markup to CLI.
          message="$(cli_translate_gui_markup "${message}")"
-         ## Strip the remaining HTML tags for CLI display.
+         ## Strip any remaining HTML tags.
          message="$(strip-markup "${message}")"
-         ## Sanitize once more: strip-markup expands HTML entities, which can
-         ## reintroduce escape sequences. This second pass neutralizes them while
-         ## preserving the SGR the markup translation inserted. Combined with the
-         ## first pass, the color translation and strip-markup, this is as strong
-         ## as a 'sanitize-string' call, so unsanitized input is safe here.
-         message="$(printf '%s' "${message}" | stdisplay_message)"
+         ## Sanitize non-ASCII once more; strip-markup expands HTML entities,
+         ## which can reintroduce escape sequences.
+         message="$(printf '%s' "${message}" | stcat_message)"
          pretty_type_cli "${typecli}"
          message="[${p_type}] [${identifier}] ${message}"
          printf '%s\n' "${message}"
@@ -776,12 +646,6 @@ collector() {
          message="message was empty after sanitize-string."
       fi
       if [ -n "${typex}" ]; then
-         ## Dedicated passive-popup type file, kept separate from messagex's
-         ## _typex so msgdispatcher's passive path reads the caller's type
-         ## without colliding with a concurrent messagex for the same identifier.
-         ## msgdispatcher only maps this to a per-type icon, never runs it.
-         ## Escalate (never downgrade): a queued error keeps its error icon even
-         ## if a later info message is appended to the same popup.
          escalate_type_file "${msgcollector_run_dir}/${identifier}_passivepopupqueuextype" "${typex}"
       fi
       write_to_file="${msgcollector_run_dir}/${identifier}_passivepopupqueuex"
@@ -801,10 +665,10 @@ collector() {
       #printf '%s\n' "msgcollector: progressx: $progressx | caller: $PPID | $caller" >> /home/user/progresslog
 
       if [ "${verbose}" = "1" ]; then
-         bash -x "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/msgprogress" --identifier "${identifier}" --progressbaridx "${progressbaridx}" --progress "${progressx}"
+         bash -x "${MSGCOLLECTOR_PATH:-}/usr/libexec/msgcollector/msgprogress" --identifier "${identifier}" --progressbaridx "${progressbaridx}" --progress "${progressx}"
       else
          ## & disown to prevent long waiting.
-         "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/msgprogress" --identifier "${identifier}" --progressbaridx "${progressbaridx}" --progress "${progressx}" & disown
+         "${MSGCOLLECTOR_PATH:-}/usr/libexec/msgcollector/msgprogress" --identifier "${identifier}" --progressbaridx "${progressbaridx}" --progress "${progressx}" & disown
       fi
    fi
    ## }}
@@ -833,7 +697,7 @@ collector() {
       append_to_file
 
       ## Cannot run from msgdispatcher due to user mismatch permission issues.
-      "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/msgprogressbar" --identifier "${identifier}" --progressbaridx "${progressbaridx}" --progressbartitlex "${progressbartitlex}" --message "${message}" & disown
+      "${MSGCOLLECTOR_PATH:-}/usr/libexec/msgcollector/msgprogressbar" --identifier "${identifier}" --progressbaridx "${progressbaridx}" --progressbartitlex "${progressbartitlex}" --message "${message}" & disown
    fi
    ## }}
 }
@@ -1065,17 +929,16 @@ main() {
    trap "error_handler" ERR
    my_command_line_parameters="$*"
 
-   ## Before parse: parse_cmd_options' trace reads ${cyan}/${reset}.
    colors
 
    parse_cmd_options "$@"
 
-   source "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/msgcollector_shared"
+   source "${MSGCOLLECTOR_PATH:-}/usr/libexec/msgcollector/msgcollector_shared"
    ## sets: ${msgcollector_run_dir}
    folder_init
 
    ## provides: msgcollector_check, is_whole_number
-   source "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/check"
+   source "${MSGCOLLECTOR_PATH:-}/usr/libexec/msgcollector/check"
 
    if [ "${forget}" = "1" ]; then
       forget
@@ -1098,6 +961,6 @@ main() {
    true "$0: END"
 }
 
-if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
+if was_executed "${BASH_SOURCE[0]}"; then
    main "$@"
 fi

@@ -19,6 +19,9 @@ $bash_command_backup"
 $error_text"
    fi
 
+   ## Note that msgcollector itself doesn't support --debug, but that's OK
+   ## because SCRIPTNAME is not going to be 'msgcollector'. Only callers need
+   ## to support this option.
    if [ -f /usr/share/whonix/marker ]; then
       local MSG="<p>###############################################################################
 <br></br>## $SCRIPTNAME script bug.
