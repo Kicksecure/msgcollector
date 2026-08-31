@@ -31,7 +31,7 @@ msgdispatcher_pid_check() {
 }
 
 msgdispatcher_run_check() {
-   source "${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/msgcollector_shared"
+   source "${MSGCOLLECTOR_PATH:-}/usr/libexec/msgcollector/msgcollector_shared"
    ## sets: ${msgcollector_run_dir}
    folder_init
 
@@ -64,7 +64,7 @@ msgdispatcher_init() {
    #arg_max_bytes=138300
    arg_max_bytes=32768
 
-   output_tool="${MSGCOLLECTOR_REPO:-}/usr/libexec/msgcollector/msgcollector"
+   output_tool="${MSGCOLLECTOR_PATH:-}/usr/libexec/msgcollector/msgcollector"
    output_general="output_func_general"
    output_x="output_func_x"
    output_cli="output_func_cli"
